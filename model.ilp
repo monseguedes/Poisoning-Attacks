@@ -1,0 +1,24 @@
+\ Model Poisoning_Attack_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Maximize
+ 
+Subject To
+ cons_first_order_optimality_conditions_num_weights[1]:
+   1.354974489795918 weights_num[1] + 0.7091234723978087 weights_num[2]
+   + 1.15 self.weights_cat[1,1] + 1.15 bias = 0.1375359539789071
+ cons_first_order_optimality_conditions_num_weights[2]:
+   0.7091234723978087 weights_num[1] + 1.434828448946719 weights_num[2]
+   + 1.205955892681557 self.weights_cat[1,1] + 1.205955892681557 bias
+   = 0.1467783291046684
+ cons_first_order_optimality_conditions_cat_weights[1,_1]:
+   1.15 weights_num[1] + 1.205955892681557 weights_num[2]
+   + 2.661224489795918 self.weights_cat[1,1] + 2 bias = 0.2460850111856827
+ cons_first_order_optimality_conditions_bias: 1.15 weights_num[1]
+   + 1.205955892681557 weights_num[2] + 2 self.weights_cat[1,1] + 2 bias
+   = 0.2460850111856827
+Bounds
+ weights_num[1] free
+ weights_num[2] free
+ self.weights_cat[1,1] free
+ -infinity <= bias <= 0.0919480668109977
+End
