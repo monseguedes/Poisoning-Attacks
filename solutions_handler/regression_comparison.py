@@ -25,7 +25,7 @@ class ComparisonModel():
     def __init__(self, bilevel_instance_data: model.instance_class.InstanceData, 
                        bilevel_model: model.model_class.PoisonAttackModel,
                        ridge_instance_data: model.instance_class.InstanceData,
-                       ridge_model: model.RegressionModel):  
+                       ridge_model: model.model_class.RegressionModel):  
         """
         Given some data class and some model class, build a model to
         then compare to other model.

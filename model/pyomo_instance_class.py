@@ -204,6 +204,16 @@ class InstanceData():
         self.no_cat_features = self.cat_poison_dataframe.index.levshape[1]
         self.no_total_features = self.processed_x_train_dataframe.index.levshape[1]
         self.no_num_features = self.no_total_features - self.no_cat_features
+
+    def format_data(self):
+        # Order of sets
+        self.no_samples =   #No. of non-poisoned samples
+        self.no_features =   # No. of numerical features
+                
+        # Parameters
+        self.ridge_x_train_dataframe = 
+        self.y_train_dataframe = 
+        self.regularization = 
            
        
 
