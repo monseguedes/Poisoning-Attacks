@@ -2,10 +2,23 @@
 @author: Monse Guedes Ayala
 @project: Poisoning Attacks Paper
 
-This is the model building file for the bilevel model. It created a model class, and inside that class all 
-gurobipy objects, as well as a model class, are stored. It imports all functions from another scripts,
-data is given to the model as an input class, and lower-level variables are bounded usign the developed
-bounding procedure. 
+This is the model building file for the models.
+
+The PisonAttackModel is a model class, and inside that class all 
+gurobipy objects, as well as a model class, are stored. It imports 
+all functions from the auxiliary_functions scripts, data is given to 
+the model as an input class, and lower-level variables are bounded usign 
+the developed bounding procedure. 
+
+The RegressionModel is another model class, and inside that class 
+all gurobipy objects, as well as a model class, are stored. It imports 
+all functions from another scripts, data is given to the model as an input 
+class.
+
+The BenchmarkPoisonAttackModel is another model class, and inside that class 
+all pyomo objects are stored. It imports all functions from another script, data 
+is given to the model as an input class.
+
 """
 
 # Python Libraries
@@ -13,6 +26,8 @@ from os import path
 import gurobipy as gp
 from gurobipy import GRB
 import itertools
+import pyomo.environ as pyo
+import pyomo.kernel as pmo
 
 # Self-created modules
 import model.auxiliary_functions as aux
@@ -262,4 +277,209 @@ class PoisonAttackModel():
 
         print('Objective has been built')
 
+class RegressionModel():
+    """
+    This is the class of a unconstrained ridge regression model, 
+    which has all parameters, variables, and objective.
+    """ 
 
+    def __init__(self, m: gp.Model,  instance_data: model.instance_class.InstanceData, function='MSE', **kwds,):  # Use initialisation parameters from AbtractModel class
+        """
+        m: a gurobipy empty model.
+        instance_data: a class object with all data.
+        function: type of objective function to be used.
+        """
+
+        super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
+        self.model = m
+        self.function = function
+        self.build_parameters(instance_data)
+        self.build_variables(instance_data)
+        self.build_constraints()
+        self.build_objective()
+        self.model.update()
+        
+    def __repr__(self) -> str:
+        return super().__repr__()
+
+    def build_parameters(self, instance_data: model.instance_class.InstanceData):
+        """
+        Parameters of the single level model: 
+        - number of training samples.
+        - number of features.
+        - sets for each of the above numbers.
+        - data for features.
+        - response variable of training data.
+        - regularization parameter.
+        """
+
+        print('Defining parameters')
+        
+        # Order of sets
+        self.no_samples = instance_data.no_samples  #No. of non-poisoned samples
+        self.no_features = instance_data.no_features  # No. of numerical features
+        
+        print('No. training samples is:', self.no_samples)
+        
+        # Sets
+        self.samples_set = range(1, self.no_samples + 1)   # Set of non-poisoned samples 
+        self.features_set = range(1, self.no_features + 1)   # Set of numerical features
+
+        # Parameters
+        self.x_train = instance_data.ridge_x_train_dataframe.to_dict()
+        self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
+        self.regularization = instance_data.regularization
+
+        print('Parameters have been defined')
+
+    def build_variables(self, instance_data: model.instance_class.InstanceData):
+        """
+        Decision variables of single level model: 
+        - weights.
+        - bias term.
+        """
+
+        print('Creating variables')
+        
+        self.weights = self.model.addVars(self.features_set, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, ub=GRB.INFINITY ,name='weights')
+        self.bias = self.model.addVar(vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, ub=GRB.INFINITY, name='bias')
+
+        print('Variables have been created')
+
+    def build_constraints(self):
+        """
+        There are no constraints.
+        """
+
+        print('There are no constraints')
+
+    def build_objective(self):
+        """
+        Objective function of ridge regression. Maximize the mean squared error or the 
+        sum of least squares.
+        """
+
+        self.model.setObjective(aux.ridge_objective_function(self, self.function), GRB.MINIMIZE)
+
+        print('Objective has been built')
+
+class BenchmarkPoisonAttackModel(pmo.block):
+    def __init__(self,  instance_data: model.instance_class.InstanceData, **kwds):
+        super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
+        # Initialize the whole abstract model whenever PoisonAttackModel is created:
+        self.build_parameters(instance_data)
+        self.build_variables(instance_data)
+        self.build_constraints()
+        self.build_objective()
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+
+    def build_parameters(self, instance_data: model.instance_class.InstanceData):
+        """
+        Parameters of the single level model: sets and no. elements in sets for
+        features, normal samples, and poisoned samples; training features, training 
+        target, poison target, and regularization parameter. 
+        """
+        print('Defining parameters')
+        self.no_samples =  instance_data.no_samples #Number of non-poisoned samples
+        self.no_psamples =  instance_data.no_psamples #Number of poisoned samples
+        self.no_num_features =  instance_data.no_num_features #Number of features of feature vector
+        self.no_cat_features =  instance_data.no_cat_features
+        self.no_total_features =  instance_data.no_total_features
+
+        print('No. p samples is:', self.no_psamples)
+        
+        self.samples_set = range(1, self.no_samples + 1) #Set of non-poisoned samples 
+        self.psamples_set = range(1, self.no_psamples + 1) #Set of poisoned samples 
+        self.num_features_set = range(1, self.no_num_features + 1) #Set of elements in feature vector
+        self.cat_features_set = range(1, self.no_cat_features + 1)
+        self.total_features_set = range(1, self.no_total_features + 1)
+        
+        # Parameters
+        self.x_train = instance_data.processed_x_train_dataframe.to_dict()
+        self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
+        self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()
+        self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
+        self.regularization = instance_data.regularization
+        print('Parameters have been defined')
+
+
+    def build_variables(self, instance_data: model.instance_class.InstanceData):
+        """
+        Decision variables of single level model: features of poisoned samples, 
+        weights of regression model, and bias of regression model.
+        """
+
+        self.x_poison = pmo.variable_dict() # Numerical feature vector of poisoned samples
+        for psample in self.psamples_set:
+            for numfeature in  self.num_features_set:
+                self.x_poison[psample,numfeature] = pmo.variable(domain=pmo.PercentFraction)
+
+        upper_bound =  bnd.find_bounds(instance_data, self)
+        lower_bound = - upper_bound
+        
+        self.weights = pmo.variable_dict() # Weights for numerical features
+        for numfeature in self.total_features_set:
+            self.weights[numfeature] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
+        
+        self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
+        print('Variables have been created')
+
+    def build_constraints(self):
+        """
+        Constraints of the single-level reformulation: first order optimality conditions
+        for lower-level variables: weights and bias of regression model 
+        """
+        
+        print('Building num weights contraints')
+        self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
+        for numfeature in self.num_features_set:
+            print(numfeature)
+            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
+        
+        print('Building cat weights contraints')
+        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()  # There is one constraint per feature
+        for numfeature in self.num_features_set:
+            print(numfeature)
+            self.cons_first_order_optimality_conditions_cat_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
+
+        print('Building bias constraints')
+        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=aux.loss_function_derivative_bias(self), rhs=0)
+        
+        print('Constraints have been built')
+        
+    def build_objective(self):
+        """
+        Objective function of single-level reformulation, same as leader's 
+        objective for bi-level model.
+        """
+        
+        self.objective_function = pmo.objective(expr=aux.mean_squared_error(self), 
+                                                sense=pyo.maximize)
+
+        print('Objective has been built')
+    
+    def build_instance(self, instance_data: model.instance_class.InstanceData):
+        """
+        Builds a specific instance to be used when solving the model. 
+
+        Takes as input an object of an instance class that has several dataframes
+        as attributes.
+        """
+
+        # Data in dictionary format accepted by pyomo (see documentation for more info)
+        data_input = {None:
+            {'x_train' : instance_data.x_train_dataframe.to_dict()} |
+            instance_data.y_train_dataframe.to_dict() |
+            instance_data.y_poison_dataframe.to_dict() |
+            {'no_samples': {None: instance_data.no_samples},
+            'no_psamples': {None: instance_data.no_psamples},
+            'no_features': {None: instance_data.no_features},
+            'regularization': {None: instance_data.regularization}}    
+            }
+
+        # Create Data Instance
+        instance = self.create_instance(data_input, name=instance_data.iteration_count)
+        
+        return instance
