@@ -31,6 +31,7 @@ import pyomo.kernel as pmo
 
 # Self-created modules
 import model.auxiliary_functions as aux
+import model.pyomo_auxiliary_functions as paux
 import model.instance_class
 import algorithm.bounding_procedure as bnd
 
@@ -436,16 +437,16 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
         for numfeature in self.num_features_set:
             print(numfeature)
-            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
+            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
         
         print('Building cat weights contraints')
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()  # There is one constraint per feature
         for numfeature in self.num_features_set:
             print(numfeature)
-            self.cons_first_order_optimality_conditions_cat_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
+            self.cons_first_order_optimality_conditions_cat_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
 
         print('Building bias constraints')
-        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=aux.loss_function_derivative_bias(self), rhs=0)
+        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self), rhs=0)
         
         print('Constraints have been built')
         
@@ -455,7 +456,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         objective for bi-level model.
         """
         
-        self.objective_function = pmo.objective(expr=aux.mean_squared_error(self), 
+        self.objective_function = pmo.objective(expr=paux.mean_squared_error(self), 
                                                 sense=pyo.maximize)
 
         print('Objective has been built')
