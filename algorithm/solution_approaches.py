@@ -8,7 +8,6 @@ and solve models.
 
 # Self-created modules
 from model.model_class import *
-from model.ridge_model_class import *
 import model.instance_class as data
 
 # Python Libraries
