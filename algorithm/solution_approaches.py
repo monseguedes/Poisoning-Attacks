@@ -27,7 +27,8 @@ import matplotlib.pyplot as plt
 def solving_MINLP(dataset_name: str, 
                   poison_rate: int, 
                   training_samples: int,
-                  seed: int):
+                  seed: int,
+                  function = 'MSE'):
     """
     Algorithm for solving the MINLP bilevel model.
     """
@@ -40,7 +41,7 @@ def solving_MINLP(dataset_name: str,
     
     # Create model
     gurobi_model = gp.Model('Poisoning_Attack')
-    my_model = PoisonAttackModel(gurobi_model, instance_data)
+    my_model = PoisonAttackModel(gurobi_model, instance_data, function=function)
     m = my_model.model
     print('Model has been built')
 
@@ -78,6 +79,7 @@ def solving_MINLP(dataset_name: str,
 def ridge_regression(dataset_name: str,
                      training_samples: int, 
                      seed: int, 
+                     function='MSE',
                      initialized_solution=0,
                      poisoned=False,
                      poison_solutions=None,
@@ -99,7 +101,7 @@ def ridge_regression(dataset_name: str,
     
     # Create model
     gurobi_model = gp.Model('Regression_Model')
-    my_model = RegressionModel(gurobi_model, instance_data)
+    my_model = RegressionModel(gurobi_model, instance_data, function=function)
     m = my_model.model
     print('Model has been built')
 
