@@ -4,11 +4,19 @@
 
 Auxiliary module of package 'algorithm' with functions to apply solution approaches 
 and solve models.
+
+- solving_MINLP
+- ridge_regression
+- single_attack_strategy
+- iterative_attack_strategy
+
 """
 
 # Self-created modules
 from model.model_class import *
 import model.instance_class as data
+import model.pyomo_instance_class as benchmark_data
+
 
 # Python Libraries
 from os import path
@@ -19,6 +27,8 @@ import gurobipy as gp
 import time
 import csv
 import matplotlib.pyplot as plt
+import pyomo.environ as pyo
+
 
 
 # Main Functions to solve model
@@ -119,8 +129,42 @@ def ridge_regression(dataset_name: str,
 
     return my_model, instance_data, solutions_dict
 
+def single_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rate: int, seed: int, initialized_solution=0):
+    """
+    Algorithm for single attack strategy of benchmark paper.
 
+    Input parameters are: dataframe name, poison rate, seed (to control randomness), and initialized solution.
+    """
 
+    # Initialise data (ready for building first instance)
+    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name, 
+                                                seed=seed)
+    instance_data.prepare_instance(poison_rate=poison_rate, 
+                                   N=1)
+
+    # Create abstract model
+    model = BenchmarkPoisonAttackModel(instance_data)
+    
+    print('Model has been built')
+
+    print('Solving the model...')
+    # Solve model
+    results = opt.solve(model, load_solutions=True, tee=True)
+    # results = solver_manager.solve(model, load_solutions=True, tee=True, opt=opt)
+    print('Model has been solved')
+
+    ### Store results of the poison subset found during this iteration     
+    index = pd.MultiIndex.from_tuples(model.x_poison.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
+    poison_solution = pd.Series(model.x_poison.values(), index=index)  # Make a dataframe with solutions and desires index
+    new_x_train = poison_solution
+    new_x_train.name = 'x_train'
+    ###
+
+    solutions_dict = {'x_poison': poison_solution.to_dict(),
+                     'weights': model.weights.value,
+                     'bias': model.bias.value}
+    
+    return model, instance_data, solutions_dict
 
 
 
