@@ -30,7 +30,6 @@ import matplotlib.pyplot as plt
 import pyomo.environ as pyo
 
 
-
 # Main Functions to solve model
 
 def solving_MINLP(dataset_name: str, 
@@ -166,5 +165,55 @@ def single_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rat
     
     return model, instance_data, solutions_dict
 
+def iterative_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rate: int, no_psubsets: int, seed: int, initialized_solution=0):
+    """
+    Algorithm for iterative attack strategy. 
 
+    It starts by creating the abstract model, and an initial data object for creating the first 
+    instance. After this, while the iteration count is smaller than the number of subsets (there
+    is an iteration per subset), the model instance is created with the intance data object and the 
+    model is solved for current instance. After that, solutions are stored in a dataframe, and data
+    object for instance is updated to that current iteration becomes data. Then, we go back to start
+    of while loop and process is repeated for all subsets/iterations.
+    """
+
+    # Initializa data (ready for building first instance)
+    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name, seed=seed)
+    instance_data.prepare_instance(poison_rate=poison_rate, N=no_psubsets)
+
+    # Iteration count
+    iteration = instance_data.iteration_count
+
+    iterations_solutions = []
+    
+    while iteration <= no_psubsets: # There is an iteration for each poison subset
+        # Build instance for current iteration data
+        # Create abstract model
+        model = BenchmarkPoisonAttackModel(instance_data)
+
+        # Solve model
+        results = opt.solve(model, load_solutions=True, tee=True)
+
+        ### Store results of the poison subset found during this iteration     
+        index = pd.MultiIndex.from_tuples(model.x_poison.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
+        poison_solution = pd.Series([variable._value for variable in model.x_poison.values()], index=index)  # Make a dataframe with solutions and desires index
+        new_x_train = poison_solution
+        new_x_train.name = 'x_train'
+        ###
+
+        solutions_dict = {'x_poison': poison_solution.to_dict(),
+                         'weights': model.weights,
+                         'bias': model.bias.value}
+        iterations_solutions.append(solutions_dict)
+
+        # Modify data dataframes with results
+        instance_data.update_data(new_x_train=new_x_train)
+
+        iteration = instance_data.iteration_count
+        print('Iteration no. {} is finished'.format(iteration - 1))
+        print('Objective value is ', model.objective_function)
+
+    solutions = {'iteration no.' + str(iteration): solution for iteration, solution in enumerate(iterations_solutions)}
+
+    return model, instance_data, solutions
 
