@@ -90,10 +90,8 @@ def ridge_regression(dataset_name: str,
                      function='MSE',
                      initialized_solution=0,
                      poisoned=False,
-                     benchmark=False,
                      poison_solutions=None,
-                     bilevel_instance=None,
-                     benchmark_instance=None):
+                     bilevel_instance=None):
     """
     Fits a fit regression model. The goal of this function is to be able to 
     compare the performance of poisoned and nonpoisoned models.
@@ -108,9 +106,6 @@ def ridge_regression(dataset_name: str,
     if poisoned == True:   # Take as data the training samples + poisoning samples instead
         instance_data = bilevel_instance
         instance_data.append_poisoning_attacks(poison_solutions)
-
-    if benchmark == True:
-        instance_data = benchmark_instance
     
     # Create model
     gurobi_model = gp.Model('Regression_Model')

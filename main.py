@@ -63,3 +63,8 @@ comparison.store_comparison_metrics()
 print(bilevel_solutions)
 print(pridge_solutions)
 print(bilevel_model.upper_bound)
+
+benchmark_comparison = ComparisonModel(bilevel_instance_data=benchmark_instance,
+                                       bilevel_model=benchmark_model,
+                                       ridge_instance_data=ridge_instance,
+                                       ridge_model=ridge_model)

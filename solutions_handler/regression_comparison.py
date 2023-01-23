@@ -71,6 +71,31 @@ class ComparisonModel():
 
         return self.pred_bilevel_y_train
 
+    def make_benchmark_predictions(self, 
+                                   solutions: dict):   
+        """
+        Take the regression coefficents given by solving the model
+        and use them to make predictions.
+        """
+        
+        # Define vector of size rows of data_dataframe, and with bias in all terms.
+        self.pred_p_y_train = np.repeat(solutions['bias'], len(self.data_dataframe))
+
+        # Take columns one by one, convert them to vector, and multiply them by the corresponding weights
+        for column in self.data_dataframe.columns:
+            if ':' not in column:
+                column_index = int(column)
+                self.pred_benchmark_y_train += self.data_dataframe[column] * self.bilevel_model.weights_num[column_index].X
+            else:
+                column_index = [int(index) for index in column.split(':')]
+                self.pred_benchmark_y_train += self.data_dataframe[column] * self.bilevel_model.weights_cat[(column_index[0], column_index[1])].X
+        
+        self.dataframe = self.data_dataframe
+        self.dataframe['actual_y_train'] = self.y_train 
+        self.dataframe['pred_p_y_train'] = self.pred_p_y_train
+
+        return self.pred_p_y_train
+
     def make_non_poisoned_predictions(self):
         """
         Take the regression coefficents given by solving the nonpoisoned model
