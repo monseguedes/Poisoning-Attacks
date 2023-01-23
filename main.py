@@ -17,7 +17,7 @@ import pandas as pd
 
 model_parameters = {'dataset_name': 'smallvtest', 
                     'poison_rate': 20,
-                    'training_samples': 10,
+                    'training_samples': 12,
                     'seed': 0}
 
 

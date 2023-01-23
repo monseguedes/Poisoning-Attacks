@@ -215,17 +215,27 @@ class InstanceData():
         poisoning_df = pd.concat([num_df, cat_df], axis=1)
 
         # Join original and poisoned dataframe
-        whole_df = pd.concat([df, poisoning_df], axis=0)
-        whole_df.reset_index(inplace=True, drop=True)
-        whole_df.index += 1
+        self.whole_df = pd.concat([df, poisoning_df], axis=0)
+        self.whole_df.reset_index(inplace=True, drop=True)
+        self.whole_df.index += 1
+        self.whole_df.columns = [count + 1 for count, value in enumerate(self.whole_df.columns)]
+        self.no_features = len(self.whole_df.columns)
+        self.no_samples = len(self.whole_df.index)
+        self.whole_df = self.whole_df.stack().rename_axis(index={None: 'feature'}) 
 
         # Add poisoning y to training y
         y_train = self.y_train_dataframe.copy(deep=True)
         y_poison = self.y_poison_dataframe.copy(deep=True)
         y_poison.rename(columns={'y_poison':'y_train'}, inplace=True)
-        whole_y = pd.concat([y_train, y_poison])
-        whole_y.reset_index(inplace=True, drop=True)
-        whole_y.index += 1
+        self.whole_y = pd.concat([y_train, y_poison])
+        self.whole_y.reset_index(inplace=True, drop=True)
+        self.whole_y.index += 1
+         
+        # Update objects that will be used as parameters.
+        self.ridge_x_train_dataframe = self.whole_df
+        self.y_train_dataframe = self.whole_y
+    
+
 
 
 

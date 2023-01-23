@@ -102,6 +102,8 @@ class ComparisonModel():
         figure = sns.scatterplot(data=self.bilevel_dataframe, x='actual_y_train', y='pred_bilevel_y_train', label='Poisoned')
         sns.scatterplot(data=self.ridge_dataframe, x='actual_y_train', y='pred_ridge_y_train', label='Non-poisoned')
         figure.set_aspect('equal', adjustable='box')
+        plt.xlim([-0.1,1.1])
+        plt.ylim([-0.1,1.1])
         plt.title('Actual vs Predicted for Training Data')
         plt.xlabel('Actual')
         plt.ylabel('Predicted')
