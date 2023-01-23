@@ -33,6 +33,7 @@ import pyomo.kernel as pmo
 import model.auxiliary_functions as aux
 import model.pyomo_auxiliary_functions as paux
 import model.instance_class
+import model.pyomo_instance_class
 import algorithm.bounding_procedure as bnd
 
 class PoisonAttackModel():
@@ -365,7 +366,7 @@ class RegressionModel():
         print('Objective has been built')
 
 class BenchmarkPoisonAttackModel(pmo.block):
-    def __init__(self,  instance_data: model.instance_class.InstanceData, **kwds):
+    def __init__(self,  instance_data: model.pyomo_instance_class.InstanceData, **kwds):
         super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
         # Initialize the whole abstract model whenever PoisonAttackModel is created:
         self.build_parameters(instance_data)
@@ -376,7 +377,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
     def __repr__(self) -> str:
         return super().__repr__()
 
-    def build_parameters(self, instance_data: model.instance_class.InstanceData):
+    def build_parameters(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
         Parameters of the single level model: sets and no. elements in sets for
         features, normal samples, and poisoned samples; training features, training 
@@ -406,7 +407,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print('Parameters have been defined')
 
 
-    def build_variables(self, instance_data: model.instance_class.InstanceData):
+    def build_variables(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
         Decision variables of single level model: features of poisoned samples, 
         weights of regression model, and bias of regression model.
@@ -461,7 +462,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         print('Objective has been built')
     
-    def build_instance(self, instance_data: model.instance_class.InstanceData):
+    def build_instance(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
         Builds a specific instance to be used when solving the model. 
 
