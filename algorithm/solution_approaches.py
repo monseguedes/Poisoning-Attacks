@@ -56,9 +56,14 @@ def solving_MINLP(dataset_name: str,
     # Solve model
     print('Solving the model...')
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.01
+    m.params.FeasibilityTol = 0.000001
     results = m.optimize()
     print('Model has been solved')
+    m.write('out.sol')
+
+    # m.read('out.sol')
+    # m.update()
+    # results = m.optimize()
 
     ### Store results
     index = pd.MultiIndex.from_tuples(my_model.x_poison_num.keys(), 
@@ -178,8 +183,8 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_
     """
 
     # Initializa data (ready for building first instance)
-    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name, seed=seed)
-    instance_data.prepare_instance(poison_rate=poison_rate, N=no_psubsets)
+    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name)
+    instance_data.prepare_instance(poison_rate=poison_rate, N=no_psubsets, seed=seed)
 
     # Iteration count
     iteration = instance_data.iteration_count

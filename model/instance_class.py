@@ -42,7 +42,7 @@ class InstanceData():
         self.poison_rate = poison_rate / 100    # 4, 8, 12, 16, or 20
 
         # Run all necessary methods
-        self.create_dataframes(training_samples, seed)
+        self.create_dataframes(training_samples, self.seed)
         self.split_dataframe()
         self.num_cat_split()
         self.poison_samples()
@@ -65,8 +65,8 @@ class InstanceData():
 
         # Pick fixed number of trainig samples.
         self.train_dataframe = self.whole_dataframe.sample(frac=None, 
-                                                            n=training_samples, 
-                                                            random_state=seed) # The indexes are not reset, but randomly shuffled 
+                                                           n=training_samples, 
+                                                           random_state=seed) # The indexes are not reset, but randomly shuffled 
     
         # Store rest of samples, which will be further divided into testing and validating sets
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  

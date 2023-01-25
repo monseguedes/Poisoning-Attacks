@@ -135,7 +135,12 @@ class ComparisonModel():
         plt.xlabel('Actual')
         plt.ylabel('Predicted')
         plt.legend()
-        plt.savefig('actual_vs_predicted.png')
+        plt.savefig('actual_vs_predicted' + '_' +
+                     str(self.bilevel_model.no_numfeatures) + '_' + 
+                     str(self.bilevel_model.no_catfeatures) + '_' +
+                     str(len(self.bilevel_dataframe)) + '_' +
+                     str(int(self.bilevel_instance_data.poison_rate * 100)) + 
+                     '.png')
         plt.show()
 
     def store_comparison_metrics(self):

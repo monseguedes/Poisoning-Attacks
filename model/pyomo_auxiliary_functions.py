@@ -60,7 +60,7 @@ def loss_function_derivative_num_weights(model, j):
 
 def loss_function_derivative_cat_weights(model, j):
     """
-    Finds the derivetive of the loss function (follower's objective) with respect to 
+    Finds the derivative of the loss function (follower's objective) with respect to 
     the weights of the linear regression model, and sets it to 0 (first order optimality
     condition).
     """

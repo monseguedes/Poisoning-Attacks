@@ -12,7 +12,7 @@ from os import path
 from math import floor
 
 class InstanceData():
-    def __init__(self, dataset_name: str, seed: int):    # Right now names are either 'pharm', or 'house'
+    def __init__(self, dataset_name: str):    # Right now names are either 'pharm', or 'house'
         """
         The initialization corresponds to the data for the first iteration. If there are no iterations (single attack strategy), 
         it still works with N=1.
@@ -23,15 +23,15 @@ class InstanceData():
         seed: seed for different random splits of training, validation and testing sets
         """
 
-        self.iteration_count = 1    # To keep track of iteration count
-        self.dataset_directory = ''.join(['data/', dataset_name])    # e.g., data/pharm
-        self.seed = seed
+        self.dataset_directory = ''.join(['data/', dataset_name])  
     
-    def prepare_instance(self, poison_rate: int, N: int):
+    def prepare_instance(self, poison_rate: int, training_samples: int, seed: int,  N: int):
         """
         TODO: fill
         """
     
+        self.seed = seed
+
         # Poisoning parameters
         self.poison_rate = poison_rate / 100    # 4, 8, 12, 16, or 20
         self.no_poisson_subsets = N    # no. of subsets in which the total poisson samples (gotten after applying rate to training data) is divided
@@ -207,13 +207,13 @@ class InstanceData():
 
     def format_data(self):
         # Order of sets
-        self.no_samples =   #No. of non-poisoned samples
-        self.no_features =   # No. of numerical features
+        self.no_samples = 1  #No. of non-poisoned samples
+        self.no_features = 1  # No. of numerical features
                 
         # Parameters
-        self.ridge_x_train_dataframe = 
-        self.y_train_dataframe = 
-        self.regularization = 
+        self.ridge_x_train_dataframe = 1
+        self.y_train_dataframe = 1
+        self.regularization = 1
            
        
 
