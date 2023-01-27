@@ -56,7 +56,8 @@ def solving_MINLP(dataset_name: str,
     # Solve model
     print('Solving the model...')
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.000001
+    m.params.FeasibilityTol = 0.00001
+    m.params.TimeLimit = 600
     results = m.optimize()
     print('Model has been solved')
     m.write('out.sol')

@@ -135,7 +135,7 @@ class ComparisonModel():
         plt.xlabel('Actual')
         plt.ylabel('Predicted')
         plt.legend()
-        plt.savefig('actual_vs_predicted' + '_' +
+        plt.savefig('plots/actual_vs_predicted' + '_' +
                      str(self.bilevel_model.no_numfeatures) + '_' + 
                      str(self.bilevel_model.no_catfeatures) + '_' +
                      str(len(self.bilevel_dataframe)) + '_' +

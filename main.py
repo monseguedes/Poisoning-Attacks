@@ -15,9 +15,9 @@ import gurobipy as gp
 import os
 import pandas as pd
 
-model_parameters = {'dataset_name': '1num1cat', 
-                    'poison_rate': 4,
-                    'training_samples': 300,
+model_parameters = {'dataset_name': '5num1cat', 
+                    'poison_rate': 20,
+                    'training_samples': 10,
                     'seed': 2,
                     'function': 'MSE',
                     'no_psubsets': 2}
