@@ -87,9 +87,10 @@ def solving_MINLP(dataset_name: str,
         writer.writerows(m._data)
 
     # Plot bounds
-    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', header=['Time', 'Objective', 'Bound'])
-    bounds_df.set_index('Time')
-    bounds_df.plot()
+    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', names=['Time', 'Objective', 'Bound'], header=None)
+    bounds_df = bounds_df.iloc[5:]
+    bounds_df.set_index('Time', drop=True)
+    bounds_df[['Objective', 'Bound']].plot(marker='.')
     plt.title('Evolution of Incumbent and Upper-Bound')
     plt.ylabel('Objective value')
     plt.xlabel('Time (s)')
@@ -100,9 +101,9 @@ def solving_MINLP(dataset_name: str,
     print('Model has been solved')
 
     m.write('out.sol')
-    # m.read('out.sol')
-    # m.update()
-    # results = m.optimize()
+    m.read('out.sol')
+    m.update()
+    results = m.optimize()
 
     ### Store results
     index = pd.MultiIndex.from_tuples(my_model.x_poison_num.keys(), 
