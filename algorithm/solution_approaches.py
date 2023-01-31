@@ -53,15 +53,53 @@ def solving_MINLP(dataset_name: str,
     m = my_model.model
     print('Model has been built')
 
+    def data_cb(model, where):
+        if where == gp.GRB.Callback.MIP:
+            cur_obj = model.cbGet(gp.GRB.Callback.MIP_OBJBST)
+            cur_bd = model.cbGet(gp.GRB.Callback.MIP_OBJBND)
+
+            # Did objective value or best bound change?
+            if model._obj != cur_obj or model._bd != cur_bd:
+                model._obj = cur_obj
+                model._bd = cur_bd
+                model._data.append([time.time() - m._start, cur_obj, cur_bd])
+
     # Solve model
+    m._obj = None
+    m._bd = None
+    m._data = []
+    m._start = time.time()
+
     print('Solving the model...')
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.00001
+    m.params.FeasibilityTol = 0.0001
     m.params.TimeLimit = 600
-    results = m.optimize()
-    print('Model has been solved')
-    m.write('out.sol')
+    results = m.optimize(callback=data_cb)
 
+    file_name = '_'.join(['bounds',
+                          str(my_model.no_numfeatures),
+                          str(my_model.no_catfeatures),
+                          str(len(instance_data.x_train_dataframe)),
+                          str(int(instance_data.poison_rate * 100))])
+
+    with open('bounds/' + file_name + '.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerows(m._data)
+
+    # Plot bounds
+    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', header=['Time', 'Objective', 'Bound'])
+    bounds_df.set_index('Time')
+    bounds_df.plot()
+    plt.title('Evolution of Incumbent and Upper-Bound')
+    plt.ylabel('Objective value')
+    plt.xlabel('Time (s)')
+    plt.savefig('bounds/' + 'plot_' + file_name + '.png')
+    plt.close()
+
+
+    print('Model has been solved')
+
+    m.write('out.sol')
     # m.read('out.sol')
     # m.update()
     # results = m.optimize()

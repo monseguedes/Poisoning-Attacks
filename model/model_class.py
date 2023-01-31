@@ -169,7 +169,7 @@ class PoisonAttackModel():
         
         print('Variables have been created')
 
-    def build_constraints(self, trilinear_envelopes=False):
+    def build_constraints(self, trilinear_envelopes=True):
         """
         Constraints of the single-level reformulation: 
         - SOS 1 constraints for categorical features.
