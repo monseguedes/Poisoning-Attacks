@@ -2,7 +2,7 @@
 @author: Monse Guedes Ayala
 @project: Poisoning Attacks Paper
 
-TODO:fill
+Functions necessary to evaluate the performance of poisoning attacks. 
 """
 
 import numpy as np

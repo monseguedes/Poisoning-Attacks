@@ -379,80 +379,102 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
     def build_parameters(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
+        PYOMO
         Parameters of the single level model: sets and no. elements in sets for
         features, normal samples, and poisoned samples; training features, training 
         target, poison target, and regularization parameter. 
         """
-        print('Defining parameters')
-        self.no_samples =  instance_data.no_samples #Number of non-poisoned samples
-        self.no_psamples =  instance_data.no_psamples #Number of poisoned samples
-        self.no_num_features =  instance_data.no_num_features #Number of features of feature vector
-        self.no_cat_features =  instance_data.no_cat_features
-        self.no_total_features =  instance_data.no_total_features
 
-        print('No. p samples is:', self.no_psamples)
+        print('Defining parameters')
+       
+        # Order of sets
+        self.no_samples = instance_data.no_samples  #No. of non-poisoned samples
+        self.no_psamples = instance_data.no_psamples  #No. of poisoned samples
+        self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
+        self.no_catfeatures = instance_data.no_catfeatures  # No. of categorical features
+        print('No. training samples is:', self.no_samples)
+        print('No. poisoning samples is:', self.no_psamples)
         
-        self.samples_set = range(1, self.no_samples + 1) #Set of non-poisoned samples 
-        self.psamples_set = range(1, self.no_psamples + 1) #Set of poisoned samples 
-        self.num_features_set = range(1, self.no_num_features + 1) #Set of elements in feature vector
-        self.cat_features_set = range(1, self.no_cat_features + 1)
-        self.total_features_set = range(1, self.no_total_features + 1)
-        
+        # Sets
+        self.samples_set = range(1, self.no_samples + 1)   # Set of non-poisoned samples 
+        self.psamples_set = range(1, self.no_psamples + 1)   # Set of poisoned samples 
+        self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
+        self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
+        self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
+
         # Parameters
-        self.x_train = instance_data.processed_x_train_dataframe.to_dict()
+        self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
+        self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
-        self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()
         self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
         self.regularization = instance_data.regularization
-        print('Parameters have been defined')
 
+        print('Parameters have been defined')
 
     def build_variables(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
+        PYOMO
         Decision variables of single level model: features of poisoned samples, 
         weights of regression model, and bias of regression model.
         """
 
-        self.x_poison = pmo.variable_dict() # Numerical feature vector of poisoned samples
+        print('Creating variables')
+
+        self.x_poison_num = pmo.variable_dict() # Numerical feature vector of poisoned samples
         for psample in self.psamples_set:
-            for numfeature in  self.num_features_set:
-                self.x_poison[psample,numfeature] = pmo.variable(domain=pmo.PercentFraction)
+            for numfeature in  self.numfeatures_set:
+                self.x_poison_num[psample,numfeature] = pmo.variable(domain=pmo.PercentFraction)
 
         upper_bound =  bnd.find_bounds(instance_data, self)
         lower_bound = - upper_bound
         
-        self.weights = pmo.variable_dict() # Weights for numerical features
-        for numfeature in self.total_features_set:
-            self.weights[numfeature] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
+        self.weights_num = pmo.variable_dict() # Weights for numerical features
+        for numfeature in self.numfeatures_set:
+            self.weights_num[numfeature] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
+
+        self.categories_sets = {}
+        for i in self.catfeatures_set:
+            self.categories_sets[i] = range(self.no_categories[i])
+
+        def default_var(i, j):
+            return pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
+
+        self.weights_cat = pmo.variable_dict(self.catfeatures_set, 
+                                             self.categories_sets,
+                                             default=default_var)
         
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
         print('Variables have been created')
 
     def build_constraints(self):
         """
+        PYOMO
         Constraints of the single-level reformulation: first order optimality conditions
         for lower-level variables: weights and bias of regression model 
         """
         
         print('Building num weights contraints')
         self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
-        for numfeature in self.num_features_set:
+        for numfeature in self.numfeatures_set:
             print(numfeature)
-            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
+            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
         
+        def default_con(i, j):
+            return pmo.constraint(body=aux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
+
         print('Building cat weights contraints')
-        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()  # There is one constraint per feature
-        for numfeature in self.num_features_set:
-            print(numfeature)
-            self.cons_first_order_optimality_conditions_cat_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
+        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict(self.catfeatures_set,
+                                                                                      self.categories_sets,
+                                                                                      default=default_con)  
 
         print('Building bias constraints')
-        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self), rhs=0)
+        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=aux.loss_function_derivative_bias(self), rhs=0)
         
         print('Constraints have been built')
-        
+            
     def build_objective(self):
         """
+        PYOMO
         Objective function of single-level reformulation, same as leader's 
         objective for bi-level model.
         """

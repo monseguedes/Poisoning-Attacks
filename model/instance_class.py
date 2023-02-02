@@ -29,7 +29,7 @@ class InstanceData():
     def prepare_instance(self, poison_rate: int, training_samples: int, seed: int):
         """
         Prepares the instance by creating dataframe, dividing it into poisoning samples and 
-        standard samples, defining the sizes of the sets involved in the modes, and the 
+        standard samples, defining the sizes of the sets involved in the model, and the 
         regularisation parameter. This depends on the poison rate.
         poisson_rate: 4, 8, 12, 16, 20.
         training_samples: no. training samples chosen from the whole data.
