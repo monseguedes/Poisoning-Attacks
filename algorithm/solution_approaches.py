@@ -97,13 +97,12 @@ def solving_MINLP(dataset_name: str,
     plt.savefig('bounds/' + 'plot_' + file_name + '.png')
     plt.close()
 
-
     print('Model has been solved')
 
     m.write('out.sol')
-    m.read('out.sol')
-    m.update()
-    results = m.optimize()
+    # m.read('out.sol')
+    # m.update()
+    # results = m.optimize()
 
     ### Store results
     index = pd.MultiIndex.from_tuples(my_model.x_poison_num.keys(), 
@@ -160,8 +159,8 @@ def ridge_regression(dataset_name: str,
 
     print('Solving the model...')
     # Solve model
-    m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.01
+    # m.params.NonConvex = 2
+    m.params.FeasibilityTol = 0.0001
     results = m.optimize()
     print('Model has been solved')
 
@@ -173,7 +172,11 @@ def ridge_regression(dataset_name: str,
 
     return my_model, instance_data, solutions_dict
 
-def single_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rate: int, seed: int, initialized_solution=0):
+def single_attack_strategy(opt: pyo.SolverFactory, 
+                           dataset_name: str, 
+                           poison_rate: int, 
+                           seed: int, 
+                           initialized_solution=0):
     """
     Algorithm for single attack strategy of benchmark paper.
 
@@ -210,7 +213,13 @@ def single_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rat
     
     return model, instance_data, solutions_dict
 
-def iterative_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_rate: int, no_psubsets: int, seed: int, initialized_solution=0):
+def iterative_attack_strategy(opt: pyo.SolverFactory, 
+                              dataset_name: str, 
+                              poison_rate: int,
+                              training_samples: int, 
+                              no_psubsets: int, 
+                              seed: int, 
+                              initialized_solution=0):
     """
     Algorithm for iterative attack strategy. 
 
@@ -224,7 +233,10 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_
 
     # Initializa data (ready for building first instance)
     instance_data = benchmark_data.InstanceData(dataset_name=dataset_name)
-    instance_data.prepare_instance(poison_rate=poison_rate, N=no_psubsets, seed=seed)
+    instance_data.prepare_instance(poison_rate=poison_rate,
+                                   training_samples=training_samples,
+                                   N=no_psubsets, 
+                                   seed=seed)
 
     # Iteration count
     iteration = instance_data.iteration_count
@@ -240,19 +252,20 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, dataset_name: str, poison_
         results = opt.solve(model, load_solutions=True, tee=True)
 
         ### Store results of the poison subset found during this iteration     
-        index = pd.MultiIndex.from_tuples(model.x_poison.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
-        poison_solution = pd.Series([variable._value for variable in model.x_poison.values()], index=index)  # Make a dataframe with solutions and desires index
-        new_x_train = poison_solution
-        new_x_train.name = 'x_train'
+        index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
+        poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
+        new_x_train_num = poison_solution
+        new_x_train_num.name = 'x_train_num'
         ###
 
-        solutions_dict = {'x_poison': poison_solution.to_dict(),
-                         'weights': model.weights,
+        solutions_dict = {'x_poison_num': poison_solution.to_dict(),
+                         'weights_num': model.weights_num,
+                         'weights_cat': model.weights_cat,
                          'bias': model.bias.value}
         iterations_solutions.append(solutions_dict)
 
         # Modify data dataframes with results
-        instance_data.update_data(new_x_train=new_x_train)
+        instance_data.update_data(new_x_train_num=new_x_train_num)
 
         iteration = instance_data.iteration_count
         print('Iteration no. {} is finished'.format(iteration - 1))

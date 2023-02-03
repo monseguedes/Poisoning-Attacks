@@ -177,10 +177,10 @@ def ridge_objective_function(model, function):
                         - model.y_train[k]) ** 2 \
                         for k in model.samples_set)
 
-    regularization_component = model.regularization * gp.quicksum(model.weights[r] ** 2 for r in model.features_set)
+    regularization_component = model.regularization * 1 / 2 * gp.quicksum(model.weights[r] ** 2 for r in model.features_set)
 
     if function == 'MSE':
-      obj = 1 / model.no_samples * sum_square_errors + regularization_component
+      obj = ((1 / model.no_samples) * sum_square_errors) + regularization_component
 
     elif function == 'SLS':
       obj = sum_square_errors + regularization_component

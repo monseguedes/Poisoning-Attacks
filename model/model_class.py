@@ -169,7 +169,7 @@ class PoisonAttackModel():
         
         print('Variables have been created')
 
-    def build_constraints(self, trilinear_envelopes=True):
+    def build_constraints(self, trilinear_envelopes=False):
         """
         Constraints of the single-level reformulation: 
         - SOS 1 constraints for categorical features.
@@ -405,6 +405,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         # Parameters
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
+        self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()['x_poison_cat']
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
         self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
         self.regularization = instance_data.regularization
@@ -434,14 +435,12 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         self.categories_sets = {}
         for i in self.catfeatures_set:
-            self.categories_sets[i] = range(self.no_categories[i])
+            self.categories_sets[i] = range(1, self.no_categories[i] + 1)
 
-        def default_var(i, j):
-            return pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
-
-        self.weights_cat = pmo.variable_dict(self.catfeatures_set, 
-                                             self.categories_sets,
-                                             default=default_var)
+        self.weights_cat = pmo.variable_dict()
+        for cat_feature in self.catfeatures_set:
+            for category in self.categories_sets[cat_feature]:
+                self.weights_cat[cat_feature, category] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
         
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
         print('Variables have been created')
@@ -457,18 +456,16 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
         for numfeature in self.numfeatures_set:
             print(numfeature)
-            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=aux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
+            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
         
-        def default_con(i, j):
-            return pmo.constraint(body=aux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
-
-        print('Building cat weights contraints')
-        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict(self.catfeatures_set,
-                                                                                      self.categories_sets,
-                                                                                      default=default_con)  
+        print('Building cat weights contraints') 
+        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
+        for cat_feature in self.catfeatures_set:
+            for category in self.categories_sets[cat_feature]:
+                self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
 
         print('Building bias constraints')
-        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=aux.loss_function_derivative_bias(self), rhs=0)
+        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self), rhs=0)
         
         print('Constraints have been built')
             
