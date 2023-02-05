@@ -11,6 +11,8 @@ import seaborn as sns
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
+import pyomo.environ as pyo
+
 
 import pandas as pd
 
@@ -71,30 +73,33 @@ class ComparisonModel():
 
         return self.pred_bilevel_y_train
 
-    def make_benchmark_predictions(self, 
-                                   solutions: dict):   
+    def make_benchmark_predictions(self, benchmark_model, benchmark_intance):   
         """
         Take the regression coefficents given by solving the model
         and use them to make predictions.
         """
+
+        self.benchmark_intance = benchmark_intance
+        self.benchmark_model = benchmark_model
+        self.benchmark_data_dataframe = self.benchmark_intance.x_train_dataframe.copy(deep=True)
         
         # Define vector of size rows of data_dataframe, and with bias in all terms.
-        self.pred_p_y_train = np.repeat(solutions['bias'], len(self.data_dataframe))
+        self.pred_benchmark_y_train = np.repeat(pyo.value(self.benchmark_model.bias), len(self.benchmark_data_dataframe))
 
         # Take columns one by one, convert them to vector, and multiply them by the corresponding weights
-        for column in self.data_dataframe.columns:
+        for column in self.benchmark_data_dataframe.columns:
             if ':' not in column:
                 column_index = int(column)
-                self.pred_benchmark_y_train += self.data_dataframe[column] * self.bilevel_model.weights_num[column_index].X
+                self.pred_benchmark_y_train += self.benchmark_data_dataframe[column] * self.benchmark_model.weights_num[column_index]._value
             else:
                 column_index = [int(index) for index in column.split(':')]
-                self.pred_benchmark_y_train += self.data_dataframe[column] * self.bilevel_model.weights_cat[(column_index[0], column_index[1])].X
+                self.pred_benchmark_y_train += self.benchmark_data_dataframe[column] * self.benchmark_model.weights_cat[(column_index[0], column_index[1])]._value
         
-        self.dataframe = self.data_dataframe
-        self.dataframe['actual_y_train'] = self.y_train 
-        self.dataframe['pred_p_y_train'] = self.pred_p_y_train
+        self.benchmark_dataframe = self.benchmark_data_dataframe
+        self.benchmark_dataframe['actual_y_train'] = self.y_train 
+        self.benchmark_dataframe['pred_benchmark_y_train'] = self.pred_benchmark_y_train
 
-        return self.pred_p_y_train
+        return self.pred_benchmark_y_train
 
     def make_non_poisoned_predictions(self):
         """
@@ -140,6 +145,33 @@ class ComparisonModel():
                      str(self.bilevel_model.no_catfeatures) + '_' +
                      str(len(self.bilevel_dataframe)) + '_' +
                      str(int(self.bilevel_instance_data.poison_rate * 100)) + 
+                     '.png')
+        plt.show()
+
+    def plot_actual_vs_pred_benchmark(self):
+        """
+        Take the predictions of both models
+        and plot them vs actual.
+        """
+
+        # Plot bilevel model
+        figure = sns.scatterplot(data=self.benchmark_dataframe, x='actual_y_train', y='pred_benchmark_y_train', label='Poisoned')
+        sns.scatterplot(data=self.ridge_dataframe, x='actual_y_train', y='pred_ridge_y_train', label='Non-poisoned')
+        figure.set_aspect('equal', adjustable='box')
+        max_value = max([max(self.benchmark_dataframe['actual_y_train']), 
+                         max(self.benchmark_dataframe['pred_benchmark_y_train']), 
+                         max(self.ridge_dataframe['pred_ridge_y_train'])])
+        plt.xlim([-0.05, max_value + 0.05])
+        plt.ylim([-0.05,max_value + 0.05])
+        plt.title('Actual vs Predicted for Training Data')
+        plt.xlabel('Actual')
+        plt.ylabel('Predicted')
+        plt.legend()
+        plt.savefig('plots/benchmark_actual_vs_predicted' + '_' +
+                     str(self.benchmark_model.no_numfeatures) + '_' + 
+                     str(self.benchmark_model.no_catfeatures) + '_' +
+                     str(len(self.benchmark_dataframe)) + '_' +
+                     str(int(self.benchmark_intance.poison_rate * 100)) + 
                      '.png')
         plt.show()
 

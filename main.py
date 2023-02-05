@@ -24,13 +24,13 @@ model_parameters = {'dataset_name': '5num1cat',
 
 
 # Solve using bilevel model
-# bilevel_model, bilevel_instance, bilevel_solutions = solving_MINLP(dataset_name=model_parameters['dataset_name'],
-#                                                                    poison_rate=model_parameters['poison_rate'],
-#                                                                    training_samples=model_parameters['training_samples'],
-#                                                                    seed=model_parameters['seed'],
-#                                                                    function=model_parameters['function'])
+bilevel_model, bilevel_instance, bilevel_solution = solving_MINLP(dataset_name=model_parameters['dataset_name'],
+                                                                   poison_rate=model_parameters['poison_rate'],
+                                                                   training_samples=model_parameters['training_samples'],
+                                                                   seed=model_parameters['seed'],
+                                                                   function=model_parameters['function'])
 
-# pridge_model, pridge_instance, pridge_solutions = ridge_regression(dataset_name=model_parameters['dataset_name'],
+# pridge_model, pridge_instance, pridge_solution = ridge_regression(dataset_name=model_parameters['dataset_name'],
 #                                                                    training_samples=model_parameters['training_samples'],
 #                                                                    seed=model_parameters['seed'],
 #                                                                    function=model_parameters['function'],
@@ -38,7 +38,7 @@ model_parameters = {'dataset_name': '5num1cat',
 #                                                                    poison_solutions=bilevel_solutions,
 #                                                                    bilevel_instance=bilevel_instance)
 
-ridge_model, ridge_instance, ridge_solutions = ridge_regression(dataset_name=model_parameters['dataset_name'],
+ridge_model, ridge_instance, ridge_solution = ridge_regression(dataset_name=model_parameters['dataset_name'],
                                                                 training_samples=model_parameters['training_samples'],
                                                                 seed=model_parameters['seed'],
                                                                 function=model_parameters['function'])
@@ -52,13 +52,16 @@ benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strat
                                                                                     no_psubsets = model_parameters['no_psubsets'], 
                                                                                     seed=model_parameters['seed'])
 
-# comparison = ComparisonModel(bilevel_instance_data=bilevel_instance,
-#                              bilevel_model=bilevel_model,
-#                              ridge_instance_data=ridge_instance,
-#                              ridge_model=ridge_model)
+comparison = ComparisonModel(bilevel_instance_data=bilevel_instance,
+                             bilevel_model=bilevel_model,
+                             ridge_instance_data=ridge_instance,
+                             ridge_model=ridge_model)
 
-# comparison.make_poisoned_predictions()
-# comparison.make_non_poisoned_predictions()
-# comparison.plot_actual_vs_pred()
+
+comparison.make_poisoned_predictions()
+comparison.make_non_poisoned_predictions()
+comparison.make_benchmark_predictions(benchmark_model=benchmark_model, benchmark_intance=benchmark_instance)
+comparison.plot_actual_vs_pred_benchmark()
+comparison.plot_actual_vs_pred()
 # comparison.store_comparison_metrics()
 

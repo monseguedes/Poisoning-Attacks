@@ -269,7 +269,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
 
         iteration = instance_data.iteration_count
         print('Iteration no. {} is finished'.format(iteration - 1))
-        print('Objective value is ', model.objective_function)
+        print('Objective value is ', pyo.value(model.objective_function))
 
     solutions = {'iteration no.' + str(iteration): solution for iteration, solution in enumerate(iterations_solutions)}
 

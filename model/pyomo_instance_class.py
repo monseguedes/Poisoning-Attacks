@@ -174,6 +174,7 @@ class InstanceData():
         self.complete_cat_poison_dataframe = self.poison_dataframe[self.cat_columns]
         self.complete_cat_poison_dataframe.index.name = 'sample'  
         self.complete_cat_poison_dataframe.index += 1   # Index starts at 1
+
         # Define poison data (x_poison_cat) for initial iteration
         self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[:self.no_psamples_per_subset].reset_index(drop=True)
         self.cat_poison_dataframe.index.name = 'sample' 
@@ -241,7 +242,6 @@ class InstanceData():
 
         # Add categorical features to new_x_train
         new_x_train_num = new_x_train_num.unstack(level=1)
-        # new_x_train_num.columns = [str(column) for column in new_x_train_num.columns]
         
         ### Update parameters dataframe
         # DATA FEATURES (x_train_num)
@@ -249,20 +249,10 @@ class InstanceData():
         self.num_x_train_dataframe.index += 1
         self.num_x_train_dataframe = self.num_x_train_dataframe.stack().rename_axis(index={None: 'feature'}) 
 
-        print(self.cat_x_train_dataframe)
-        extra_cat_dataframe = self.cat_poison_dataframe.copy()
-        extra_cat_dataframe = extra_cat_dataframe.rename_axis(index={'x_poison_cat': 'x_train_cat'})
-        print(extra_cat_dataframe)
-        self.cat_x_train_dataframe = pd.concat([self.cat_x_train_dataframe, extra_cat_dataframe], ignore_index=True)  # Add new x_train data (solutions) to old x_train data
-        self.cat_x_train_dataframe.index += 1
-        print(self.cat_poison_dataframe)
-        print(self.cat_x_train_dataframe)
-
-        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
-        # self.processed_x_train_dataframe =  self.x_train_dataframe.rename(columns={x:y for x,y in zip(self.x_train_dataframe.columns,range(1,len(self.x_train_dataframe.columns) + 1))})
-        # self.processed_x_train_dataframe = self.processed_x_train_dataframe[self.processed_x_train_dataframe.columns].stack().rename_axis(index={None: 'feature'})    
-        # self.processed_x_train_dataframe.name = 'x_train'
-        # self.processed_x_train_dataframe.index.rename('sample', level=0, inplace=True)
+        extra_cat_dataframe = self.cat_poison_dataframe.copy().rename(columns={'x_poison_cat': 'x_train_cat'})
+        first_level = [element for element in range(self.no_samples + 1 , self.no_samples + len(extra_cat_dataframe.index.get_level_values(0)) + 1)]
+        extra_cat_dataframe.index.set_levels(first_level, level=0, inplace=True)
+        self.cat_x_train_dataframe = pd.concat([self.cat_x_train_dataframe, extra_cat_dataframe], axis=0)  # Add new x_train data (solutions) to old x_train data
 
         # DATA TARGET (y_train)
         self.y_train_dataframe = pd.concat([self.y_train_dataframe, self.y_poison_dataframe.rename(columns={'y_poison':'y_train'})]).reset_index(drop=True) # Add poison target to main target dataframe since attacks from previpus iterations become data for next iteration
@@ -271,12 +261,19 @@ class InstanceData():
 
         # ATTACK CAT FEATURES
         self.cat_poison_dataframe = self.complete_cat_poison_dataframe[(self.iteration_count - 2) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
-                                                                       (self.iteration_count - 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
-        self.cat_poison_dataframe.index.rename('sample')
+                                                                       (self.iteration_count - 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration   
+
+        self.cat_poison_dataframe.index.name = 'sample'
         self.cat_poison_dataframe.index += 1
-        self.cat_poison_dataframe =  self.cat_poison_dataframe.rename(columns={x:y for x,y in zip(self.cat_poison_dataframe.columns,range(1,len(self.cat_poison_dataframe.columns) + 1))})
-        self.cat_poison_dataframe = self.cat_poison_dataframe[self.cat_poison_dataframe.columns].stack().rename_axis(index={None: 'feature'})    
+
+        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
+        self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(index={None: 'column'})   
         self.cat_poison_dataframe.name = 'x_poison_cat'
+        self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
+        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
+        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
+        self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.  
 
         # ATTACK TARGET (y_poison)
         self.y_poison_dataframe = self.complete_y_poison_dataframe[(self.iteration_count - 1) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
