@@ -87,12 +87,13 @@ class InstanceData():
                                                            inplace=False).reset_index(drop=True)    
         self.x_train_dataframe.index.name = 'sample'  
         self.x_train_dataframe.index += 1   # Index starts at 1
+
         
         # self.original_x_train_dataframe = self.x_train_dataframe
 
         # Set no. of samples variables.
         self.no_samples = len(self.x_train_dataframe.index)
-        self.no_features = len(self.x_train_dataframe.columns)
+        self.no_total_features = len(self.x_train_dataframe.columns)
 
         # Change dataframe column names to create dataframe for ridge model.
         self.ridge_x_train_dataframe = self.x_train_dataframe.copy()

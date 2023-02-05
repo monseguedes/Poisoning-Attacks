@@ -392,6 +392,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.no_psamples = instance_data.no_psamples  #No. of poisoned samples
         self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
         self.no_catfeatures = instance_data.no_catfeatures  # No. of categorical features
+        self.no_total_features = instance_data.no_total_features 
         print('No. training samples is:', self.no_samples)
         print('No. poisoning samples is:', self.no_psamples)
         
@@ -400,6 +401,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.psamples_set = range(1, self.no_psamples + 1)   # Set of poisoned samples 
         self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
         self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
+        print(self.psamples_set)
         self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
 
         # Parameters
@@ -462,7 +464,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
         for cat_feature in self.catfeatures_set:
             for category in self.categories_sets[cat_feature]:
-                self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, numfeature), rhs=0)
+                self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, cat_feature, category), rhs=0)
 
         print('Building bias constraints')
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self), rhs=0)

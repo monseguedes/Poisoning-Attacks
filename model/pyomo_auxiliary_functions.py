@@ -63,23 +63,23 @@ def loss_function_derivative_num_weights(model, j):
     
     return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
 
-def loss_function_derivative_cat_weights(model, j):
+def loss_function_derivative_cat_weights(model, j, w):
     """
     Finds the derivative of the loss function (follower's objective) with respect to 
     the weights of the linear regression model, and sets it to 0 (first order optimality
     condition).
     """
 
-    train_samples_component = sum((linear_regression_function(model, i) - model.y_train[i]) * model.x_poison_cat[i,model.no_total_features - model.no_num_features + j] 
+    train_samples_component = sum((linear_regression_function(model, i) - model.y_train[i]) * model.x_poison_cat[i, j, w] 
         for i in model.samples_set) #Component involving the sum of training samples errors
     poison_samples_component = sum((sum(model.x_poison_num[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
                                    sum(sum(model.weights_cat[j, z] * model.x_poison_cat[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
                                                                                                        for j in model.catfeatures_set) 
                                    + model.bias
                                    - model.y_poison[q]) 
-                                   * model.x_poison_cat[q,j] 
+                                   * model.x_poison_cat[q,j,w] 
                                    for q in model.psamples_set) #Component involving the sum of poison samples errors
-    regularization_component = model.regularization * model.weights_cat[j] #Component involving the regularization
+    regularization_component = model.regularization * model.weights_cat[j,w] #Component involving the regularization
     
     return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
 
