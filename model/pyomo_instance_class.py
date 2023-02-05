@@ -225,7 +225,7 @@ class InstanceData():
         """
         
         # Other parameters
-        self.regularization = 0.6612244897959183
+        self.regularization = 0.05
 
     def update_data(self, new_x_train_num: pd.DataFrame):
         """
@@ -241,17 +241,22 @@ class InstanceData():
 
         # Add categorical features to new_x_train
         new_x_train_num = new_x_train_num.unstack(level=1)
-        new_x_train_num.columns = [str(column) for column in new_x_train_num.columns]
-
-        # Make categorical features have matching indices to concatenate with numerical features.
-        categorical_features = self.cat_poison_dataframe.unstack(level=1)
-        categorical_features.columns = self.cat_columns
-        new_x_train = pd.concat([new_x_train, categorical_features], axis=1)
+        # new_x_train_num.columns = [str(column) for column in new_x_train_num.columns]
         
         ### Update parameters dataframe
-        # DATA FEATURES (x_train)
-        self.num_x_train_dataframe = pd.concat([self.num_x_train_dataframe, new_x_train_num], ignore_index=True)  # Add new x_train data (solutions) to old x_train data
+        # DATA FEATURES (x_train_num)
+        self.num_x_train_dataframe = pd.concat([self.num_x_train_dataframe.unstack(level=1), new_x_train_num], ignore_index=True)  # Add new x_train data (solutions) to old x_train data
         self.num_x_train_dataframe.index += 1
+        self.num_x_train_dataframe = self.num_x_train_dataframe.stack().rename_axis(index={None: 'feature'}) 
+
+        print(self.cat_x_train_dataframe)
+        extra_cat_dataframe = self.cat_poison_dataframe.copy()
+        extra_cat_dataframe = extra_cat_dataframe.rename_axis(index={'x_poison_cat': 'x_train_cat'})
+        print(extra_cat_dataframe)
+        self.cat_x_train_dataframe = pd.concat([self.cat_x_train_dataframe, extra_cat_dataframe], ignore_index=True)  # Add new x_train data (solutions) to old x_train data
+        self.cat_x_train_dataframe.index += 1
+        print(self.cat_poison_dataframe)
+        print(self.cat_x_train_dataframe)
 
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
         # self.processed_x_train_dataframe =  self.x_train_dataframe.rename(columns={x:y for x,y in zip(self.x_train_dataframe.columns,range(1,len(self.x_train_dataframe.columns) + 1))})
@@ -267,7 +272,6 @@ class InstanceData():
         # ATTACK CAT FEATURES
         self.cat_poison_dataframe = self.complete_cat_poison_dataframe[(self.iteration_count - 2) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
                                                                        (self.iteration_count - 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
-        
         self.cat_poison_dataframe.index.rename('sample')
         self.cat_poison_dataframe.index += 1
         self.cat_poison_dataframe =  self.cat_poison_dataframe.rename(columns={x:y for x,y in zip(self.cat_poison_dataframe.columns,range(1,len(self.cat_poison_dataframe.columns) + 1))})
@@ -279,14 +283,11 @@ class InstanceData():
                                                                     self.iteration_count * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
         self.y_poison_dataframe.index.rename('sample')
         self.y_poison_dataframe.index += 1
-        ###
 
         # Update sets
-        self.no_samples = self.processed_x_train_dataframe.index.levshape[0]
+        self.no_samples = len(self.y_train_dataframe.index)
         self.no_psamples = self.y_poison_dataframe.index.size
-        self.no_cat_features = self.cat_poison_dataframe.index.levshape[1]
-        self.no_total_features = self.processed_x_train_dataframe.index.levshape[1]
-        self.no_num_features = self.no_total_features - self.no_cat_features
+     
 
 
 

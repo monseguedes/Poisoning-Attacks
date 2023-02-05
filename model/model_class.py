@@ -401,7 +401,6 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.psamples_set = range(1, self.no_psamples + 1)   # Set of poisoned samples 
         self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
         self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
-        print(self.psamples_set)
         self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
 
         # Parameters

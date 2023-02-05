@@ -70,7 +70,7 @@ def loss_function_derivative_cat_weights(model, j, w):
     condition).
     """
 
-    train_samples_component = sum((linear_regression_function(model, i) - model.y_train[i]) * model.x_poison_cat[i, j, w] 
+    train_samples_component = sum((linear_regression_function(model, i) - model.y_train[i]) * model.x_train_cat[i, j, w] 
         for i in model.samples_set) #Component involving the sum of training samples errors
     poison_samples_component = sum((sum(model.x_poison_num[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
                                    sum(sum(model.weights_cat[j, z] * model.x_poison_cat[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
@@ -90,8 +90,7 @@ def loss_function_derivative_bias(model):
     condition).
     """
 
-    train_samples_component = sum((linear_regression_function(i, model.total_features_set, model.x_train, model.weights, model.bias) - model.y_train[i]) 
-        for i in model.samples_set)
+    train_samples_component = sum((linear_regression_function(model, i) - model.y_train[i]) for i in model.samples_set)
     poison_samples_component = sum(sum(model.x_poison_num[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
                                    sum(sum(model.weights_cat[j, z] * model.x_poison_cat[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
                                                                                                        for j in model.catfeatures_set) 
