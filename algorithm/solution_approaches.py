@@ -73,7 +73,7 @@ def solving_MINLP(dataset_name: str,
     print('Solving the model...')
     m.params.NonConvex = 2
     m.params.FeasibilityTol = 0.0001
-    m.params.TimeLimit = 600
+    m.params.TimeLimit = 100
     results = m.optimize(callback=data_cb)
 
     file_name = '_'.join(['bounds',

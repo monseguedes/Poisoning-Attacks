@@ -71,6 +71,22 @@ class InstanceData():
         # Store rest of samples, which will be further divided into testing and validating sets
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  
 
+        self.test_dataframe =  self.test_validation_dataframe.sample(frac=None, 
+                                                                     n=2 * training_samples, 
+                                                                     random_state=seed) # The indexes are not reset, but randomly shuffled 
+
+        self.test_dataframe = self.test_dataframe.reset_index(drop=True)
+        self.test_dataframe.index.name = 'sample'  
+        self.test_dataframe.index += 1   # Index starts at 1 
+        self.test_y = self.test_dataframe['target']  
+        self.test_dataframe = self.test_dataframe.drop(columns=['target'], 
+                                                       inplace=False)
+
+        # Change dataframe column names to create dataframe for ridge model.
+        self.test_ridge_x_train_dataframe = self.test_dataframe.copy()
+        self.test_ridge_x_train_dataframe.columns = [count + 1 for count, value in enumerate(self.test_dataframe.columns)]
+        self.test_ridge_x_train_dataframe = self.test_ridge_x_train_dataframe.stack().rename_axis(index={None: 'feature'})  
+
     def split_dataframe(self):
         """
         Splits training dataframe into features dataframe and target dataframe.
