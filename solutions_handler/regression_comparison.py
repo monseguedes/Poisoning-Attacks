@@ -245,7 +245,7 @@ class ComparisonModel():
         self.metrics_dataframe['non-MINLP increase'] = (self.metrics_dataframe['poisoned'] - self.metrics_dataframe['nonpoisoned']) / self.metrics_dataframe['nonpoisoned'] * 100
         self.metrics_dataframe['benchmark-MINLP increase'] = (self.metrics_dataframe['poisoned'] - self.metrics_dataframe['benchmark']) / self.metrics_dataframe['benchmark'] * 100
 
-        self.metrics_dataframe.to_csv('results/' + self.folder +  
+        self.metrics_dataframe.to_csv('solutions/' + self.folder +  
                                       '/all_actual_vs_predicted' + '_' +
                                       self.datatype + '_' +
                                       str(self.bilevel_model.no_numfeatures) + '_' + 

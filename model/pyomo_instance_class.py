@@ -226,7 +226,8 @@ class InstanceData():
         """
         
         # Other parameters
-        self.regularization = 0.05
+        self.regularization = 0.6612244897959183
+        self.regularization = 0.1
 
     def update_data(self, new_x_train_num: pd.DataFrame):
         """

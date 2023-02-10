@@ -203,7 +203,7 @@ class InstanceData():
         
         # Other parameters
         self.regularization = 0.6612244897959183
-        self.regularization = 0.05
+        self.regularization = 0.1
            
     def append_poisoning_attacks(self, solutions):
         """
