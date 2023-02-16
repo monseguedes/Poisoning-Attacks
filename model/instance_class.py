@@ -72,7 +72,7 @@ class InstanceData():
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  
 
         self.test_dataframe =  self.test_validation_dataframe.sample(frac=None, 
-                                                                     n=2 * training_samples, 
+                                                                     n=5 * training_samples, 
                                                                      random_state=seed) # The indexes are not reset, but randomly shuffled 
 
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
@@ -203,7 +203,7 @@ class InstanceData():
         
         # Other parameters
         self.regularization = 0.6612244897959183
-        self.regularization = 0.1
+        self.regularization = 0.01
            
     def append_poisoning_attacks(self, solutions):
         """

@@ -50,12 +50,12 @@ class DataSet():
 
         return self.model
 
-    def get_used_features(self):
+    def get_used_features(self, alpha):
         """
         Get the names of the features that LASSO assigns weights
         different than 0.
         """
-        self.fit_lasso()
+        self.fit_lasso(alpha=alpha)
         coeffs = self.model.coef_  
         bool_coeff = [False if coef == 0 else True for coef in coeffs]     
         self.used_features = [name for name, nonzero in zip(self.name_features, bool_coeff) if nonzero]
@@ -65,12 +65,24 @@ class DataSet():
 
         return self.coeffs_used_features
 
-    #def create_dataset(self, no_numerical, no_categorical):
+    def create_dataset(self, no_numerical: int, no_categorical: int):
+        """
+        Takes the most important features, and creates a dataframe with just them.
+        The number of numerical and categorical features can be chosen. 
+        """
+
+        # Get names of most important numerical features 
+        numerical_features = [name in self.used_features if ':' not in name]
+        if len(numerical_features) < no_numerical:
+            self.get_used_features()
+        # If numerical features smaller than the number we want, repeat lasso with alpha 0.001 smaller 
+
+
 
 
     #def export_dataset(self):
 
 
-test = DataSet('house')
-test.get_used_features()
+#test = DataSet('house')
+#test.get_used_features()
 

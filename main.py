@@ -15,13 +15,14 @@ import gurobipy as gp
 import os
 import pandas as pd
 
-model_parameters = {'dataset_name': '1num1cat', 
+
+model_parameters = {'dataset_name': '5num1cat', 
                     'poison_rate': 20,
                     'training_samples': 40,
-                    'seed': 2,
+                    'seed': 4,
                     'function': 'MSE',
                     'no_psubsets': 1,
-                    'datatype': 'train'}
+                    'datatype': 'test'}
 
 
 def run_experiment(model_parameters):
@@ -80,13 +81,13 @@ def run_experiment(model_parameters):
     comparison.make_poisoned_predictions()
     comparison.make_non_poisoned_predictions()
     comparison.make_benchmark_predictions(benchmark_model=benchmark_model, benchmark_intance=benchmark_instance)
-    comparison.plot_actual_vs_pred_benchmark()
     comparison.plot_actual_vs_pred()
+    comparison.plot_actual_vs_pred_benchmark()
     comparison.plot_actual_vs_predicted_all()
     comparison.store_comparison_metrics()
 
 # dictionaries = []
-# for i in [0,1,2,3,4,5]:
+# for i in range(10):
 #     model_parameters['seed'] = i
 #     dictionaries.append(model_parameters.copy())
 

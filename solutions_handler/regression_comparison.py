@@ -7,17 +7,23 @@ Functions necessary to evaluate the performance of poisoning attacks.
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 import seaborn as sns
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 import pyomo.environ as pyo
 
-
 import pandas as pd
 
 import model.instance_class
 import model.model_class
+
+sns.set_style("whitegrid")
+
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
 
 class ComparisonModel():
     """
@@ -139,15 +145,21 @@ class ComparisonModel():
         """
 
         # Plot bilevel model
-        figure = sns.scatterplot(data=self.bilevel_dataframe, x='actual_y_train', y='pred_bilevel_y_train', label='Poisoned')
-        sns.scatterplot(data=self.ridge_dataframe, x='actual_y_train', y='pred_ridge_y_train', label='Non-poisoned')
+        figure = sns.scatterplot(data=self.bilevel_dataframe, x='actual_y_train', y='pred_bilevel_y_train', label='Poisoned', color='red')
+        sns.scatterplot(data=self.ridge_dataframe, x='actual_y_train', y='pred_ridge_y_train', label='Non-poisoned', color='lightskyblue')
         figure.set_aspect('equal', adjustable='box')
         max_value = max([max(self.bilevel_dataframe['actual_y_train']), 
                          max(self.bilevel_dataframe['pred_bilevel_y_train']), 
                          max(self.ridge_dataframe['pred_ridge_y_train'])])
         plt.xlim([-0.05, max_value + 0.05])
         plt.ylim([-0.05,max_value + 0.05])
-        plt.title('Actual vs Predicted for Training Data')
+        # plt.xlim([-0.05, 0.6])
+        # plt.ylim([-0.05,0.6])
+        if self.datatype  == 'train':
+            plt.title('Actual vs Predicted for Training Data')
+        elif self.datatype == 'test':
+            #plt.title('Actual vs Predicted for Test Data')
+            a=1
         plt.xlabel('Actual')
         plt.ylabel('Predicted')
         plt.legend()
@@ -159,7 +171,7 @@ class ComparisonModel():
                      str(len(self.bilevel_dataframe)) + '_' +
                      str(int(self.bilevel_instance_data.poison_rate * 100)) + '_' +
                      str(self.bilevel_instance_data.seed) +
-                     '.png')
+                     '.png', transparent=True, bbox_inches = "tight")
         plt.show()
 
     def plot_actual_vs_pred_benchmark(self):
