@@ -50,7 +50,7 @@ class DataSet():
 
         return self.model
 
-    def get_used_features(self, alpha):
+    def get_used_features(self, alpha=0.006):
         """
         Get the names of the features that LASSO assigns weights
         different than 0.
@@ -72,17 +72,14 @@ class DataSet():
         """
 
         # Get names of most important numerical features 
-        numerical_features = [name in self.used_features if ':' not in name]
-        if len(numerical_features) < no_numerical:
-            self.get_used_features()
-        # If numerical features smaller than the number we want, repeat lasso with alpha 0.001 smaller 
-
-
-
+        #numerical_features = [name in self.used_features if ':' not in name]
+        # if len(numerical_features) < no_numerical:
+        #     self.get_used_features()
+        # # If numerical features smaller than the number we want, repeat lasso with alpha 0.001 smaller 
 
     #def export_dataset(self):
 
 
-#test = DataSet('house')
-#test.get_used_features()
+test = DataSet('house')
+test.get_used_features()
 
