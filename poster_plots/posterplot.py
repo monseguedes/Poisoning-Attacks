@@ -10,12 +10,15 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.linear_model
+import os
 
 from mpl_toolkits.mplot3d import Axes3D
-
-import model.instance_class as data
-
 from sklearn.linear_model import LinearRegression
+
+# Add path to be able to use module from other folder
+import sys
+sys.path.append('./model')                
+import instance_class as data
 
 sns.set_style("whitegrid")
 
@@ -70,11 +73,9 @@ def plot_regression_lines(dataset_name, feature):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.07), ncol=1, fontsize=20)
     plt.xticks(fontsize=20)
     plt.yticks(fontsize=20)
-
     plt.title('Effect of Additional Data', fontsize=30)
 
-    plt.savefig('bounding_coeff.pdf', transparent=True, bbox_inches = "tight")
-
+    plt.savefig('poster_plots/plots/bounding_coeff.pdf', transparent=True, bbox_inches = "tight")
     plt.show()
 
 def plot_3D_regression():
@@ -108,13 +109,10 @@ def plot_3D_regression():
     zs = xs*coefs[0]+ys*coefs[1]+intercept
     print("Equation: y = {:.2f} + {:.2f}x1 + {:.2f}x2".format(intercept, coefs[0],
                                                             coefs[1]))
-
     ax.plot_surface(xs,ys,zs, alpha=0.5, color='darkorange')
-
     plt.title('3D Regression Model', fontsize=24)
 
-    plt.savefig('3D_regression_example.pdf', transparent=True, bbox_inches = "tight")
-
+    plt.savefig('poster_plots/plots/3D_regression_example.pdf', transparent=True, bbox_inches = "tight")
     plt.show() 
     
 plot_regression_lines('house', 6)
