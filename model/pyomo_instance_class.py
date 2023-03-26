@@ -68,6 +68,20 @@ class InstanceData():
         
         # Store rest of samples, which will be further divided into testing and validating sets
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)
+    
+        # Store rest of samples, which will be further divided into testing and validating sets
+        self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  
+
+        self.test_dataframe =  self.test_validation_dataframe.sample(frac=None, 
+                                                                     n = min(5 * training_samples,len(self.test_validation_dataframe.index)), 
+                                                                     random_state=seed) # The indexes are not reset, but randomly shuffled 
+
+        self.test_dataframe = self.test_dataframe.reset_index(drop=True)
+        self.test_dataframe.index.name = 'sample'  
+        self.test_dataframe.index += 1   # Index starts at 1 
+        self.test_y = self.test_dataframe['target']  
+        self.test_dataframe = self.test_dataframe.drop(columns=['target'], 
+                                                       inplace=False)
 
     def split_dataframe(self):
         """

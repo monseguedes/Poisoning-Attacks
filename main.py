@@ -16,7 +16,7 @@ import os
 import pandas as pd
 
 
-model_parameters = {'dataset_name': '5num1cat', 
+model_parameters = {'dataset_name': '1num1cat', 
                     'poison_rate': 20,
                     'training_samples': 300,
                     'seed': 2,
@@ -30,40 +30,17 @@ folder = '_'.join([model_parameters['dataset_name'],
                     str(model_parameters['no_psubsets']),
                     str(model_parameters['seed'])])
 
-if not os.path.exists(os.path.join('solutions', folder)):
-    os.mkdir(os.path.join('solutions', folder))
+# TODO: have this code inside solution and plot generation.
+if not os.path.exists(os.path.join('results/scores', folder)):
+    os.mkdir(os.path.join('results/scores', folder))
 
 if not os.path.exists(os.path.join('plots', folder)):   
     os.mkdir(os.path.join('plots', folder))
 
-# Solve using bilevel model
-# bilevel_model, bilevel_instance, bilevel_solution = solving_MINLP(dataset_name=model_parameters['dataset_name'],
-#                                                                 poison_rate=model_parameters['poison_rate'],
-#                                                                 training_samples=model_parameters['training_samples'],
-#                                                                 seed=model_parameters['seed'],
-#                                                                 function=model_parameters['function'])
-
-# pridge_model, pridge_instance, pridge_solution = ridge_regression(dataset_name=model_parameters['dataset_name'],
-#                                                                    training_samples=model_parameters['training_samples'],
-#                                                                    seed=model_parameters['seed'],
-#                                                                    function=model_parameters['function'],
-#                                                                    poisoned=True,
-#                                                                    poison_solutions=bilevel_solutions,
-#                                                                    bilevel_instance=bilevel_instance)
-
-# ridge_model, ridge_instance, ridge_solution = ridge_regression(dataset_name=model_parameters['dataset_name'],
-#                                                                 training_samples=model_parameters['training_samples'],
-#                                                                 seed=model_parameters['seed'],
-#                                                                 function=model_parameters['function'])
-
-# Initiate solver object
-opt = pyo.SolverFactory('ipopt')
-benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
-                                                                                    dataset_name=model_parameters['dataset_name'], 
-                                                                                    poison_rate=model_parameters['poison_rate'],
-                                                                                    training_samples=model_parameters['training_samples'],
-                                                                                    no_psubsets = model_parameters['no_psubsets'], 
-                                                                                    seed=model_parameters['seed'])
+# Solve models
+bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
+ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
+benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
 
 # comparison = ComparisonModel(bilevel_instance_data=bilevel_instance,
 #                             bilevel_model=bilevel_model,

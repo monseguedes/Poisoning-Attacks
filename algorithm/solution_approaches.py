@@ -31,12 +31,81 @@ import pyomo.environ as pyo
 
 
 # Main Functions to solve model
+def solve_model(model_name: str, model_parameters: dict, checking_bilevel=False):
+    """
+    Function that solves any of the models
+    """
+    model_functions = {
+        'bilevel': solve_bilevel,
+        'ridge': solve_ridge,
+        'benchmark': solve_benchmark
+    }
 
+    if model_name in model_functions:
+        model_func = model_functions[model_name]
+        model, intance, solution = model_func(model_parameters, checking_bilevel)
+
+    return model, intance, solution
+
+def solve_bilevel(model_parameters: dict, checking_bilevel: bool):
+    """
+    Function to solve and store bilevel results
+    """
+    # Solve using bilevel model
+    bilevel_model, bilevel_instance, bilevel_solution = solving_MINLP(dataset_name=model_parameters['dataset_name'],
+                                                                      poison_rate=model_parameters['poison_rate'],
+                                                                      training_samples=model_parameters['training_samples'],
+                                                                      seed=model_parameters['seed'],
+                                                                      function=model_parameters['function'])
+
+    if checking_bilevel:
+        # To check that solutions of lower level are optimal
+        pridge_model, pridge_instance, pridge_solution = solve_ridge(dataset_name=model_parameters['dataset_name'],
+                                                                     training_samples=model_parameters['training_samples'],
+                                                                     seed=model_parameters['seed'],
+                                                                     function=model_parameters['function'],
+                                                                     poisoned=True,
+                                                                     poison_solutions=bilevel_solution,
+                                                                     bilevel_instance=bilevel_instance)
+        
+    return bilevel_model, bilevel_instance, bilevel_solution
+
+def solve_ridge(model_parameters: dict, checking_bilevel: bool):
+    """
+    Function to solve and store ridge results
+    """
+    # Normal ridge regression
+    ridge_model, ridge_instance, ridge_solution = ridge_regression(dataset_name=model_parameters['dataset_name'],
+                                                                            training_samples=model_parameters['training_samples'],
+                                                                            seed=model_parameters['seed'],
+                                                                            function=model_parameters['function'])
+
+    return ridge_model, ridge_instance, ridge_solution
+
+def solve_benchmark(model_parameters: dict, checking_bilevel: bool):
+    """
+    Function to solve and store benchmark results
+    """
+    # Solve benchmark 
+    opt = pyo.SolverFactory('ipopt')
+    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
+                                                                                        dataset_name=model_parameters['dataset_name'], 
+                                                                                        poison_rate=model_parameters['poison_rate'],
+                                                                                        training_samples=model_parameters['training_samples'],
+                                                                                        no_psubsets = model_parameters['no_psubsets'], 
+                                                                                        seed=model_parameters['seed'])
+    
+    return benchmark_model, benchmark_instance, benchmark_solution
+
+
+# Algorithmic approaches
 def solving_MINLP(dataset_name: str, 
                   poison_rate: int, 
                   training_samples: int,
                   seed: int,
-                  function = 'MSE'):
+                  function = 'MSE',
+                  feasibility=0.0001,
+                  time_limit=600):
     """
     Algorithm for solving the MINLP bilevel model.
     """
@@ -51,8 +120,8 @@ def solving_MINLP(dataset_name: str,
     gurobi_model = gp.Model('Poisoning_Attack')
     my_model = PoisonAttackModel(gurobi_model, instance_data, function=function)
     m = my_model.model
-    print('Model has been built')
 
+    # Callback function for bounds
     def data_cb(model, where):
         if where == gp.GRB.Callback.MIP:
             cur_obj = model.cbGet(gp.GRB.Callback.MIP_OBJBST)
@@ -64,49 +133,62 @@ def solving_MINLP(dataset_name: str,
                 model._bd = cur_bd
                 model._data.append([time.time() - m._start, cur_obj, cur_bd])
 
-    # Solve model
+    # Prepare objects for callback
     m._obj = None
     m._bd = None
     m._data = []
     m._start = time.time()
 
-    print('Solving the model...')
+    print('Solving model...')
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.00000001
-    m.params.TimeLimit = 600
+    m.params.FeasibilityTol = feasibility
+    m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
+    print('Model has been solved')
 
+    # Save bounds in file
     file_name = '_'.join(['bounds',
                           str(my_model.no_numfeatures),
                           str(my_model.no_catfeatures),
                           str(len(instance_data.x_train_dataframe)),
                           str(int(instance_data.poison_rate * 100))])
-
-    with open('bounds/' + file_name + '.csv', 'w') as f:
+    with open('results/bounds/files/' + file_name + '.csv', 'w') as f:
         writer = csv.writer(f)
         writer.writerows(m._data)
+    
+    def plot_bounds(file_name):
+        """
+        Function to plot upper and lower bounds.
+        """
+        # Plot bounds
+        bounds_df = pd.read_csv('results/bounds/files/' + file_name + '.csv', names=['Time', 'Primal', 'Dual'], header=None)
+        bounds_df = bounds_df.iloc[5:]
+        bounds_df.set_index('Time', drop=True, inplace=True)
+        bounds_df[['Primal', 'Dual']].plot(style={'Primal': '-k', 'Dual': '--k'}, figsize=(8.5,6.5))
+        plt.title('Evolution of Primal and Dual Bounds', fontsize=30)
+        plt.ylabel('Bounds', fontsize=20)
+        plt.xlabel('Time (s)', fontsize=20)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.legend(fontsize=20)
+        plt.savefig('results/bounds/plots/' + 'plot_' + file_name + '.pdf', transparent=True, bbox_inches = "tight")
+        #plt.show()
+        plt.close()
 
-    # Plot bounds
-    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', names=['Time', 'Primal', 'Dual'], header=None)
-    bounds_df = bounds_df.iloc[5:]
-    bounds_df.set_index('Time', drop=True, inplace=True)
-    bounds_df[['Primal', 'Dual']].plot(style={'Primal': '-k', 'Dual': '--k'}, figsize=(8.5,6.5))
-    plt.title('Evolution of Primal and Dual Bounds', fontsize=30)
-    plt.ylabel('Bounds', fontsize=20)
-    plt.xlabel('Time (s)', fontsize=20)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.legend(fontsize=20)
-    plt.savefig('bounds/' + 'plot_' + file_name + '.pdf', transparent=True, bbox_inches = "tight")
-    #plt.show()
-    plt.close()
+    plot_bounds(file_name)
 
-    print('Model has been solved')
+    def initialise_opt_solution(m):
+        """
+        Initialise model with known optimal solution.
+        """
+        m.write('out.sol')
+        m.read('out.sol')
+        m.update()
+        results = m.optimize()
 
-    m.write('out.sol')
-    # m.read('out.sol')
-    # m.update()
-    # results = m.optimize()
+        return results
+    
+    # results = initialise_opt_solution(m)
 
     ### Store results
     index = pd.MultiIndex.from_tuples(my_model.x_poison_num.keys(), 
