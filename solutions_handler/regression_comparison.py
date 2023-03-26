@@ -156,13 +156,15 @@ class ComparisonModel():
         # plt.xlim([-0.05, 0.6])
         # plt.ylim([-0.05,0.6])
         if self.datatype  == 'train':
-            plt.title('Actual vs Predicted for Training Data')
+            plt.title('Actual vs Predicted for Training Data', fontsize=20)
         elif self.datatype == 'test':
-            #plt.title('Actual vs Predicted for Test Data')
-            a=1
-        plt.xlabel('Actual')
-        plt.ylabel('Predicted')
-        plt.legend()
+            plt.title('Actual vs Predicted for Test Data', fontsize=20)
+        plt.xlabel('Actual', fontsize=14)
+        plt.ylabel('Predicted', fontsize=14)
+        # plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=2, fontsize=14)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.1), fontsize=14)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
         plt.savefig('plots/' + self.folder +
                      '/actual_vs_predicted' + '_' +
                      self.datatype + '_' +
@@ -171,7 +173,7 @@ class ComparisonModel():
                      str(len(self.bilevel_dataframe)) + '_' +
                      str(int(self.bilevel_instance_data.poison_rate * 100)) + '_' +
                      str(self.bilevel_instance_data.seed) +
-                     '.png', transparent=True, bbox_inches = "tight")
+                     '.pdf', transparent=True, bbox_inches = "tight")
         plt.show()
 
     def plot_actual_vs_pred_benchmark(self):

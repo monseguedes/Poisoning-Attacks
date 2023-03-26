@@ -405,6 +405,8 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         # Parameters
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
+        for k, v in self.x_train_num.items():
+            self.x_train_num[k] = pmo.parameter(v)
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
         self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()['x_poison_cat']
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
@@ -462,7 +464,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print('Building cat weights contraints') 
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
         for cat_feature in self.catfeatures_set:
+            print(cat_feature)
             for category in self.categories_sets[cat_feature]:
+                print(category)
                 self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, cat_feature, category), rhs=0)
 
         print('Building bias constraints')

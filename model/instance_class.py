@@ -72,7 +72,7 @@ class InstanceData():
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  
 
         self.test_dataframe =  self.test_validation_dataframe.sample(frac=None, 
-                                                                     n=5 * training_samples, 
+                                                                     n = min(5 * training_samples,len(self.test_validation_dataframe.index)), 
                                                                      random_state=seed) # The indexes are not reset, but randomly shuffled 
 
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
@@ -214,7 +214,6 @@ class InstanceData():
 
         # Add poisoning samples to training dataframe
         df = self.x_train_dataframe.copy()
-        print(self.x_train_dataframe)
 
         # Create dataframe with solutions of numerical features
         num_dict = {(str(triple[0]), str(triple[1])) : solutions['x_poison_num'][triple] for triple in solutions['x_poison_num'].keys()}

@@ -72,8 +72,8 @@ def solving_MINLP(dataset_name: str,
 
     print('Solving the model...')
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = 0.0001
-    m.params.TimeLimit = 10
+    m.params.FeasibilityTol = 0.00000001
+    m.params.TimeLimit = 600
     results = m.optimize(callback=data_cb)
 
     file_name = '_'.join(['bounds',
@@ -87,14 +87,18 @@ def solving_MINLP(dataset_name: str,
         writer.writerows(m._data)
 
     # Plot bounds
-    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', names=['Time', 'Objective', 'Bound'], header=None)
+    bounds_df = pd.read_csv('bounds/' + file_name + '.csv', names=['Time', 'Primal', 'Dual'], header=None)
     bounds_df = bounds_df.iloc[5:]
-    bounds_df.set_index('Time', drop=True)
-    bounds_df[['Objective', 'Bound']].plot(marker='.')
-    plt.title('Evolution of Incumbent and Upper-Bound')
-    plt.ylabel('Objective value')
-    plt.xlabel('Time (s)')
-    plt.savefig('bounds/' + 'plot_' + file_name + '.png')
+    bounds_df.set_index('Time', drop=True, inplace=True)
+    bounds_df[['Primal', 'Dual']].plot(style={'Primal': '-k', 'Dual': '--k'}, figsize=(8.5,6.5))
+    plt.title('Evolution of Primal and Dual Bounds', fontsize=30)
+    plt.ylabel('Bounds', fontsize=20)
+    plt.xlabel('Time (s)', fontsize=20)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.legend(fontsize=20)
+    plt.savefig('bounds/' + 'plot_' + file_name + '.pdf', transparent=True, bbox_inches = "tight")
+    #plt.show()
     plt.close()
 
     print('Model has been solved')
@@ -242,11 +246,15 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
     iteration = instance_data.iteration_count
 
     iterations_solutions = []
+
+    model = BenchmarkPoisonAttackModel(instance_data)
     
     while iteration <= no_psubsets: # There is an iteration for each poison subset
         # Build instance for current iteration data
-        # Create abstract model
-        model = BenchmarkPoisonAttackModel(instance_data)
+        # Create model
+        #model = BenchmarkPoisonAttackModel(instance_data)
+
+        model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
 
         # Solve model
         results = opt.solve(model, load_solutions=True, tee=True)
