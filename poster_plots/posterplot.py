@@ -19,6 +19,7 @@ from sklearn.linear_model import LinearRegression
 import sys
 sys.path.append('./model')                
 import instance_class as data
+# import model.instance_class as data
 
 sns.set_style("whitegrid")
 

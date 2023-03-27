@@ -9,12 +9,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import seaborn as sns
+import pandas as pd
+import pyomo.environ as pyo
+
+import os
+
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
-import pyomo.environ as pyo
-
-import pandas as pd
 
 import model.instance_class
 import model.model_class
@@ -31,8 +33,7 @@ class ComparisonModel():
     This class builds all necessary objects to compare models.
     """
 
-    def __init__(self, datatype: str,
-                       folder):  
+    def __init__(self, model_parameters):  
         """
         Given some data class and some model class, build a model to
         then compare to other model.
@@ -42,21 +43,19 @@ class ComparisonModel():
         ridge_model: the nonpoisoned ridge model classs
         """
 
-        self.datatype = datatype
-        self.folder = folder
-
-        if self.datatype == 'train':
-            self.y = list(self.bilevel_model.y_train.values())
-            self.data_dataframe = self.bilevel_instance_data.x_train_dataframe.copy(deep=True)
-            self.ridge_data_dataframe = self.ridge_instance_data.ridge_x_train_dataframe.copy(deep=True).unstack()
+        self.datatype = model_parameters['datatype']
+        self.folder = '_'.join([model_parameters['dataset_name'], 
+                                str(model_parameters['poison_rate']),
+                                str(model_parameters['training_samples']),
+                                str(model_parameters['no_psubsets']),
+                                str(model_parameters['seed'])])
         
-        elif self.datatype == 'test':
-            self.y = list(self.bilevel_instance_data.test_y)
-            self.data_dataframe = self.bilevel_instance_data.test_dataframe.copy(deep=True)
-            self.ridge_data_dataframe = self.ridge_instance_data.test_ridge_x_train_dataframe.copy(deep=True).unstack()
+        if not os.path.exists(os.path.join('plots', self.folder)):   
+            os.mkdir(os.path.join('plots', self.folder))
 
-        self.pred_bilevel_y_train = None
-        self.pred_ridge_y_train = None
+        
+        if not os.path.exists(os.path.join('results/scores', self.folder)):
+            os.mkdir(os.path.join('results/scores', self.folder))
 
     def make_poisoned_predictions(self, bilevel_model: model.model_class.PoisonAttackModel, 
                                         bilevel_instance: model.instance_class.InstanceData):
@@ -68,9 +67,11 @@ class ComparisonModel():
         self.bilevel_instance = bilevel_instance
 
         if self.datatype == 'train':
+            self.y = list(self.bilevel_model.y_train)
             self.bilevel_dataframe = self.bilevel_instance.x_train_dataframe.copy(deep=True)
 
         elif self.datatype == 'test':
+            self.y = list(self.bilevel_instance.test_y)
             self.bilevel_dataframe = self.bilevel_instance.test_dataframe.copy(deep=True)
         
         # Define vector of size rows of bilevel_dataframe, and with bias in all terms
@@ -101,9 +102,11 @@ class ComparisonModel():
         self.benchmark_intance = benchmark_intance
 
         if self.datatype == 'train':
+            self.y = list(self.benchmark_model.y_train.values())
             self.benchmark_dataframe = self.benchmark_intance.x_train_dataframe.copy(deep=True)
 
         elif self.datatype == 'test':
+            self.y = list(self.benchmark_intance.test_y)
             self.benchmark_dataframe = self.benchmark_intance.test_dataframe.copy(deep=True)
         
         # Define vector of size rows of data_dataframe, and with bias in all terms.
@@ -152,7 +155,7 @@ class ComparisonModel():
         self.ridge_dataframe['pred_ridge_y_train'] = self.pred_ridge_y_train
 
         return self.pred_ridge_y_train
-
+    
     def plot_actual_vs_pred(self, model_name):
         """
         Take the predictions of either model
