@@ -45,6 +45,7 @@ class InstanceData():
         self.create_dataframes(training_samples, self.seed)
         self.split_dataframe()
         self.num_cat_split()
+        self.feature_selection()
         self.poison_samples()
         self.inital_sets_size()
         self.regularization_parameter()
@@ -156,6 +157,12 @@ class InstanceData():
 
         return self.num_x_train_dataframe, self.cat_x_train_dataframe
 
+    def feature_selection(no_nfeatures: int, no_cfeatures: int):
+        """
+        Run LASSO model to pick most important features.
+        """ 
+        #TODO: write down
+
     def poison_samples(self):
         """
         Takes the dataframe for training data and gets data for poisoning samples
@@ -166,10 +173,27 @@ class InstanceData():
         # Dataframe with all samples to be poisoned
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
                                                             random_state=self.seed).reset_index(drop=True)
-
+        self.x_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
+                                                           inplace=False).reset_index(drop=True)    
+        self.x_poison_dataframe.index.name = 'sample'  
+        self.x_poison_dataframe.index += 1   # Index starts at 1
+        
         # Number of poisoned samples (rate applied to training data)
         self.no_psamples = self.poison_dataframe.index.size
         
+        ### NUMERICAL FEATURES (x_data_poison_num)
+        self.num_x_poison_dataframe = self.x_poison_dataframe[self.numerical_columns]
+        self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) # Make column names integers so that 
+                                                                                              # they can later be used as pyomo indices
+        # TODO: Make those to be poisoned be 0
+        # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
+        # to dictionary and used as data since matched gurobi's format.
+        self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})    
+        self.num_x_poison_dataframe.name = 'x_data_poison_num'
+
+        ### CATEGORICAL FEATURES (x_data_poison_num)
+        
+
         ### TARGET (y_poison)
         # Get only target column from poison dataframe
         self.y_poison_dataframe = self.poison_dataframe[['target']].reset_index(drop=True)

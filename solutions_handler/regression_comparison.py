@@ -57,6 +57,24 @@ class ComparisonModel():
         if not os.path.exists(os.path.join('results/scores', self.folder)):
             os.mkdir(os.path.join('results/scores', self.folder))
 
+    def compare_everything(self, bilevel_instance, bilevel_model,
+                                 ridge_instance, ridge_model,
+                                 benchmark_instance, benchmark_model):
+        """
+        Compares all three models
+        """
+
+        self.make_poisoned_predictions(bilevel_instance=bilevel_instance,
+                                    bilevel_model=bilevel_model)
+        self.make_non_poisoned_predictions(ridge_instance=ridge_instance,
+                                                ridge_model=ridge_model)
+        self.make_benchmark_predictions(benchmark_instance=benchmark_instance,
+                                            benchmark_model=benchmark_model)
+        self.plot_actual_vs_pred('bilevel')
+        self.plot_actual_vs_pred('benchmark')
+        self.plot_actual_vs_predicted_all()
+        self.store_comparison_metrics()
+
     def make_poisoned_predictions(self, bilevel_model: model.model_class.PoisonAttackModel, 
                                         bilevel_instance: model.instance_class.InstanceData):
         """
@@ -92,14 +110,14 @@ class ComparisonModel():
         return self.pred_bilevel_y_train
 
     def make_benchmark_predictions(self, benchmark_model: model.model_class.BenchmarkPoisonAttackModel, 
-                                         benchmark_intance: model.pyomo_instance_class.InstanceData):   
+                                         benchmark_instance: model.pyomo_instance_class.InstanceData):   
         """
         Take the regression coefficents given by solving the model
         and use them to make predictions.
         """
 
         self.benchmark_model = benchmark_model
-        self.benchmark_intance = benchmark_intance
+        self.benchmark_intance = benchmark_instance
 
         if self.datatype == 'train':
             self.y = list(self.benchmark_model.y_train.values())
@@ -173,7 +191,7 @@ class ComparisonModel():
                                   str(int(self.bilevel_instance.poison_rate * 100)),
                                   str(self.bilevel_instance.seed)])
             
-        if model_name == 'benckmark':
+        elif model_name == 'benchmark':
             y_name='pred_benchmark_y_train'
             color='green'
             file_name = '_'.join(['/benchmark_actual_vs_predicted',
