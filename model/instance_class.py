@@ -13,6 +13,11 @@ from os import path
 from math import floor
 import itertools
 
+# Add path to be able to use module from other folder
+import sys
+sys.path.append('./algorithm')                
+import choosing_features as choose
+
 class InstanceData():
     """
     This class is the instance that is the fed into either the bilevel model 
@@ -26,7 +31,11 @@ class InstanceData():
 
         self.dataset_directory = ''.join(['data/', dataset_name])  
     
-    def prepare_instance(self, poison_rate: int, training_samples: int, seed: int):
+    def prepare_instance(self, poison_rate: int, 
+                               training_samples: int,
+                               no_nfeatures: int,
+                               no_cfeatures: int,  
+                               seed: int):
         """
         Prepares the instance by creating dataframe, dividing it into poisoning samples and 
         standard samples, defining the sizes of the sets involved in the model, and the 
@@ -45,7 +54,8 @@ class InstanceData():
         self.create_dataframes(training_samples, self.seed)
         self.split_dataframe()
         self.num_cat_split()
-        self.feature_selection()
+        if not no_nfeatures == 'all' and not no_cfeatures == 'all':
+            self.feature_selection(no_nfeatures, no_cfeatures)
         self.poison_samples()
         self.inital_sets_size()
         self.regularization_parameter()
@@ -157,11 +167,13 @@ class InstanceData():
 
         return self.num_x_train_dataframe, self.cat_x_train_dataframe
 
-    def feature_selection(no_nfeatures: int, no_cfeatures: int):
+    def feature_selection(self, no_nfeatures: int, no_cfeatures: int):
         """
         Run LASSO model to pick most important features.
         """ 
-        #TODO: write down
+        self.chosen_numerical, self.chosen_categorical = choose.LASSOdataframe(self.train_dataframe).get_features_lists(no_nfeatures, no_cfeatures)
+
+        return self.chosen_numerical, self.chosen_categorical
 
     def poison_samples(self):
         """
@@ -169,7 +181,7 @@ class InstanceData():
         depending on poisoning rate
         """
         
-        ### Select poison samples (from training data)
+        ### Select poison samples (from training data)-----------------------
         # Dataframe with all samples to be poisoned
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
                                                             random_state=self.seed).reset_index(drop=True)
@@ -181,20 +193,34 @@ class InstanceData():
         # Number of poisoned samples (rate applied to training data)
         self.no_psamples = self.poison_dataframe.index.size
         
-        ### NUMERICAL FEATURES (x_data_poison_num)
+        ### NUMERICAL FEATURES (x_data_poison_num)------------------------------------
         self.num_x_poison_dataframe = self.x_poison_dataframe[self.numerical_columns]
+        # Make those to be poisoned be 0
+        for numerical in self.chosen_numerical:
+            self.num_x_poison_dataframe[numerical] = 0
         self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) # Make column names integers so that 
-                                                                                              # they can later be used as pyomo indices
-        # TODO: Make those to be poisoned be 0
+                                                                                                    # they can later be used as pyomo indices
         # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
         # to dictionary and used as data since matched gurobi's format.
         self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})    
         self.num_x_poison_dataframe.name = 'x_data_poison_num'
 
-        ### CATEGORICAL FEATURES (x_data_poison_num)
-        
-
-        ### TARGET (y_poison)
+        ### CATEGORICAL FEATURES (x_data_poison_num)----------------------------------
+        # Get only categorical columns (those that include ':' in name)
+        self.cat_x_poison_dataframe = self.x_poison_dataframe[self.categorical_columns]
+        # Make those to be poisoned be 0
+        for categorical in self.chosen_categorical:
+            self.cat_x_poison_dataframe.loc[:, self.cat_x_poison_dataframe.columns.str.contains(str(categorical) + ':')] = 0      
+        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
+        self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.stack().rename_axis(index={None: 'column'})    
+        self.cat_x_poison_dataframe.name = 'x_data_poison_cat'
+        self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
+        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        self.cat_x_poison_dataframe[['feature', 'category']] = self.cat_x_poison_dataframe.column.str.split(':', expand=True).astype(int)
+        self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
+        self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
+   
+        ### TARGET (y_poison)---------------------------------------------------------
         # Get only target column from poison dataframe
         self.y_poison_dataframe = self.poison_dataframe[['target']].reset_index(drop=True)
         self.y_poison_dataframe.rename(columns={'target': 'y_poison'}, 

@@ -181,6 +181,7 @@ class ComparisonModel():
         """
         
         if model_name == 'bilevel':
+            dataframe = self.bilevel_dataframe
             y_name='pred_bilevel_y_train'
             color='red'
             file_name = '_'.join(['/actual_vs_predicted',
@@ -192,6 +193,7 @@ class ComparisonModel():
                                   str(self.bilevel_instance.seed)])
             
         elif model_name == 'benchmark':
+            dataframe = self.benchmark_dataframe
             y_name='pred_benchmark_y_train'
             color='green'
             file_name = '_'.join(['/benchmark_actual_vs_predicted',
@@ -202,11 +204,11 @@ class ComparisonModel():
                                   str(int(self.benchmark_intance.poison_rate * 100)),
                                   str(self.benchmark_intance.seed)])
 
-        figure = sns.scatterplot(data=self.bilevel_dataframe, x='actual_y_train', y=y_name, label='Poisoned', color=color)
+        figure = sns.scatterplot(data=dataframe, x='actual_y_train', y=y_name, label='Poisoned', color=color)
         sns.scatterplot(data=self.ridge_dataframe, x='actual_y_train', y='pred_ridge_y_train', label='Non-poisoned', color='lightskyblue')
         figure.set_aspect('equal', adjustable='box')
-        max_value = max([max(self.bilevel_dataframe['actual_y_train']), 
-                        max(self.bilevel_dataframe[y_name]), 
+        max_value = max([max(dataframe['actual_y_train']), 
+                        max(dataframe[y_name]), 
                         max(self.ridge_dataframe['pred_ridge_y_train'])])
         plt.xlim([-0.05, max_value + 0.05])
         plt.ylim([-0.05,max_value + 0.05])

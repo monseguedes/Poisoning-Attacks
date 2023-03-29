@@ -44,12 +44,16 @@ def SOS_constraints(model, k, j):
 
     return sum_of_categories 
 
-def loss_function_derivative_num_weights(model, function, s):
+def loss_function_derivative_num_weights(model, poisoned, function, s):
     """
     Finds the derivetive of the loss function (follower's objective) with respect to 
     the numerical weights of the linear regression model (to get first order optimality 
     condition).
     """
+    if poisoned:
+       multiplier = model.x_poison_num
+    else:
+       multiplier = model.x_data_poison_num
 
     #Component involving the sum of training samples errors
     train_samples_component = gp.quicksum(
@@ -62,8 +66,7 @@ def loss_function_derivative_num_weights(model, function, s):
                                           * model.x_train_num[i,s] \
                                           + model.bias * model.x_train_num[i,s] \
                                           - model.y_train[i] * model.x_train_num[i,s]  \
-                              for i in model.samples_set)
-                         
+                              for i in model.samples_set)                      
 
     #Component involving the sum of poison samples errors
     poison_samples_component = gp.quicksum(
@@ -73,7 +76,7 @@ def loss_function_derivative_num_weights(model, function, s):
                                                         for z in range(1, model.no_categories[j] + 1)) 
                                             for j in model.catfeatures_set) \
                                           + model.zn_bias_times_numsample[k,s] \
-                                          - model.y_poison[k] * model.x_poison_num[k,s]  \
+                                          - model.y_poison[k] * multiplier[k,s]  \
                               for k in model.psamples_set)
                                 
     #Component involving regularization
@@ -90,12 +93,16 @@ def loss_function_derivative_num_weights(model, function, s):
                         
     return  derivative_num_weights
 
-def loss_function_derivative_cat_weights(model, function, l, h):
+def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
     """
     Finds the derivetive of the loss function (follower's objective) with respect to 
     the categorical weights of the linear regression model (to get first order optimality 
     condition).
     """
+    if poisoned:
+       multiplier = model.x_poison_cat
+    else:
+       multiplier = model.x_data_poison_cat
 
     #Component involving the sum of training samples errors
     train_samples_component = gp.quicksum(
@@ -118,7 +125,7 @@ def loss_function_derivative_cat_weights(model, function, l, h):
                                                         for z in range(1, model.no_categories[j] + 1)) 
                                             for j in model.catfeatures_set) \
                                           + model.zc_bias_times_catsample[k,l,h] \
-                                          - model.y_poison[k] * model.x_poison_cat[k,l,h]  \
+                                          - model.y_poison[k] * multiplier[k,l,h]  \
                               for k in model.psamples_set)
 
     #Component involving regularization

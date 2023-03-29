@@ -53,6 +53,8 @@ def solve_bilevel(model_parameters: dict, checking_bilevel: bool):
     """
     # Solve using bilevel model
     bilevel_model, bilevel_instance, bilevel_solution = solving_MINLP(dataset_name=model_parameters['dataset_name'],
+                                                                      no_nfeatures=model_parameters['no_nfeatures'],
+                                                                      no_cfeatures=model_parameters['no_cfeatures'], 
                                                                       poison_rate=model_parameters['poison_rate'],
                                                                       training_samples=model_parameters['training_samples'],
                                                                       seed=model_parameters['seed'],
@@ -99,7 +101,9 @@ def solve_benchmark(model_parameters: dict, checking_bilevel: bool):
 
 
 # Algorithmic approaches
-def solving_MINLP(dataset_name: str, 
+def solving_MINLP(dataset_name: str,
+                  no_nfeatures: int,
+                  no_cfeatures: int, 
                   poison_rate: int, 
                   training_samples: int,
                   seed: int,
@@ -114,6 +118,8 @@ def solving_MINLP(dataset_name: str,
     instance_data = data.InstanceData(dataset_name=dataset_name)
     instance_data.prepare_instance(poison_rate=poison_rate, 
                                    training_samples=training_samples,
+                                   no_nfeatures=no_nfeatures,
+                                   no_cfeatures=no_cfeatures, 
                                    seed=seed)
     
     # Create model
@@ -145,6 +151,8 @@ def solving_MINLP(dataset_name: str,
     m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
     print('Model has been solved')
+    print(m.display())
+    m.write('out.lp')
 
     # Save bounds in file
     file_name = '_'.join(['bounds',
@@ -335,13 +343,12 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         # Build instance for current iteration data
         # Create model
         #model = BenchmarkPoisonAttackModel(instance_data)
-
-        model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
+        #model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
 
         # Solve model
         results = opt.solve(model, load_solutions=True, tee=True)
 
-        ### Store results of the poison subset found during this iteration     
+        ### Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
         poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
         new_x_train_num = poison_solution
@@ -349,8 +356,8 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         ###
 
         solutions_dict = {'x_poison_num': poison_solution.to_dict(),
-                         'weights_num': model.weights_num,
-                         'weights_cat': model.weights_cat,
+                         'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
+                         'weights_cat': {(cat_feature,category) : model.weights_cat[(cat_feature,category)].value for cat_feature in model.catfeatures_set for category in model.categories_sets[cat_feature]},
                          'bias': model.bias.value}
         iterations_solutions.append(solutions_dict)
 
@@ -361,7 +368,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         print('Iteration no. {} is finished'.format(iteration - 1))
         print('Objective value is ', pyo.value(model.objective_function))
 
-    solutions = {'iteration no.' + str(iteration): solution for iteration, solution in enumerate(iterations_solutions)}
+    solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)}
 
     return model, instance_data, solutions
 

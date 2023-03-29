@@ -84,6 +84,8 @@ class PoisonAttackModel():
         self.no_psamples = instance_data.no_psamples  #No. of poisoned samples
         self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
         self.no_catfeatures = instance_data.no_catfeatures  # No. of categorical features
+        self.chosen_numfeatures = instance_data.chosen_numerical # List of chosen numerical
+        self.chosen_catfeatures = instance_data.chosen_categorical # List of chosen numerical
         print('No. training samples is:', self.no_samples)
         print('No. poisoning samples is:', self.no_psamples)
         
@@ -93,10 +95,17 @@ class PoisonAttackModel():
         self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
         self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
         self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
+        self.chosen_numfeatures = instance_data.chosen_numerical # List of chosen numerical
+        self.chosen_catfeatures = instance_data.chosen_categorical # List of chosen numerical
+        print('Chosen numerical features are:', self.chosen_numfeatures)
+        print('Chosen categorical features are:', self.chosen_catfeatures)
 
         # Parameters
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
+        print(instance_data.num_x_train_dataframe)
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
+        self.x_data_poison_num = instance_data.num_x_poison_dataframe.to_dict()
+        self.x_data_poison_cat = instance_data.cat_x_poison_dataframe.to_dict()['x_data_poison_cat']
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
         self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
         self.regularization = instance_data.regularization
@@ -121,7 +130,7 @@ class PoisonAttackModel():
         self.upper_bound = bnd.find_bounds(instance_data, self)
         self.lower_bound = - self.upper_bound
 
-        self.x_poison_num = self.model.addVars(self.psamples_set, self.numfeatures_set, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num')
+        self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num')
 
         scc_indices = [(sample, cat_feature, category)    # Index of variables for categorical features
                        for sample in self.psamples_set 
@@ -156,16 +165,16 @@ class PoisonAttackModel():
                          for catconstraint in self.catfeatures_set
                          for categorycontraint in range(1, self.no_categories[catconstraint] + 1)]
         # Trilinear terms
-        self.tnn_ln_times_numsamples = self.model.addVars(self.psamples_set, self.numfeatures_set, self.numfeatures_set, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.tcn_lc_times_numsamples = self.model.addVars(sccn_indices, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.tnc_ln_times_catsamples = self.model.addVars(sncc_indices, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.tcc_lc_times_catsample = self.model.addVars(scccc_indices, lb=-GRB.INFINITY, ub=GRB.INFINITY)
+        self.tnn_ln_times_numsamples = self.model.addVars(self.psamples_set, self.numfeatures_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='tnn_ln_times_numsamples')
+        self.tcn_lc_times_numsamples = self.model.addVars(sccn_indices, lb=self.lower_bound, ub=self.upper_bound, name='tcn_lc_times_numsamples')
+        self.tnc_ln_times_catsamples = self.model.addVars(sncc_indices, lb=self.lower_bound, ub=self.upper_bound, name='tnc_ln_times_catsamples')
+        self.tcc_lc_times_catsample = self.model.addVars(scccc_indices, lb=self.lower_bound, ub=self.upper_bound, name='tcc_lc_times_catsample')
         
         # Bilinear terms
-        self.ln_numweight_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.lc_catweight_times_catsample = self.model.addVars(scc_indices, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.zn_bias_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=-GRB.INFINITY, ub=GRB.INFINITY)
-        self.zc_bias_times_catsample = self.model.addVars(scc_indices, lb=-GRB.INFINITY, ub=GRB.INFINITY)
+        self.ln_numweight_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='ln_numweight_times_numsample')
+        self.lc_catweight_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='lc_catweight_times_catsample')
+        self.zn_bias_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='zn_bias_times_numsample')
+        self.zc_bias_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='zc_bias_times_catsample')
         
         print('Variables have been created')
 
@@ -182,23 +191,33 @@ class PoisonAttackModel():
         """
 
         print('Building contraints')
-        
+        num_gen = (numfeature for numfeature in self.numfeatures_set if numfeature not in self.chosen_numfeatures)
+        cat_gen = (catfeature for catfeature in self.catfeatures_set if catfeature not in self.chosen_catfeatures)
+
         print('Building SOS1 contraints')
         for psample in self.psamples_set:
-            for catfeature in self.catfeatures_set:
+            for catfeature in self.chosen_catfeatures:
                 self.model.addConstr(aux.SOS_constraints(self, psample, catfeature) == 1, name='SOSconstraints[%s, %s]' % (psample, catfeature))
 
         print('Building num weights contraints')
-        for numfeature in self.numfeatures_set:
+        for numfeature in num_gen:
             print(numfeature)
-            self.model.addConstr(aux.loss_function_derivative_num_weights(self, self.function, numfeature) == 0, name='cons_first_order_optimality_conditions_num_weights[%s]' % (numfeature))
+            self.model.addConstr(aux.loss_function_derivative_num_weights(self, False, self.function, numfeature) == 0, name='cons_first_order_optimality_conditions_num_weights[%s]' % (numfeature))
+        for numfeature in self.chosen_numfeatures:
+            print(numfeature)
+            self.model.addConstr(aux.loss_function_derivative_num_weights(self, True, self.function, numfeature) == 0, name='cons_first_order_optimality_conditions_pnum_weights[%s]' % (numfeature))
 
         print('Building cat weights constraints')
-        for catfeature in self.catfeatures_set:
+        for catfeature in cat_gen:
             print(catfeature)
             for category in range(1, self.no_categories[catfeature] + 1):
                 print(category)
-                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_cat_weights[%s, %s]' % (catfeature, category))
+                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, False, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_cat_weights[%s, %s]' % (catfeature, category))
+        for catfeature in self.chosen_catfeatures:
+            print(catfeature)
+            for category in range(1, self.no_categories[catfeature] + 1):
+                print(category)
+                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, True, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_pcat_weights[%s, %s]' % (catfeature, category))
 
         print('Building bias constraints')
         self.model.addConstr(aux.loss_function_derivative_bias(self) == 0, name='cons_first_order_optimality_conditions_bias')
@@ -206,46 +225,66 @@ class PoisonAttackModel():
         print('Building trilinear constraints')
         for k in self.psamples_set:
             for r in self.numfeatures_set:
-                for s in self.numfeatures_set:
-                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name='cons_tnn')
+                for s in num_gen:
+                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_data_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name='cons_tnn')
+                for s in self.chosen_numfeatures:
+                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name='pcons_tnn')
 
         for k in self.psamples_set:
             for j in self.catfeatures_set:
                 for z in range(1, self.no_categories[j] + 1):
-                    for s in self.numfeatures_set:
-                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name='cons_tcn')
+                    for s in num_gen:
+                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_data_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name='cons_tcn')
+                    for s in self.chosen_numfeatures:
+                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name='pcons_tcn')
         
         for k in self.psamples_set:
             for r in self.numfeatures_set:
-                for l in self.catfeatures_set:
+                for l in cat_gen:
                     for h in range(1, self.no_categories[l] + 1):
-                        self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_cat[k,l,h] == self.tnc_ln_times_catsamples[k,r,l,h], name='cons_tnc')
+                        self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_data_poison_cat[k,l,h] == self.tnc_ln_times_catsamples[k,r,l,h], name='cons_tnc')
+                for l in self.chosen_catfeatures:
+                    for h in range(1, self.no_categories[l] + 1):
+                        self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_cat[k,l,h] == self.tnc_ln_times_catsamples[k,r,l,h], name='pcons_tnc')
         
         for k in self.psamples_set:
             for j in self.catfeatures_set:
                 for z in range(1, self.no_categories[j] + 1):
-                    for l in self.catfeatures_set:
+                    for l in cat_gen:
                         for h in range(1, self.no_categories[l] + 1):
-                             self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_cat[k,l,h] == self.tcc_lc_times_catsample[k,j,z,l,h], name='cons_tcc')
+                             self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_data_poison_cat[k,l,h] == self.tcc_lc_times_catsample[k,j,z,l,h], name='cons_tcc')
+                    for l in self.chosen_catfeatures:
+                        for h in range(1, self.no_categories[l] + 1):
+                             self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_cat[k,l,h] == self.tcc_lc_times_catsample[k,j,z,l,h], name='pcons_tcc')
         
         print('Building bilinear constraints')
         for k in self.psamples_set:
-            for r in self.numfeatures_set:
-                self.model.addConstr(self.weights_num[r] * self.x_poison_num[k,r] == self.ln_numweight_times_numsample[k,r], name='cons_ln')
+            for r in num_gen:   # Not poisoning, just data
+                self.model.addConstr(self.weights_num[r] * self.x_data_poison_num[k,r] == self.ln_numweight_times_numsample[k,r], name='cons_ln')
+            for r in self.chosen_numfeatures:    # Chosen poisoning
+                self.model.addConstr(self.weights_num[r] * self.x_poison_num[k,r] == self.ln_numweight_times_numsample[k,r], name='pcons_ln')
 
         for k in self.psamples_set:
-            for j in self.catfeatures_set:
+            for j in cat_gen:     # Not poisoning, just data
                 for z in range(1, self.no_categories[j] + 1):
-                    self.model.addConstr(self.weights_cat[j,z] * self.x_poison_cat[k,j,z] == self.lc_catweight_times_catsample[k,j,z], name='cons_lc')
+                    self.model.addConstr(self.weights_cat[j,z] * self.x_data_poison_cat[k,j,z] == self.lc_catweight_times_catsample[k,j,z], name='cons_lc')
+            for j in self.chosen_catfeatures:    # Chosen poisoning
+                for z in range(1, self.no_categories[j] + 1):
+                    self.model.addConstr(self.weights_cat[j,z] * self.x_poison_cat[k,j,z] == self.lc_catweight_times_catsample[k,j,z], name='pcons_lc')
         
         for k in self.psamples_set:
-            for s in self.numfeatures_set:
-                self.model.addConstr(self.bias * self.x_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='cons_zn')
+            for s in num_gen:    # Not poisoning, just data
+                self.model.addConstr(self.bias * self.x_data_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='cons_zn')
+            for s in self.chosen_numfeatures:    # Chosen poisoning
+                self.model.addConstr(self.bias * self.x_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='pcons_zn')
 
         for k in self.psamples_set:
-            for l in self.catfeatures_set:
+            for l in cat_gen:    # Not poisoning, just data
                 for h in range(1, self.no_categories[l] + 1):
-                    self.model.addConstr(self.bias * self.x_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='cons_zc')
+                    self.model.addConstr(self.bias * self.x_data_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='cons_zc')
+            for l in self.chosen_catfeatures:     # Chosen poisoning
+                for h in range(1, self.no_categories[l] + 1):
+                    self.model.addConstr(self.bias * self.x_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='pcons_zc')
         
         if trilinear_envelopes:
             # Trilinear envelopes 

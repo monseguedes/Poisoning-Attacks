@@ -8,8 +8,6 @@ import os
 import numpy as np
 from sklearn.linear_model import Lasso
 
-#TODO: make depend on dataframe instead of whole data
-
 def create_dataframe(name: str):
     """
     Create dataframe with dataset
@@ -22,7 +20,7 @@ def create_dataframe(name: str):
 
     return dataframe
 
-class DataSet():
+class LASSOdataframe():
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
 
@@ -31,10 +29,11 @@ class DataSet():
         Run all necessary functions to get list of most 
         important features
         """
+        alpha = 0.005
         self.format_data()
         self.fit_lasso()
-        self.get_used_features()
-        self.chosen_numerical, self.chosen_categorical = self.get_num_cat_features(no_numerical=no_numerical, no_categorical=no_categorical)
+        self.get_used_features(alpha=alpha)
+        self.chosen_numerical, self.chosen_categorical = self.get_num_cat_features(no_numerical=no_numerical, no_categorical=no_categorical, alpha=alpha)
 
         return self.chosen_numerical, self.chosen_categorical
 
@@ -74,40 +73,42 @@ class DataSet():
 
         return self.coeffs_used_features
 
-    def get_num_cat_features(self, no_numerical: int, no_categorical: int):
+    def get_num_cat_features(self, no_numerical: int, no_categorical: int, alpha: float):
         """
         Takes the n most important features for numerical and categorical.
         For categorical, the whole categorical feature is chosen. 
         """
 
         ### Get numerical features------------------------
-        numerical_features = {key : value for key, value in self.coeffs_used_features.items() if ':' not in key}
-        # Make sure LASSO selects enough features
-        alpha = 0.004
-        while no_numerical > len(numerical_features):
-            self.get_used_features(alpha)
-            alpha += -0.001
-        chosen_numerical = sorted(numerical_features, key=numerical_features.get, reverse=True)[:no_numerical]
-        self.chosen_numerical = list(chosen_numerical)
+        numerical_features = {int(key) : abs(value) for key, value in self.coeffs_used_features.items() if ':' not in key}
+        if no_numerical == 'all':
+            self.chosen_numerical = [column for column in self.features_dataframe.columns if ':' not in column] 
+        else:
+            # Make sure LASSO selects enough features
+            while no_numerical > len(numerical_features):
+                self.get_used_features(alpha)
+                alpha -= 0.0001
+                numerical_features = {int(key) : abs(value) for key, value in self.coeffs_used_features.items() if ':' not in key}
+            chosen_numerical = sorted(numerical_features, key=numerical_features.get, reverse=True)[:no_numerical]
+            self.chosen_numerical = list(chosen_numerical)
 
         ### Get categorical features-----------------------
-        categorical_features = {key : value for key, value in self.coeffs_used_features.items() if ':' in key}
-        max_dict = {}
-        for key, value in categorical_features.items():
-            key_type = key.split(':')[0]
-            if key_type not in max_dict or value > max_dict[key_type]:
-                max_dict[key_type] = value
-        # Make sure LASSO selects enough features
-        alpha = 0.004
-        while no_categorical > len(max_dict):
-            self.get_used_features(alpha)
-            alpha += -0.001
-        chosen_categorical = sorted(max_dict, key=max_dict.get, reverse=True)[:no_categorical]
-        self.chosen_categorical = list(chosen_categorical)
+        categorical_features = {key : abs(value) for key, value in self.coeffs_used_features.items() if ':' in key}
+        if no_categorical == 'all':
+            self.chosen_categorical = list(set([column.split(':')[0] for column in self.features_dataframe.columns if ':' in column]))
+        else:
+            max_dict = {}
+            for key, value in categorical_features.items():
+                key_type = key.split(':')[0]
+                if key_type not in max_dict or value > max_dict[key_type]:
+                    max_dict[int(key_type)] = value
+            # Make sure LASSO selects enough features
+            while no_categorical > len(max_dict):
+                self.get_used_features(alpha)
+                alpha -= 0.001
+            chosen_categorical = sorted(max_dict, key=max_dict.get, reverse=True)[:no_categorical]
+            self.chosen_categorical = list(chosen_categorical)
 
         return self.chosen_numerical, self.chosen_categorical
 
-dataframe = create_dataframe('house')
-test = DataSet(dataframe)
-print(test.get_features_lists(5,5))
 
