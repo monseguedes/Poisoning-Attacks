@@ -151,7 +151,7 @@ def solving_MINLP(dataset_name: str,
     m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
     print('Model has been solved')
-    m.write('out.lp')
+    # m.write('out.lp')
 
     # Save bounds in file
     file_name = '_'.join(['bounds',

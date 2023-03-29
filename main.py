@@ -12,10 +12,10 @@ from solutions_handler.regression_comparison import *
 
 
 model_parameters = {'dataset_name': 'house',
-                    'no_nfeatures': 1,
-                    'no_cfeatures': 1, 
+                    'no_nfeatures': 0,
+                    'no_cfeatures': 0, 
                     'poison_rate': 4,
-                    'training_samples': 20,
+                    'training_samples': 600,
                     'seed': 2,
                     'function': 'MSE',
                     'no_psubsets': 1,
@@ -23,10 +23,8 @@ model_parameters = {'dataset_name': 'house',
 
 # Solve models
 bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
-print(bilevel_solution)
 #ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
 benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
-print(benchmark_solution)
 
 # Compare models
 comparison = ComparisonModel(model_parameters)

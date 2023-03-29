@@ -127,7 +127,9 @@ class PoisonAttackModel():
 
         # Defining bounds for lower-level variables (regression parameters)
         self.upper_bound = bnd.find_bounds(instance_data, self)
+        self.upper_bound = 1
         self.lower_bound = - self.upper_bound
+        print(f'UPPER BOUND: {self.upper_bound:.2f}')
 
         self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num')
 
