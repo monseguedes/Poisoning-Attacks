@@ -11,8 +11,8 @@ from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import * 
 
 
-model_parameters = {'dataset_name': '5num1cat',
-                    'no_nfeatures': 5,
+model_parameters = {'dataset_name': 'house',
+                    'no_nfeatures': 1,
                     'no_cfeatures': 1, 
                     'poison_rate': 4,
                     'training_samples': 20,
