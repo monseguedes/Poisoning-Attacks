@@ -13,7 +13,7 @@ from solutions_handler.regression_comparison import *
 
 model_parameters = {'dataset_name': '5num1cat',
                     'no_nfeatures': 5,
-                    'no_cfeatures': 0, 
+                    'no_cfeatures': 1, 
                     'poison_rate': 4,
                     'training_samples': 20,
                     'seed': 2,

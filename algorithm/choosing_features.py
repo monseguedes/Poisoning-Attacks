@@ -87,7 +87,7 @@ class LASSOdataframe():
             # Make sure LASSO selects enough features
             while no_numerical > len(numerical_features):
                 self.get_used_features(alpha)
-                alpha -= 0.0001
+                alpha -= 0.00001
                 numerical_features = {int(key) : abs(value) for key, value in self.coeffs_used_features.items() if ':' not in key}
             chosen_numerical = sorted(numerical_features, key=numerical_features.get, reverse=True)[:no_numerical]
             self.chosen_numerical = list(chosen_numerical)
@@ -105,7 +105,7 @@ class LASSOdataframe():
             # Make sure LASSO selects enough features
             while no_categorical > len(max_dict):
                 self.get_used_features(alpha)
-                alpha -= 0.001
+                alpha -= 0.0001
             chosen_categorical = sorted(max_dict, key=max_dict.get, reverse=True)[:no_categorical]
             self.chosen_categorical = list(chosen_categorical)
 

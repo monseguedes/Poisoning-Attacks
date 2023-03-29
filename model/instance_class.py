@@ -210,12 +210,13 @@ class InstanceData():
         self.cat_x_poison_dataframe = self.x_poison_dataframe[self.categorical_columns]
         # Make those to be poisoned be 0
         for categorical in self.chosen_categorical:
-            self.cat_x_poison_dataframe.loc[:, self.cat_x_poison_dataframe.columns.str.contains(str(categorical) + ':')] = 0      
+            self.cat_x_poison_dataframe.loc[:, self.cat_x_poison_dataframe.columns.str.contains(str(categorical) + ':')] = 0     
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.stack().rename_axis(index={None: 'column'})    
         self.cat_x_poison_dataframe.name = 'x_data_poison_cat'
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        print(self.cat_x_poison_dataframe)
         self.cat_x_poison_dataframe[['feature', 'category']] = self.cat_x_poison_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.

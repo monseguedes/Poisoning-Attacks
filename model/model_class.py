@@ -57,7 +57,7 @@ class PoisonAttackModel():
         self.build_variables(instance_data)
         self.build_constraints()
         self.build_objective()
-        self.model.update()
+        #self.model.update()
         
     def __repr__(self) -> str:
         return super().__repr__()
@@ -102,7 +102,6 @@ class PoisonAttackModel():
 
         # Parameters
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
-        print(instance_data.num_x_train_dataframe)
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
         self.x_data_poison_num = instance_data.num_x_poison_dataframe.to_dict()
         self.x_data_poison_cat = instance_data.cat_x_poison_dataframe.to_dict()['x_data_poison_cat']
@@ -191,8 +190,9 @@ class PoisonAttackModel():
         """
 
         print('Building contraints')
-        num_gen = (numfeature for numfeature in self.numfeatures_set if numfeature not in self.chosen_numfeatures)
-        cat_gen = (catfeature for catfeature in self.catfeatures_set if catfeature not in self.chosen_catfeatures)
+
+        num_gen = tuple(numfeature for numfeature in self.numfeatures_set if numfeature not in self.chosen_numfeatures)
+        cat_gen = tuple(catfeature for catfeature in self.catfeatures_set if catfeature not in self.chosen_catfeatures)
 
         print('Building SOS1 contraints')
         for psample in self.psamples_set:
