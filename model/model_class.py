@@ -36,6 +36,7 @@ import model.instance_class
 import model.pyomo_instance_class
 import algorithm.bounding_procedure as bnd
 
+
 class PoisonAttackModel():
     """
     This is the class of the model, which has
@@ -131,7 +132,9 @@ class PoisonAttackModel():
         self.lower_bound = - self.upper_bound
         print(f'UPPER BOUND: {self.upper_bound:.2f}')
 
-        self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num')
+        self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num') #, start=instance_data.num_x_poison_dataframe.to_dict())
+        # for psample, nfeature in itertools.product(self.psamples_set, self.chosen_numfeatures):
+        #     self.x_poison_num[psample, nfeature].Start = instance_data.num_x_poison_dataframe.to_dict()[psample, nfeature]
 
         scc_indices = [(sample, cat_feature, category)    # Index of variables for categorical features
                        for sample in self.psamples_set 

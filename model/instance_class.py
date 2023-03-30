@@ -195,9 +195,15 @@ class InstanceData():
         
         ### NUMERICAL FEATURES (x_data_poison_num)------------------------------------
         self.num_x_poison_dataframe = self.x_poison_dataframe[self.numerical_columns]
-        # Make those to be poisoned be 0
+        # Initialise those to be poisoned to be opposite
+        def flip_nearest(x):
+            if x < 0.5:
+                return 1
+            else:
+                return 0
         for numerical in self.chosen_numerical:
-            self.num_x_poison_dataframe[numerical] = 0
+            numerical = str(numerical)
+            self.num_x_poison_dataframe[numerical] = self.num_x_poison_dataframe[numerical].apply(lambda x: flip_nearest(x))
         self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) # Make column names integers so that 
                                                                                                     # they can later be used as pyomo indices
         # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
@@ -209,14 +215,13 @@ class InstanceData():
         # Get only categorical columns (those that include ':' in name)
         self.cat_x_poison_dataframe = self.x_poison_dataframe[self.categorical_columns]
         # Make those to be poisoned be 0
-        for categorical in self.chosen_categorical:
-            self.cat_x_poison_dataframe.loc[:, self.cat_x_poison_dataframe.columns.str.contains(str(categorical) + ':')] = 0     
+        # for categorical in self.chosen_categorical:
+        #     self.cat_x_poison_dataframe.loc[:, self.cat_x_poison_dataframe.columns.str.contains(str(categorical) + ':')] = 0     
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.stack().rename_axis(index={None: 'column'})    
         self.cat_x_poison_dataframe.name = 'x_data_poison_cat'
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        print(self.cat_x_poison_dataframe)
         self.cat_x_poison_dataframe[['feature', 'category']] = self.cat_x_poison_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.

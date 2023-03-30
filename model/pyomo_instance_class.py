@@ -162,7 +162,7 @@ class InstanceData():
         self.poison_dataframe = self.poison_dataframe.iloc[:self.no_total_psamples]   
 
         # X_POISON_CAT------------------------------------------
-        self.complete_cat_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
+        self.complete_x_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
                                                                inplace=False).reset_index(drop=True) 
         self.cat_columns = [name for name in self.poison_dataframe.columns if ':' in name]
         self.complete_cat_poison_dataframe = self.poison_dataframe[self.cat_columns]
@@ -180,6 +180,24 @@ class InstanceData():
         self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
+
+        ### Initial poisoning samples-------------------------
+        self.num_x_poison_dataframe = self.complete_x_poison_dataframe[self.numerical_columns]
+        self.num_x_poison_dataframe.index += 1
+        # Initialise those to be poisoned to be opposite
+        def flip_nearest(x):
+            if x < 0.5:
+                return 1
+            else:
+                return 0
+        for feature in self.numerical_columns:
+            self.num_x_poison_dataframe[feature]= self.num_x_poison_dataframe[feature].apply(lambda x: flip_nearest(x))
+        self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) # Make column names integers so that 
+                                                                                                    # they can later be used as pyomo indices
+        # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
+        # to dictionary and used as data since matched gurobi's format.
+        self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})    
+        self.num_x_poison_dataframe.name = 'x_data_poison_num'
         
         ### TARGET (y_poison)---------------------------------
         self.complete_y_poison_dataframe = self.poison_dataframe[['target']].reset_index(drop=True) 

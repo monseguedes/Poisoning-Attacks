@@ -12,10 +12,10 @@ from solutions_handler.regression_comparison import *
 
 
 model_parameters = {'dataset_name': 'house',
-                    'no_nfeatures': 0,
+                    'no_nfeatures': 35,
                     'no_cfeatures': 0, 
                     'poison_rate': 4,
-                    'training_samples': 600,
+                    'training_samples': 300,
                     'seed': 2,
                     'function': 'MSE',
                     'no_psubsets': 1,

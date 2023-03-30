@@ -337,7 +337,11 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
     iterations_solutions = []
 
     model = BenchmarkPoisonAttackModel(instance_data)
-    
+
+    # Initialise solutions
+    for psample, numfeature in itertools.product(model.psamples_set, model.numfeatures_set):
+        model.x_poison_num[psample, numfeature].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
+
     while iteration <= no_psubsets: # There is an iteration for each poison subset
         # Build instance for current iteration data
         # Create model
