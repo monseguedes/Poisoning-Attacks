@@ -311,8 +311,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                               poison_rate: int,
                               training_samples: int, 
                               no_psubsets: int, 
-                              seed: int, 
-                              initialized_solution=0):
+                              seed: int):
     """
     Algorithm for iterative attack strategy. 
 
@@ -375,3 +374,73 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
 
     return model, instance_data, solutions
 
+def benchmark_plus_optimising_heuristic(opt: pyo.SolverFactory, 
+                                        model_parameters: dict, 
+                                        feasibility=0.0001,
+                                        time_limit=600):
+    """
+    This is the heuristic algorithm we use to get feasible 
+    solutions. It works as follows. We quickly optimise numerical 
+    features (locally) using ipopt. Then take these solutions and 
+    matrix accordingly. Then we optimize subsets of features on top
+    of this first optimization. Features are chosen using LASSO.
+    """
+    
+    # Solve model using benchmark method.
+    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
+                                                                                        dataset_name=model_parameters['dataset_name'], 
+                                                                                        poison_rate=model_parameters['poison_rate'],
+                                                                                        training_samples=model_parameters['training_samples'],
+                                                                                        no_psubsets = model_parameters['no_psubsets'], 
+                                                                                        seed=model_parameters['seed'])
+
+    # Add poisoning samples as data
+
+
+    # Optimise now categorical features separately (MINLP)
+    instance_data = data.InstanceData(dataset_name=model_parameters['dataset_name'])
+    instance_data.prepare_instance(poison_rate=model_parameters['poison_rate'],
+                                   training_samples=model_parameters['training_samples'],
+                                   no_nfeatures='all',
+                                   no_cfeatures='all', 
+                                   seed=model_parameters['seed'])
+    
+    # Change the necessary dataframes to have benchmark as columns in data dataframes (x_poison_dataframe)
+    # update x_poison_dataframe
+    instance_data.feature_selection(no_nfeatures=model_parameters['no_nfeatures'],
+                                    no_cfeatures=model_parameters['no_cfeatures'])
+    instance_data.poison_samples()
+
+    # Create model
+    gurobi_model = gp.Model('Poisoning_Attack')
+    my_model = PoisonAttackModel(gurobi_model, instance_data, function=function)
+    m = my_model.model
+
+    print('Solving model...')
+    m.params.NonConvex = 2
+    m.params.FeasibilityTol = feasibility
+    m.params.TimeLimit = time_limit
+    results = m.optimize()
+    print('Model has been solved')
+
+    ### Store results
+    index = pd.MultiIndex.from_tuples(my_model.x_poison_num.keys(), 
+                                      names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison_num
+    num_poison_solution = pd.Series([element.X for element in my_model.x_poison_num.values()], 
+                                    index=index)  # Make a dataframe with solutions and desires index
+    index = pd.MultiIndex.from_tuples(my_model.x_poison_cat.keys(), 
+                                      names=('sample', 'feature', 'category'))   # Create index from the keys (indexes) of the solutions of x_poison_cat
+    cat_poison_solution = pd.Series([element.X for element in my_model.x_poison_cat.values()], 
+                                    index=index)  # Make a dataframe with solutions and desires index
+    num_poison_solution.name = 'x_train_num'
+    cat_poison_solution.name = 'x_train_cat'
+
+    solutions_dict = {'x_poison_num': num_poison_solution.to_dict(),
+                      'x_poison_cat': cat_poison_solution.to_dict(),
+                      'weights_num': [element.X for element in my_model.weights_num.values()],
+                      'weights_cat': [element.X for element in my_model.weights_cat.values()],
+                      'bias': my_model.bias.X}
+
+    print('Objective value is ', m.ObjVal)
+
+    return my_model, instance_data, solutions_dict

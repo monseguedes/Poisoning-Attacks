@@ -117,6 +117,17 @@ class InstanceData():
         self.x_train_dataframe.index.name = 'sample'  
         self.x_train_dataframe.index += 1   # Index starts at 1
 
+        ### Select POISON SAMPLES (from training data)-----------------------
+        # Dataframe with all samples to be poisoned
+        self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
+                                                            random_state=self.seed).reset_index(drop=True)
+        self.x_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
+                                                           inplace=False).reset_index(drop=True)    
+        self.x_poison_dataframe.index.name = 'sample'  
+        self.x_poison_dataframe.index += 1 
+        # Number of poisoned samples (rate applied to training data)
+        self.no_psamples = self.poison_dataframe.index.size
+
         # Set no. of samples variables.
         self.no_samples = len(self.x_train_dataframe.index)
         self.no_features = len(self.x_train_dataframe.columns)
@@ -180,18 +191,6 @@ class InstanceData():
         Takes the dataframe for training data and gets data for poisoning samples
         depending on poisoning rate
         """
-        
-        ### Select poison samples (from training data)-----------------------
-        # Dataframe with all samples to be poisoned
-        self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
-                                                            random_state=self.seed).reset_index(drop=True)
-        self.x_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
-                                                           inplace=False).reset_index(drop=True)    
-        self.x_poison_dataframe.index.name = 'sample'  
-        self.x_poison_dataframe.index += 1   # Index starts at 1
-        
-        # Number of poisoned samples (rate applied to training data)
-        self.no_psamples = self.poison_dataframe.index.size
         
         ### NUMERICAL FEATURES (x_data_poison_num)------------------------------------
         self.num_x_poison_dataframe = self.x_poison_dataframe[self.numerical_columns]
