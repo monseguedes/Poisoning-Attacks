@@ -93,8 +93,12 @@ class PoisonAttackModel():
         # Sets
         self.samples_set = range(1, self.no_samples + 1)   # Set of non-poisoned samples 
         self.psamples_set = range(1, self.no_psamples + 1)   # Set of poisoned samples 
-        self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
-        self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
+        # self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
+        if instance_data.numerical_columns == []:
+            self.numfeatures_set = []
+        else:
+            self.numfeatures_set = [int(column) for column in instance_data.numerical_columns]
+        self.catfeatures_set = sorted([int(column) for column in list(instance_data.no_categories_dict)])   # Set of categorical features
         self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
         self.chosen_numfeatures = instance_data.chosen_numerical # List of chosen numerical
         self.chosen_catfeatures = instance_data.chosen_categorical # List of chosen numerical
@@ -135,12 +139,23 @@ class PoisonAttackModel():
         self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num') #, start=instance_data.num_x_poison_dataframe.to_dict())
         # for psample, nfeature in itertools.product(self.psamples_set, self.chosen_numfeatures):
         #     self.x_poison_num[psample, nfeature].Start = instance_data.num_x_poison_dataframe.to_dict()[psample, nfeature]
-
         scc_indices = [(sample, cat_feature, category)    # Index of variables for categorical features
                        for sample in self.psamples_set 
                        for cat_feature in self.catfeatures_set 
                        for category in range(1, self.no_categories[cat_feature] + 1)]
-        self.x_poison_cat = self.model.addVars(scc_indices, vtype=GRB.BINARY, name='x_poison_cat')
+        
+        scc_p_indices = [(sample, cat_feature, category)    # Index of variables for categorical features
+                        for sample in self.psamples_set 
+                        for cat_feature in self.chosen_catfeatures 
+                        for category in range(1, self.no_categories[cat_feature] + 1)]
+        self.x_poison_cat = self.model.addVars(scc_p_indices, vtype=GRB.BINARY, name='x_poison_cat')
+
+        # # initialise categorical features
+        # for psample, cfeature in itertools.product(self.psamples_set, self.chosen_catfeatures):
+        #     print(psample, cfeature)
+        #     for category in range(1, self.no_categories[cfeature] + 1):
+        #         print(category)
+        #         self.x_poison_cat[psample, cfeature, category].Start = instance_data.cat_x_poison_dataframe.to_dict()['x_data_poison_cat'][psample, cfeature, category]
         
         self.weights_num = self.model.addVars(self.numfeatures_set, vtype=GRB.CONTINUOUS, lb=self.lower_bound, ub=self.upper_bound, name='weights_num')
 

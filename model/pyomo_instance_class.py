@@ -59,6 +59,8 @@ class InstanceData():
         self.whole_dataframe = pd.read_csv(path.join(self.dataset_directory, 
                                                      'data-binary.csv'), 
                                            index_col=[0]) 
+        print(len(self.whole_dataframe.columns))
+
         # Pick fixed number of trainig samples.
         self.train_dataframe = self.whole_dataframe.sample(frac=None, 
                                                            n=training_samples, 
@@ -190,8 +192,8 @@ class InstanceData():
                 return 1
             else:
                 return 0
-        for feature in self.numerical_columns:
-            self.num_x_poison_dataframe[feature]= self.num_x_poison_dataframe[feature].apply(lambda x: flip_nearest(x))
+        # for feature in self.numerical_columns:
+        #     self.num_x_poison_dataframe[feature]= self.num_x_poison_dataframe[feature].apply(lambda x: flip_nearest(x))
         self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) # Make column names integers so that 
                                                                                                     # they can later be used as pyomo indices
         # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted

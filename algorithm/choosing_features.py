@@ -81,7 +81,9 @@ class LASSOdataframe():
         
         ### Get numerical features------------------------
         if no_numerical == 'all':
-            self.chosen_numerical = [column for column in self.features_dataframe.columns if ':' not in column] 
+            self.chosen_numerical = [column for column in self.features_dataframe.columns if ':' not in column]
+        elif no_numerical == 0:
+            self.chosen_numerical = []
         else:
             numerical_features = {}
             # Make sure LASSO selects enough features
