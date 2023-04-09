@@ -29,6 +29,8 @@ class LASSOdataframe():
         Run all necessary functions to get list of most 
         important features
         """
+        self.no_numerical = no_numerical
+        self.no_categorical = no_categorical
         alpha = 0.05
         self.format_data()
         self.chosen_numerical, self.chosen_categorical = self.get_num_cat_features(no_numerical, no_categorical, alpha)
@@ -89,7 +91,7 @@ class LASSOdataframe():
             # Make sure LASSO selects enough features
             while no_numerical > len(numerical_features):
                 self.get_used_features(alpha)
-                alpha -= 0.005
+                alpha -= 0.001
                 numerical_features = {int(key) : abs(value) for key, value in self.coeffs_used_features.items() if ':' not in key}
             chosen_numerical = sorted(numerical_features, key=numerical_features.get, reverse=True)[:no_numerical]
             self.chosen_numerical = list(chosen_numerical)
@@ -108,11 +110,31 @@ class LASSOdataframe():
                     key_type = int(key.split(':')[0])
                     if key_type not in max_dict or value > max_dict[key_type]:
                         max_dict[key_type] = value
-                alpha -= 0.005
+                alpha -= 0.001
 
             chosen_categorical = sorted(max_dict, key=max_dict.get, reverse=True)[:no_categorical]
             self.chosen_categorical = list(chosen_categorical)
 
         return self.chosen_numerical, self.chosen_categorical
 
+    def save_new_dataframe(self):
+        """
+        Filter dataframe and save it 
+        """
+        categorical_dataframe = pd.concat([self.dataframe.filter(regex=f"^{prefix}:") for prefix in self.chosen_categorical], axis=1)
+        numerical_dataframe = self.dataframe[[str(column) for column in self.chosen_numerical]]
+        whole_dataframe = pd.concat([numerical_dataframe, categorical_dataframe], axis=1)
 
+        dataset_name = str(self.no_numerical) + 'num' + str(self.no_categorical) + 'cat'
+        directory = os.path.join('data', dataset_name)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        whole_dataframe.to_csv(os.path.join(directory, 'data-binary.csv'))
+        
+
+dataframe = create_dataframe('house')
+model = LASSOdataframe(dataframe)
+model.get_features_lists(10,5)
+model.save_new_dataframe()
