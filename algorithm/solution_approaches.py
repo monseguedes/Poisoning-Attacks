@@ -421,11 +421,6 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         model.x_poison_num[psample, numfeature].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
 
     while iteration <= no_psubsets: # There is an iteration for each poison subset
-        print(iteration)
-        # Build instance for current iteration data
-        # Create model
-        #model = BenchmarkPoisonAttackModel(instance_data)
-        #model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
 
         # Solve model
         results = opt.solve(model, load_solutions=True, tee=True)
@@ -452,7 +447,9 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         print('Objective value is ', pyo.value(model.objective_function))
         solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)} 
 
-        #iteration = instance_data.iteration_count
+        # iteration = instance_data.iteration_count
+
+        # model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
 
     return model, instance_data, solutions['iteration no.' + str(iteration - 1)]
 
@@ -635,14 +632,12 @@ def flipping_heuristic(model_parameters: dict):
                 given_values = (psample, feature)
                 # Filter the keys based on given values for first two elements
                 filtered_keys = [k for k in my_dict.keys() if k[:2] == given_values]
-                print(filtered_keys)
                 # Get the second element of the tuple for which the associated value is higher
                 max_value_key = max(filtered_keys, key=my_dict.get)
                 max_value_second_element = max_value_key[1]
                 # Change features as desired
                 benchmark_instance.cat_poison_dataframe.loc[psample, feature, max_value_second_element] = 1
                 other_features = [k[1] for k in filtered_keys if k[1] != max_value_second_element] 
-                print(other_features)
                 for i in other_features:
                     benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] = 0
             else:    # (if geq 0.5)
@@ -652,20 +647,16 @@ def flipping_heuristic(model_parameters: dict):
                 given_values = feature
                 # Filter the keys based on given values for first two elements
                 filtered_keys = [k for k in my_dict.keys() if k[0] == given_values]
-                print(filtered_keys)
                 # Get the second element of the tuple for which the associated value is higher
                 min_value_key = min(filtered_keys, key=my_dict.get)
                 min_value_second_element = min_value_key[1]
                 # Change features as desired
                 benchmark_instance.cat_poison_dataframe.loc[psample, feature, min_value_second_element] = 1
                 other_features = [k[1] for k in filtered_keys if k[1] != min_value_second_element] 
-                print(other_features)               
                 for i in other_features:
                     benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] =  0
     
     new_model, solutions_dict = solve_pyomo(opt, model_parameters, benchmark_instance)
-
-    print(benchmark_instance.cat_poison_dataframe)
 
     print('Objective value is ', solutions_dict['objective'])
     print('Benchmark objective value is ', benchmark_solution['objective'])

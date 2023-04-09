@@ -225,6 +225,7 @@ class InstanceData():
         categorical_names = set([name.split(':')[0] for name in self.categorical_columns]) 
         self.categories_dict = {int(cat_name) : [int(category.split(':')[1]) for category in self.categorical_columns if category.startswith(cat_name + ':')] for cat_name in categorical_names}
         self.no_categories_dict = {int(cat_name) : len(self.categories_dict[int(cat_name)]) for cat_name in categorical_names}
+        print(self.no_categories_dict)
 
     def regularization_parameter(self):
         """

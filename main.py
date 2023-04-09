@@ -10,10 +10,7 @@ import model.model_class as model
 from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import * 
 
-
-
-
-model_parameters = {'dataset_name': 'house',
+model_parameters = {'dataset_name': '5num5cat',
                     'no_nfeatures': 0,
                     'no_cfeatures': 2, 
                     'poison_rate': 0.4,
@@ -34,7 +31,7 @@ model_parameters = {'dataset_name': 'house',
 flipping_heuristic(model_parameters)
 
 # Compare models
-comparison = ComparisonModel(model_parameters)
+# comparison = ComparisonModel(model_parameters)
 # comparison.compare_everything(bilevel_instance=bilevel_instance, bilevel_model=bilevel_model,
 #                               ridge_instance=ridge_instance,ridge_model=ridge_model,
 #                               benchmark_instance=benchmark_instance, benchmark_model=benchmark_model)
