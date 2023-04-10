@@ -428,8 +428,8 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         ### Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
         poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
-        new_x_train_num = poison_solution
-        new_x_train_num.name = 'x_train_num'
+        new_x_poison_num = poison_solution
+        new_x_poison_num.name = 'x_poison_num'
 
         solutions_dict = {'x_poison_num': poison_solution.to_dict(),
                          'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
@@ -439,9 +439,10 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         iterations_solutions.append(solutions_dict)
 
         # Modify data dataframes with results
-        instance_data.update_data(iteration, new_x_train_num=new_x_train_num)
+        instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
 
-        # UPDATE PARAMETERS FROM DATA
+        # Update parameter from data
+        
         
         print('Iteration no. {} is finished'.format(iteration))
         print('Objective value is ', pyo.value(model.objective_function))

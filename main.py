@@ -17,7 +17,7 @@ model_parameters = {'dataset_name': '5num5cat',
                     'training_samples': 300,
                     'seed': 2,
                     'function': 'MSE',
-                    'no_psubsets': 1,
+                    'no_psubsets': 2,
                     'datatype': 'test',
                     'feasibility': 0.0001,
                     'time_limit': 100}

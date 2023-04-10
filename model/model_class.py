@@ -466,16 +466,23 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         # Parameters
         self.flag_array = instance_data.flag_array
-        self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
-        for k, v in self.x_train_num.items():
-            self.x_train_num[k] = pmo.parameter(v)
+        self.flag_array = {k + 1 : pmo.parameter(v) for k, v in enumerate(instance_data.flag_array)}
+        # self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
+        # for k, v in self.x_train_num.items():
+        #     self.x_train_num[k] = pmo.parameter(v)
+        self.x_train_num = {k: pmo.parameter(v) for k, v in instance_data.num_x_train_dataframe.to_dict().items()}
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
-        self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()['x_poison_cat']
-        self.x_poison_cat_data = instance_data.cat_poison_dataframe_data.to_dict()['x_poison_cat']
-        self.x_poison_num_data = instance_data.num_x_poison_dataframe.to_dict()
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
-        self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
+        # self.x_poison_num_data = instance_data.num_x_poison_dataframe.to_dict()
+        self.x_poison_num_data = {k :pmo.parameter(v) for k,v in instance_data.num_x_poison_dataframe.to_dict().items()}
+        self.x_poison_cat_data = instance_data.cat_poison_dataframe_data.to_dict()['x_poison_cat']
         self.y_poison_data = instance_data.complete_y_poison_dataframe.to_dict()['y_poison']
+
+        # self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()['x_poison_cat']
+        self.x_poison_cat = {k :pmo.parameter(v) for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items()}
+        # self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
+        self.y_poison = {k :pmo.parameter(v) for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items()}
+
         self.regularization = instance_data.regularization
 
         print('Parameters have been defined')
@@ -496,6 +503,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         upper_bound =  bnd.find_bounds(instance_data, self)
         lower_bound = - upper_bound
+        print(upper_bound)
         
         self.weights_num = pmo.variable_dict() # Weights for numerical features
         for numfeature in self.numfeatures_set:

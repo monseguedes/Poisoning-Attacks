@@ -198,13 +198,13 @@ class InstanceData():
         self.num_x_poison_dataframe = self.complete_x_poison_dataframe[self.numerical_columns]
         self.num_x_poison_dataframe.index += 1
         # Initialise those to be poisoned to be opposite
-        def flip_nearest(x):
-            if x < 0.5:
-                return 1
-            else:
-                return 0
-        for feature in self.numerical_columns:
-            self.num_x_poison_dataframe[feature]= self.num_x_poison_dataframe[feature].apply(lambda x: flip_nearest(x))
+        # def flip_nearest(x):
+        #     if x < 0.5:
+        #         return 1
+        #     else:
+        #         return 0
+        # for feature in self.numerical_columns:
+        #     self.num_x_poison_dataframe[feature]= self.num_x_poison_dataframe[feature].apply(lambda x: flip_nearest(x))
         self.num_x_poison_dataframe.columns = self.num_x_poison_dataframe.columns.astype(int) 
         self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})    
         self.num_x_poison_dataframe.name = 'x_data_poison_num'
@@ -246,7 +246,7 @@ class InstanceData():
         self.regularization = 0.6612244897959183
         self.regularization = 0.1
 
-    def update_data(self, iteration: int, new_x_train_num: pd.DataFrame):
+    def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
         """
         Updates instance data in order to incorporate solutions of previous iteration.
 
@@ -255,13 +255,17 @@ class InstanceData():
         iterations become datapoints.
         """
 
-        new_x_train_num = new_x_train_num.unstack(level=1)
+        #new_x_train_num = new_x_train_num.unstack(level=1)
+        print(self.num_x_poison_dataframe)
+        print(new_x_poison_num)
         
-        ### Update parameters dataframe
-        # DATA FEATURES (x_train_num)-------------------------------
- 
+        ### NUMERICAL POISON (x_poison_num_data)-------------------------------
+        self.num_x_poison_dataframe.to_numpy()[(iteration - 1) * self.no_numfeatures * self.no_psamples_per_subset:
+                                               iteration * self.no_numfeatures * self.no_psamples_per_subset] = new_x_poison_num.to_numpy()
+        
+        print(self.num_x_poison_dataframe)
 
-        ### CATEGORICAL FEATURES OF POISONING VARIABLES
+        ### ATTACK CATEGORICAL FEATURES (x_poison_cat)
         self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[(iteration - 1) * self.no_psamples_per_subset:   
                                                                             iteration * self.no_psamples_per_subset].reset_index(drop=True)
         self.cat_poison_dataframe.index.name = 'sample' 
@@ -275,30 +279,15 @@ class InstanceData():
         self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
-        # # DATA TARGET (y_train)-------------------------------------
-        # self.y_train_dataframe = pd.concat([self.y_train_dataframe, self.y_poison_dataframe.rename(columns={'y_poison':'y_train'})]).reset_index(drop=True) # Add poison target to main target dataframe since attacks from previpus iterations become data for next iteration
-        # self.y_train_dataframe.index.rename('sample')
-        # self.y_train_dataframe.index += 1
-
-        # # ATTACK CAT FEATURES----------------------------------------
-        # self.cat_poison_dataframe = self.complete_cat_poison_dataframe[(self.iteration_count - 2) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
-        #                                                                (self.iteration_count - 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration   
-        # self.cat_poison_dataframe.index.name = 'sample'
-        # self.cat_poison_dataframe.index += 1
-        # # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
-        # self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(index={None: 'column'})   
-        # self.cat_poison_dataframe.name = 'x_poison_cat'
-        # self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
-        # # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        # self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
-        # self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
-        # self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.  
-
-        # ATTACK TARGET (y_poison)------------------------------------
+        ### ATTACK TARGET (y_poison)------------------------------------
         self.y_poison_dataframe = self.complete_y_poison_dataframe[(iteration - 1) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
                                                                     iteration * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
         self.y_poison_dataframe.index.rename('sample')
         self.y_poison_dataframe.index += 1
+
+        ### UPDATE FLAG 
+        self.flag_array = np.ones(self.no_psamples_per_subset)
+        self.flag_array[(iteration - 1) * self.no_psamples_per_subset: iteration * self.no_psamples_per_subset] = 0
 
     
      
