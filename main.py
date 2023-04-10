@@ -13,11 +13,11 @@ from solutions_handler.regression_comparison import *
 model_parameters = {'dataset_name': '5num5cat',
                     'no_nfeatures': 0,
                     'no_cfeatures': 1, 
-                    'poison_rate': 4,
+                    'poison_rate': 60,
                     'training_samples': 300,
                     'seed': 2,
                     'function': 'MSE',
-                    'no_psubsets': 2,
+                    'no_psubsets': 4,
                     'datatype': 'test',
                     'feasibility': 0.0001,
                     'time_limit': 100}

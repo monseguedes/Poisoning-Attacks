@@ -439,16 +439,28 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         iterations_solutions.append(solutions_dict)
 
         # Modify data dataframes with results
-        instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
+        if iteration != no_psubsets:
+            instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
 
         # Update parameter from data
-        
+        for k, v in enumerate(instance_data.flag_array): 
+            model.flag_array[k + 1].value = v 
+        for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
+            model.x_poison_num_data[k].value = v
+        for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
+            model.x_poison_cat[k].value = v
+        for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
+            model.y_poison[k].value = v
         
         print('Iteration no. {} is finished'.format(iteration))
         print('Objective value is ', pyo.value(model.objective_function))
         solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)} 
+        objectives = {'iteration no.' + str(iteration + 1): solution['objective'] for iteration, solution in enumerate(iterations_solutions)} 
 
         iteration += 1
+
+        print(objectives)
+
 
     return model, instance_data, solutions['iteration no.' + str(iteration - 1)]
 

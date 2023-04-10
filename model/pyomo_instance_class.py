@@ -266,8 +266,8 @@ class InstanceData():
         print(self.num_x_poison_dataframe)
 
         ### ATTACK CATEGORICAL FEATURES (x_poison_cat)
-        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[(iteration - 1) * self.no_psamples_per_subset:   
-                                                                            iteration * self.no_psamples_per_subset].reset_index(drop=True)
+        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[iteration * self.no_psamples_per_subset:   
+                                                                            (iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)
         self.cat_poison_dataframe.index.name = 'sample' 
         self.cat_poison_dataframe.index += 1
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
@@ -280,14 +280,14 @@ class InstanceData():
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
         ### ATTACK TARGET (y_poison)------------------------------------
-        self.y_poison_dataframe = self.complete_y_poison_dataframe[(iteration - 1) * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
-                                                                    iteration * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
+        self.y_poison_dataframe = self.complete_y_poison_dataframe[iteration * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
+                                                                    (iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
         self.y_poison_dataframe.index.rename('sample')
         self.y_poison_dataframe.index += 1
 
         ### UPDATE FLAG 
         self.flag_array = np.ones(self.no_psamples_per_subset)
-        self.flag_array[(iteration - 1) * self.no_psamples_per_subset: iteration * self.no_psamples_per_subset] = 0
+        self.flag_array[iteration * self.no_psamples_per_subset: (iteration + 1) * self.no_psamples_per_subset] = 0
 
     
      
