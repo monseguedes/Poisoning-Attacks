@@ -58,7 +58,14 @@ def loss_function_derivative_num_weights(model, j):
                                    + model.bias
                                    - model.y_poison[q]) 
                                    * model.x_poison_num[q,j] 
-                                   for q in model.psamples_set) #Component involving the sum of poison samples errors
+                                   for q in model.psamples_per_subset_set) \
+                               + sum((sum(model.x_poison_num_data[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
+                                   sum(sum(model.weights_cat[j, z] * model.x_poison_cat_data[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
+                                                                                                       for j in model.catfeatures_set) 
+                                   + model.bias
+                                   - model.y_poison_data[q]) 
+                                   * model.x_poison_num[q,j] * model.flag_array[q - 1]
+                                   for q in model.psamples_set) 
     regularization_component = model.regularization * model.weights_num[j] #Component involving the regularization
     
     return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
@@ -78,6 +85,13 @@ def loss_function_derivative_cat_weights(model, j, w):
                                    + model.bias
                                    - model.y_poison[q]) 
                                    * model.x_poison_cat[q,j,w] 
+                                   for q in model.psamples_per_subset_set) \
+                               + sum((sum(model.x_poison_num_data[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
+                                   sum(sum(model.weights_cat[j, z] * model.x_poison_cat_data[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
+                                                                                                       for j in model.catfeatures_set) 
+                                   + model.bias
+                                   - model.y_poison_data[q]) 
+                                   * model.x_poison_cat[q,j,w] * model.flag_array[q-1]
                                    for q in model.psamples_set) #Component involving the sum of poison samples errors
     regularization_component = model.regularization * model.weights_cat[j,w] #Component involving the regularization
     
@@ -96,6 +110,11 @@ def loss_function_derivative_bias(model):
                                                                                                        for j in model.catfeatures_set) 
                                    + model.bias
                                    - model.y_poison[q] 
-                                   for q in model.psamples_set) #Component involving the sum of poison samples errors
-
+                                   for q in model.psamples_per_subset_set) \
+                               + sum((sum(model.x_poison_num_data[q, j] * model.weights_num[j] for j in model.numfeatures_set) + 
+                                   sum(sum(model.weights_cat[j, z] * model.x_poison_cat_data[q, j, z] for z in range(1, model.no_categories[j] + 1)) 
+                                                                                                       for j in model.catfeatures_set) 
+                                   + model.bias
+                                   - model.y_poison_data[q]) * model.flag_array[q-1]
+                                   for q in model.psamples_set) 
     return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component)

@@ -449,6 +449,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         # Order of sets
         self.no_samples = instance_data.no_samples  #No. of non-poisoned samples
         self.no_psamples = instance_data.no_psamples  #No. of poisoned samples
+        self.no_psamples_per_subset = instance_data.no_psamples_per_subset
         self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
         self.no_catfeatures = instance_data.no_catfeatures  # No. of categorical features
         self.no_total_features = instance_data.no_total_features 
@@ -458,18 +459,23 @@ class BenchmarkPoisonAttackModel(pmo.block):
         # Sets
         self.samples_set = range(1, self.no_samples + 1)   # Set of non-poisoned samples 
         self.psamples_set = range(1, self.no_psamples + 1)   # Set of poisoned samples 
+        self.psamples_per_subset_set = range(1, self.no_psamples_per_subset + 1)
         self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
         self.catfeatures_set = range(1, self.no_catfeatures + 1)   # Set of categorical features
         self.no_categories = instance_data.no_categories_dict   # Depends on categorical features
 
         # Parameters
+        self.flag_array = instance_data.flag_array
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
         for k, v in self.x_train_num.items():
             self.x_train_num[k] = pmo.parameter(v)
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
         self.x_poison_cat = instance_data.cat_poison_dataframe.to_dict()['x_poison_cat']
+        self.x_poison_cat_data = instance_data.cat_poison_dataframe_data.to_dict()['x_poison_cat']
+        self.x_poison_num_data = instance_data.num_x_poison_dataframe.to_dict()
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
         self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
+        self.y_poison_data = instance_data.complete_y_poison_dataframe.to_dict()['y_poison']
         self.regularization = instance_data.regularization
 
         print('Parameters have been defined')
@@ -484,7 +490,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print('Creating variables')
 
         self.x_poison_num = pmo.variable_dict() # Numerical feature vector of poisoned samples
-        for psample in self.psamples_set:
+        for psample in self.psamples_per_subset_set:
             for numfeature in  self.numfeatures_set:
                 self.x_poison_num[psample,numfeature] = pmo.variable(domain=pmo.PercentFraction)
 

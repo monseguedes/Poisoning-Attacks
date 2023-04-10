@@ -410,13 +410,13 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                                    seed=seed)
 
     # Iteration count
-    iteration = instance_data.iteration_count
+    iteration = 1
 
     iterations_solutions = []
 
     model = BenchmarkPoisonAttackModel(instance_data)
 
-    # Initialise solutions
+    # Initialise variables
     for psample, numfeature in itertools.product(model.psamples_set, model.numfeatures_set):
         model.x_poison_num[psample, numfeature].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
 
@@ -430,7 +430,6 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
         new_x_train_num = poison_solution
         new_x_train_num.name = 'x_train_num'
-        ###
 
         solutions_dict = {'x_poison_num': poison_solution.to_dict(),
                          'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
@@ -440,16 +439,15 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         iterations_solutions.append(solutions_dict)
 
         # Modify data dataframes with results
-        # instance_data.update_data(new_x_train_num=new_x_train_num)
-        iteration += 1
+        instance_data.update_data(iteration, new_x_train_num=new_x_train_num)
+
+        # UPDATE PARAMETERS FROM DATA
         
         print('Iteration no. {} is finished'.format(iteration))
         print('Objective value is ', pyo.value(model.objective_function))
         solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)} 
 
-        # iteration = instance_data.iteration_count
-
-        # model.x_train_num[1,1].value = instance_data.num_x_train_dataframe.to_dict()[1,1]
+        iteration += 1
 
     return model, instance_data, solutions['iteration no.' + str(iteration - 1)]
 
@@ -500,9 +498,10 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
     instance_data.poison_samples()
 
     my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
-        
-    print('Benchmark bjective value is ',benchmark_solution['objective'])    
+
     print('Objective value is ',solutions_dict['objective'])
+    print('Benchmark bjective value is ',benchmark_solution['objective'])    
+    
 
     return my_model, instance_data, solutions_dict
 
