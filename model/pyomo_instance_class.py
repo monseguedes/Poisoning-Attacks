@@ -27,7 +27,7 @@ class InstanceData():
         Prepares the instance by creating dataframe, dividing it into poisoning samples and 
         standard samples, defining the sizes of the sets involved in the model, and the 
         regularisation parameter. This depends on the poison rate.
-        poisson_rate: 4, 8, 12, 16, 20.
+        poison_rate: 4, 8, 12, 16, 20.
         training_samples: no. training samples chosen from the whole data.
         N: number of poisoning subsets.
         seed: seed for different random splits of training, validation and testing sets.
@@ -37,7 +37,7 @@ class InstanceData():
 
         # Poisoning parameters
         self.poison_rate = poison_rate / 100    # 4, 8, 12, 16, or 20
-        self.no_poisson_subsets = N    # no. of subsets in which the total poisson samples (gotten after applying rate to training data) is divided
+        self.no_poison_subsets = N    # no. of subsets in which the total poison samples (gotten after applying rate to training data) is divided
         
         # Run all necessary methods
         self.create_dataframes(training_samples, self.seed)
@@ -59,7 +59,6 @@ class InstanceData():
         self.whole_dataframe = pd.read_csv(path.join(self.dataset_directory, 
                                                      'data-binary.csv'), 
                                            index_col=[0]) 
-        print(len(self.whole_dataframe.columns))
 
         # Pick fixed number of trainig samples.
         self.train_dataframe = self.whole_dataframe.sample(frac=None, 
@@ -93,7 +92,7 @@ class InstanceData():
         ### FEATURES (x_train)------------------------
         # Get only feature columns and reset index. Columns are still 1,2,.. 1:1,...
         self.x_train_dataframe = self.train_dataframe.drop(columns=['target'], 
-                                                           inplace=False).reset_index(drop=True)    
+                                                           inplace=False).reset_index(drop=True)  
         self.x_train_dataframe.index.name = 'sample'  
         self.x_train_dataframe.index += 1   # Index starts at 1
 
@@ -139,7 +138,11 @@ class InstanceData():
         self.cat_x_train_dataframe.name = 'x_train_cat'
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        self.cat_x_train_dataframe[['feature', 'category']] = self.cat_x_train_dataframe.column.str.split(':', expand=True).astype(int)
+        if len(self.cat_x_train_dataframe) == 0:
+            self.cat_x_train_dataframe['feature'] = []
+            self.cat_x_train_dataframe['category'] = []
+        else:
+            self.cat_x_train_dataframe[['feature', 'category']] = self.cat_x_train_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
@@ -155,11 +158,14 @@ class InstanceData():
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
                                                             random_state=self.seed).reset_index(drop=True)  
         # Total number of poisoned samples (rate applied to training data)
-        self.no_total_psamples = self.poison_dataframe.index.size   
+        self.no_total_psamples = self.poison_dataframe.index.size 
         # Get the biggest number of samples per subset that makes possible the desired number of subsets
-        self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_poisson_subsets) 
+        if self.no_poison_subsets == 0:
+            self.no_psamples_per_subset = 0
+        else:
+            self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_poison_subsets)
         # Now multiplies the no. samples per subset and no. of subset to get total poisoned samples 
-        self.no_total_psamples = self.no_psamples_per_subset * self.no_poisson_subsets 
+        self.no_total_psamples = self.no_psamples_per_subset * self.no_poison_subsets 
         # If the initial poison data had a non divisible number of samples, update it to be divisible
         self.poison_dataframe = self.poison_dataframe.iloc[:self.no_total_psamples]   
 
@@ -177,7 +183,11 @@ class InstanceData():
         self.cat_poison_dataframe_data.name = 'x_poison_cat'
         self.cat_poison_dataframe_data = self.cat_poison_dataframe_data.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        self.cat_poison_dataframe_data[['feature', 'category']] = self.cat_poison_dataframe_data.column.str.split(':', expand=True).astype(int)
+        if len(self.cat_poison_dataframe_data) == 0:
+            self.cat_poison_dataframe_data['feature'] = []
+            self.cat_poison_dataframe_data['category'] = []
+        else:
+            self.cat_poison_dataframe_data[['feature', 'category']] = self.cat_poison_dataframe_data.column.str.split(':', expand=True).astype(int)
         self.cat_poison_dataframe_data = self.cat_poison_dataframe_data.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_poison_dataframe_data = self.cat_poison_dataframe_data.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
@@ -190,7 +200,11 @@ class InstanceData():
         self.cat_poison_dataframe.name = 'x_poison_cat'
         self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
+        if len(self.cat_poison_dataframe) == 0:
+            self.cat_poison_dataframe['feature'] = []
+            self.cat_poison_dataframe['category'] = []
+        else:
+            self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
@@ -244,7 +258,6 @@ class InstanceData():
         
         # Other parameters
         self.regularization = 0.6612244897959183
-        self.regularization = 0.1
 
     def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
         """
@@ -255,16 +268,10 @@ class InstanceData():
         iterations become datapoints.
         """
 
-        #new_x_train_num = new_x_train_num.unstack(level=1)
-        print(self.num_x_poison_dataframe)
-        print(new_x_poison_num)
-        
         ### NUMERICAL POISON (x_poison_num_data)-------------------------------
         self.num_x_poison_dataframe.to_numpy()[(iteration - 1) * self.no_numfeatures * self.no_psamples_per_subset:
                                                iteration * self.no_numfeatures * self.no_psamples_per_subset] = new_x_poison_num.to_numpy()
         
-        print(self.num_x_poison_dataframe)
-
         ### ATTACK CATEGORICAL FEATURES (x_poison_cat)
         self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[iteration * self.no_psamples_per_subset:   
                                                                             (iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)

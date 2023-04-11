@@ -75,7 +75,7 @@ def loss_function_derivative_num_weights(model, poisoned, function, s):
                                           + gp.quicksum(gp.quicksum(model.tcn_lc_times_numsamples[k,j,z,s]
                                                         for z in range(1, model.no_categories[j] + 1)) 
                                             for j in model.catfeatures_set) \
-                                          + model.zn_bias_times_numsample[k,s] \
+                                          + model.bias * multiplier[k,s] \
                                           - model.y_poison[k] * multiplier[k,s]  \
                               for k in model.psamples_set)
                                 
@@ -124,7 +124,7 @@ def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
                                           + gp.quicksum(gp.quicksum(model.tcc_lc_times_catsample[k,j,z,l,h]
                                                         for z in range(1, model.no_categories[j] + 1)) 
                                             for j in model.catfeatures_set) \
-                                          + model.zc_bias_times_catsample[k,l,h] \
+                                          + model.bias * multiplier[k,l,h] \
                                           - model.y_poison[k] * multiplier[k,l,h]  \
                               for k in model.psamples_set)
 

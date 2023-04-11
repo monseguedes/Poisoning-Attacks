@@ -21,10 +21,9 @@ def linear_regression_function(model, no_sample):
     categorical_part = sum(sum(model.weights_cat[j, z] * model.x_train_cat[no_sample, j, z] for z in range(1, model.no_categories[j] + 1)) 
                                                                                                        for j in model.catfeatures_set) 
     y_hat = numerical_part + categorical_part + model.bias
-    
     return y_hat
 
-def mean_squared_error(model):
+def mean_squared_error(model, function: str):
     """
     Gets mean squared error, which is the mean of sum of the square of the difference
     between predicted values (regression) and target values for all samples.
@@ -32,17 +31,20 @@ def mean_squared_error(model):
     """
 
     #Get sum of squared error of regression prediction and target
-    sum_square_errors = sum((linear_regression_function(model, i) - model.y_train[i]) ** 2  for i in model.samples_set)
+    sum_square_errors = sum((linear_regression_function(model, i) - model.y_train[i]) ** 2  for i in model.samples_set) # + sum(model.weights_num[k] for k in model.numfeatures_set)
 
     #sum_square_errors = sum( (sum(model.x_train[i, j] * model.weights[j] for j in model.features_set) + model.bias - model.y_train[i]) ** 2 
      #   for i in model.samples_set)
 
     #Get mean of squared errors
-    mse = 1 / model.no_samples * sum_square_errors
+    if function == 'MSE':
+        mse = 1 / model.no_samples * sum_square_errors
+    elif function == 'SLS':
+        mse = sum_square_errors
 
     return mse
 
-def loss_function_derivative_num_weights(model, j):
+def loss_function_derivative_num_weights(model, j, function):
     """
     Finds the derivetive of the loss function (follower's objective) with respect to 
     the weights of the linear regression model, and sets it to 0 (first order optimality
@@ -66,11 +68,16 @@ def loss_function_derivative_num_weights(model, j):
                                    - model.y_poison_data[q]) 
                                    * model.x_poison_num[q,j] * model.flag_array[q]
                                    for q in model.psamples_set) 
-    regularization_component = model.regularization * model.weights_num[j] #Component involving the regularization
+    regularization_component = 2 * model.regularization * model.weights_num[j] #Component involving the regularization
     
-    return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
+    if function == 'MSE':
+        final = (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
+    if function == 'SLS':
+        final = 2 * (train_samples_component + poison_samples_component) + regularization_component 
 
-def loss_function_derivative_cat_weights(model, j, w):
+    return  final
+
+def loss_function_derivative_cat_weights(model, j, w, function):
     """
     Finds the derivative of the loss function (follower's objective) with respect to 
     the weights of the linear regression model, and sets it to 0 (first order optimality
@@ -93,11 +100,16 @@ def loss_function_derivative_cat_weights(model, j, w):
                                    - model.y_poison_data[q]) 
                                    * model.x_poison_cat[q,j,w] * model.flag_array[q]
                                    for q in model.psamples_set) #Component involving the sum of poison samples errors
-    regularization_component = model.regularization * model.weights_cat[j,w] #Component involving the regularization
+    regularization_component = 2 * model.regularization * model.weights_cat[j,w] #Component involving the regularization
     
-    return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
+    if function == 'MSE':
+        final = (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
+    elif function == 'SLS':
+        final = 2 * (train_samples_component + poison_samples_component) + regularization_component 
+    
+    return  final
 
-def loss_function_derivative_bias(model):
+def loss_function_derivative_bias(model, function):
     """
     Finds the derivetive of the loss function (follower's objective) with respect to 
     the bias of the linear regression model, and sets it to 0 (first order optimality
@@ -117,4 +129,10 @@ def loss_function_derivative_bias(model):
                                    + model.bias
                                    - model.y_poison_data[q]) * model.flag_array[q]
                                    for q in model.psamples_set) 
-    return  (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component)
+    
+    if function == 'MSE':
+        final = (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component)
+    elif function == 'SLS':
+        final =  2 * (train_samples_component + poison_samples_component)
+    
+    return  final

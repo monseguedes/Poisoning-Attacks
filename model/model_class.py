@@ -132,7 +132,7 @@ class PoisonAttackModel():
 
         # Defining bounds for lower-level variables (regression parameters)
         self.upper_bound = bnd.find_bounds(instance_data, self)
-        self.upper_bound = 1
+        # self.upper_bound = 1
         self.lower_bound = - self.upper_bound
         print(f'UPPER BOUND: {self.upper_bound:.2f}')
 
@@ -217,7 +217,7 @@ class PoisonAttackModel():
         print('Building SOS1 contraints')
         for psample in self.psamples_set:
             for catfeature in self.chosen_catfeatures:
-                self.model.addConstr(aux.SOS_constraints(self, psample, catfeature) == 1, name='SOSconstraints[%s, %s]' % (psample, catfeature))
+                self.model.addConstr(aux.SOS_constraints(self, psample, catfeature) == 1, name='SOSconstraints[%s,%s]' % (psample, catfeature))
 
         print('Building num weights contraints')
         for numfeature in num_gen:
@@ -232,12 +232,12 @@ class PoisonAttackModel():
             print(catfeature)
             for category in range(1, self.no_categories[catfeature] + 1):
                 print(category)
-                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, False, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_cat_weights[%s, %s]' % (catfeature, category))
+                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, False, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_cat_weights[%s,%s]' % (catfeature, category))
         for catfeature in self.chosen_catfeatures:
             print(catfeature)
             for category in range(1, self.no_categories[catfeature] + 1):
                 print(category)
-                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, True, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_pcat_weights[%s, %s]' % (catfeature, category))
+                self.model.addConstr(aux.loss_function_derivative_cat_weights(self, True, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_pcat_weights[%s,%s]' % (catfeature, category))
 
         print('Building bias constraints')
         self.model.addConstr(aux.loss_function_derivative_bias(self) == 0, name='cons_first_order_optimality_conditions_bias')
@@ -246,17 +246,17 @@ class PoisonAttackModel():
         for k in self.psamples_set:
             for r in self.numfeatures_set:
                 for s in num_gen:
-                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_data_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name='cons_tnn')
+                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_data_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name=f'cons_tnn[{k},{r},{s}]')
                 for s in self.chosen_numfeatures:
-                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name='pcons_tnn')
+                    self.model.addConstr(self.ln_numweight_times_numsample[k,r] * self.x_poison_num[k,s] == self.tnn_ln_times_numsamples[k,r,s], name=f'pons_tnn[{k},{r},{s}]')
 
         for k in self.psamples_set:
             for j in self.catfeatures_set:
                 for z in range(1, self.no_categories[j] + 1):
                     for s in num_gen:
-                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_data_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name='cons_tcn')
+                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_data_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name=f'cons_tcn[{k},{j},{z},{s}]')
                     for s in self.chosen_numfeatures:
-                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name='pcons_tcn')
+                        self.model.addConstr(self.lc_catweight_times_catsample[k,j,z] * self.x_poison_num[k,s] == self.tcn_lc_times_numsamples[k,j,z,s], name=f'pcons_tcn[{k},{j},{z},{s}]')
         
         for k in self.psamples_set:
             for r in self.numfeatures_set:
@@ -292,19 +292,19 @@ class PoisonAttackModel():
                 for z in range(1, self.no_categories[j] + 1):
                     self.model.addConstr(self.weights_cat[j,z] * self.x_poison_cat[k,j,z] == self.lc_catweight_times_catsample[k,j,z], name='pcons_lc')
         
-        for k in self.psamples_set:
-            for s in num_gen:    # Not poisoning, just data
-                self.model.addConstr(self.bias * self.x_data_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='cons_zn')
-            for s in self.chosen_numfeatures:    # Chosen poisoning
-                self.model.addConstr(self.bias * self.x_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='pcons_zn')
+        # for k in self.psamples_set:
+        #     for s in num_gen:    # Not poisoning, just data
+        #         self.model.addConstr(self.bias * self.x_data_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='cons_zn')
+        #     for s in self.chosen_numfeatures:    # Chosen poisoning
+        #         self.model.addConstr(self.bias * self.x_poison_num[k,s] == self.zn_bias_times_numsample[k,s], name='pcons_zn')
 
-        for k in self.psamples_set:
-            for l in cat_gen:    # Not poisoning, just data
-                for h in range(1, self.no_categories[l] + 1):
-                    self.model.addConstr(self.bias * self.x_data_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='cons_zc')
-            for l in self.chosen_catfeatures:     # Chosen poisoning
-                for h in range(1, self.no_categories[l] + 1):
-                    self.model.addConstr(self.bias * self.x_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='pcons_zc')
+        # for k in self.psamples_set:
+        #     for l in cat_gen:    # Not poisoning, just data
+        #         for h in range(1, self.no_categories[l] + 1):
+        #             self.model.addConstr(self.bias * self.x_data_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='cons_zc')
+        #     for l in self.chosen_catfeatures:     # Chosen poisoning
+        #         for h in range(1, self.no_categories[l] + 1):
+        #             self.model.addConstr(self.bias * self.x_poison_cat[k,l,h] == self.zc_bias_times_catsample[k,l,h], name='pcons_zc')
         
         if trilinear_envelopes:
             # Trilinear envelopes 
@@ -425,9 +425,10 @@ class RegressionModel():
         print('Objective has been built')
 
 class BenchmarkPoisonAttackModel(pmo.block):
-    def __init__(self,  instance_data: model.pyomo_instance_class.InstanceData, **kwds):
+    def __init__(self,  instance_data: model.pyomo_instance_class.InstanceData, function,  **kwds):
         super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
         # Initialize the whole abstract model whenever PoisonAttackModel is created:
+        self.function = function
         self.build_parameters(instance_data)
         self.build_variables(instance_data)
         self.build_constraints()
@@ -510,6 +511,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
             for category in self.categories_sets[cat_feature]:
                 self.weights_cat[cat_feature, category] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
         
+        # TODO FIXME XXX
+        lower_bound = - 10
+        upper_bound = 10
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
         print('Variables have been created')
 
@@ -524,18 +528,17 @@ class BenchmarkPoisonAttackModel(pmo.block):
         self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
         for numfeature in self.numfeatures_set:
             print(numfeature)
-            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature), rhs=0)
-        
+            self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature, self.function), rhs=0)
         print('Building cat weights contraints') 
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
         for cat_feature in self.catfeatures_set:
             print(cat_feature)
             for category in self.categories_sets[cat_feature]:
                 print(category)
-                self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, cat_feature, category), rhs=0)
+                self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, cat_feature, category, self.function), rhs=0)
 
         print('Building bias constraints')
-        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self), rhs=0)
+        self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self, self.function), rhs=0)
         
         print('Constraints have been built')
             
@@ -546,7 +549,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
         objective for bi-level model.
         """
         
-        self.objective_function = pmo.objective(expr=paux.mean_squared_error(self), 
+        self.objective_function = pmo.objective(expr=paux.mean_squared_error(self, self.function), 
                                                 sense=pyo.maximize)
 
         print('Objective has been built')

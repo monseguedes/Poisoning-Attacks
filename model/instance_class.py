@@ -33,6 +33,7 @@ class InstanceData():
     
     def prepare_instance(self, poison_rate: int, 
                                training_samples: int,
+                               no_poison_subsets: int,
                                no_nfeatures: int,
                                no_cfeatures: int,  
                                seed: int):
@@ -49,6 +50,7 @@ class InstanceData():
 
         # Poisoning parameters
         self.poison_rate = poison_rate / 100    # 4, 8, 12, 16, or 20
+        self.no_poison_subsets = no_poison_subsets
         self.no_nfeatures = no_nfeatures
         self.no_cfeatures = no_cfeatures
 
@@ -121,8 +123,18 @@ class InstanceData():
 
         ### Select POISON SAMPLES (from training data)-----------------------
         # Dataframe with all samples to be poisoned
+
+        # Dataframe with all samples to be poisoned
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
-                                                            random_state=self.seed).reset_index(drop=True)
+                                                            random_state=self.seed).reset_index(drop=True)  
+        # Total number of poisoned samples (rate applied to training data)
+        self.no_total_psamples = self.poison_dataframe.index.size 
+        # Get the biggest number of samples per subset that makes possible the desired number of subsets
+        self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_poison_subsets)
+        # Now multiplies the no. samples per subset and no. of subset to get total poisoned samples 
+        self.no_total_psamples = self.no_psamples_per_subset * self.no_poison_subsets 
+        # If the initial poison data had a non divisible number of samples, update it to be divisible
+        self.poison_dataframe = self.poison_dataframe.iloc[:self.no_total_psamples]   
         self.x_poison_dataframe = self.poison_dataframe.drop(columns=['target'], 
                                                            inplace=False).reset_index(drop=True)    
         self.x_poison_dataframe.index.name = 'sample'  
@@ -174,7 +186,11 @@ class InstanceData():
         self.cat_x_train_dataframe.name = 'x_train_cat'
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        self.cat_x_train_dataframe[['feature', 'category']] = self.cat_x_train_dataframe.column.str.split(':', expand=True).astype(int)
+        if len(self.cat_x_train_dataframe) == 0:
+            self.cat_x_train_dataframe["feature"] = []
+            self.cat_x_train_dataframe["category"] = []
+        else:
+            self.cat_x_train_dataframe[['feature', 'category']] = self.cat_x_train_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
@@ -225,7 +241,11 @@ class InstanceData():
         self.cat_x_poison_dataframe.name = 'x_data_poison_cat'
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
         # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        self.cat_x_poison_dataframe[['feature', 'category']] = self.cat_x_poison_dataframe.column.str.split(':', expand=True).astype(int)
+        if len(self.cat_x_poison_dataframe) == 0:
+            self.cat_x_poison_dataframe['feature'] = []
+            self.cat_x_poison_dataframe['category'] = []
+        else:
+            self.cat_x_poison_dataframe[['feature', 'category']] = self.cat_x_poison_dataframe.column.str.split(':', expand=True).astype(int)
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
    

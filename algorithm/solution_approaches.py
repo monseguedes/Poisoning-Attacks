@@ -75,6 +75,8 @@ def solve_bilevel(model_parameters: dict, checking_bilevel: bool):
                                                                       no_cfeatures=model_parameters['no_cfeatures'], 
                                                                       poison_rate=model_parameters['poison_rate'],
                                                                       training_samples=model_parameters['training_samples'],
+                                                                      time_limit=model_parameters['time_limit'],
+                                                                      feasibility=model_parameters['feasibility'],
                                                                       seed=model_parameters['seed'],
                                                                       function=model_parameters['function'])
 
@@ -113,7 +115,8 @@ def solve_benchmark(model_parameters: dict, checking_bilevel: bool):
                                                                                         poison_rate=model_parameters['poison_rate'],
                                                                                         training_samples=model_parameters['training_samples'],
                                                                                         no_psubsets = model_parameters['no_psubsets'], 
-                                                                                        seed=model_parameters['seed'])
+                                                                                        seed=model_parameters['seed'],
+                                                                                        function=model_parameters['function'])
     
     return benchmark_model, benchmark_instance, benchmark_solution
 
@@ -199,6 +202,7 @@ def solving_MINLP(dataset_name: str,
                                    training_samples=training_samples,
                                    no_nfeatures=no_nfeatures,
                                    no_cfeatures=no_cfeatures, 
+                                   no_poison_subsets=1,
                                    seed=seed)
     
     # Create model
@@ -230,7 +234,8 @@ def solving_MINLP(dataset_name: str,
     m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
     print('Model has been solved')
-    # m.write('out.lp')
+    print(m)
+    m.write('out.lp')
 
     # Save bounds in file
     file_name = '_'.join(['bounds',
@@ -261,7 +266,7 @@ def solving_MINLP(dataset_name: str,
         #plt.show()
         plt.close()
 
-    plot_bounds(file_name)
+    # plot_bounds(file_name)
 
     def initialise_opt_solution(m):
         """
@@ -297,6 +302,10 @@ def solving_MINLP(dataset_name: str,
                       'bias': my_model.bias.X}
 
     print('Objective value is ', m.ObjVal)
+    print(instance_data.train_dataframe)
+    print(instance_data.poison_dataframe)
+    print(solutions_dict['weights_cat'])
+    print(solutions_dict['weights_num'])
 
     return my_model, instance_data, solutions_dict
     
@@ -390,6 +399,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                               poison_rate: int,
                               training_samples: int, 
                               no_psubsets: int, 
+                              function,
                               seed: int):
     """
     Algorithm for iterative attack strategy. 
@@ -414,16 +424,24 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
 
     iterations_solutions = []
 
-    model = BenchmarkPoisonAttackModel(instance_data)
+    model = BenchmarkPoisonAttackModel(instance_data, function)
 
     # Initialise variables
     for psample, numfeature in itertools.product(model.psamples_set, model.numfeatures_set):
         model.x_poison_num[psample, numfeature].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
 
+
+    # TODO DEBUG XXX
+    no_psubsets = 1
+
+
     while iteration <= no_psubsets: # There is an iteration for each poison subset
 
         # Solve model
-        results = opt.solve(model, load_solutions=True, tee=True)
+        results = opt.solve(model, load_solutions=True, tee=False)
+
+        print(instance_data.train_dataframe)
+        print(instance_data.poison_dataframe)
 
         ### Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
@@ -438,19 +456,40 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                          'objective': pyo.value(model.objective_function)}
         iterations_solutions.append(solutions_dict)
 
+        print(solutions_dict['weights_cat'])
+        print(solutions_dict['weights_num'])
+        print(solutions_dict['bias'])
+
         # Modify data dataframes with results
         if iteration != no_psubsets:
             instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
 
-        # Update parameter from data
-        for k, v in enumerate(instance_data.flag_array): 
-            model.flag_array[k + 1].value = v 
-        for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
-            model.x_poison_num_data[k].value = v
-        for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
-            model.x_poison_cat[k].value = v
-        for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
-            model.y_poison[k].value = v
+            # Update parameter from data
+            for k, v in enumerate(instance_data.flag_array): 
+                model.flag_array[k + 1].value = v 
+            for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
+                model.x_poison_num_data[k].value = v
+            for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
+                model.x_poison_cat[k].value = v
+            for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
+                model.y_poison[k].value = v
+
+            dataframe = instance_data.num_x_poison_dataframe.copy().iloc[iteration * instance_data.no_numfeatures * instance_data.no_psamples_per_subset: 
+                                                                        (iteration + 1) * instance_data.no_numfeatures * instance_data.no_psamples_per_subset]
+            dataframe.index = dataframe.index.set_levels(dataframe.index.levels[0] 
+                                                        - dataframe.index.get_level_values(0)[0] + 1, level=0)
+            for psample in model.psamples_per_subset_set:
+                for numfeature in  model.numfeatures_set:
+                    model.x_poison_num[psample,numfeature].set_value(dataframe.to_dict()[psample,numfeature])
+            
+        instance_data.num_x_poison_dataframe.to_numpy()[(iteration - 1) * model.no_numfeatures * model.no_psamples_per_subset:
+                                               iteration * model.no_numfeatures * model.no_psamples_per_subset] = new_x_poison_num.to_numpy()
+        
+        final_solutions = {'x_poison_num': instance_data.num_x_poison_dataframe.to_dict(),
+                         'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
+                         'weights_cat': {(cat_feature,category) : model.weights_cat[(cat_feature,category)].value for cat_feature in model.catfeatures_set for category in model.categories_sets[cat_feature]},
+                         'bias': model.bias.value,
+                         'objective': pyo.value(model.objective_function)}
         
         print('Iteration no. {} is finished'.format(iteration))
         print('Objective value is ', pyo.value(model.objective_function))
@@ -461,8 +500,11 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
 
         print(objectives)
 
+    print("Poisoning completed")
+    print(instance_data.train_dataframe)
+    print(instance_data.num_x_poison_dataframe)
 
-    return model, instance_data, solutions['iteration no.' + str(iteration - 1)]
+    return model, instance_data, final_solutions
 
 def benchmark_plus_optimising_heuristic(model_parameters: dict):
     """
@@ -500,21 +542,36 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
                                    training_samples=model_parameters['training_samples'],
                                    no_nfeatures='all',
                                    no_cfeatures='all', 
+                                   no_poison_subsets=model_parameters['no_psubsets'],
                                    seed=model_parameters['seed'])
     # Change the necessary dataframes to have benchmark as columns in data dataframes (x_poison_dataframe)
     print('And change old columns for benchmark solution')
     instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
+
     # update x_poison_dataframe
     print('Now select new features to be optimised using Gurobi')
     instance_data.feature_selection(no_nfeatures=model_parameters['no_nfeatures'],
                                     no_cfeatures=model_parameters['no_cfeatures'])
     instance_data.poison_samples()
 
+    chosen_features = instance_data.chosen_categorical
+
     my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
+    
+    # for feature in chosen_features:
+    #     instance_data.chosen_categorical = [feature]
+    #     my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
+    #     # Upfate categorical column just solved
+    #     for key, value in solutions_dict['x_poison_cat'].items():
+    #         instance_data.cat_x_poison_dataframe.loc[key] = value
+
+    # benchmark_instance.cat_poison_dataframe_data['x_poison_cat'] = instance_data.cat_x_poison_dataframe['x_data_poison_cat']
+
+    # model, solution = solve_pyomo(opt, model_parameters, benchmark_instance)
 
     print('Objective value is ',solutions_dict['objective'])
+    # print('New benchmark bjective value is ',solution['objective']) 
     print('Benchmark bjective value is ',benchmark_solution['objective'])    
-    
 
     return my_model, instance_data, solutions_dict
 

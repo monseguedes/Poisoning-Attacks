@@ -4,6 +4,7 @@
 """
 
 import pandas as pd
+import re 
 import os
 import numpy as np
 from sklearn.linear_model import Lasso
@@ -121,17 +122,22 @@ class LASSOdataframe():
         """
         Filter dataframe and save it 
         """
-        categorical_dataframe = pd.concat([self.dataframe.filter(regex=f"^{prefix}:") for prefix in self.chosen_categorical], axis=1)
-        new_categorical_columns_dict = {str(feature) + ':' : str(i + 1) + ':' for i, feature in enumerate(self.chosen_categorical)}
-        columns = list(categorical_dataframe.columns)
-        for i in range(len(columns)):
-            for old_substring, new_substring in new_categorical_columns_dict.items():
-                columns[i] = columns[i].replace(old_substring, new_substring)
-        categorical_dataframe.columns = columns
         numerical_dataframe = self.dataframe[[str(column) for column in self.chosen_numerical]]
         new_numerical_cols = [str(i + 1) for i in range(len(numerical_dataframe.columns))]
         numerical_dataframe = numerical_dataframe.rename(columns=dict(zip(numerical_dataframe.columns, new_numerical_cols)))
-        whole_dataframe = pd.concat([numerical_dataframe, categorical_dataframe, self.dataframe['target']], axis=1)
+
+        if self.chosen_categorical != []:        
+            categorical_dataframe = pd.concat([self.dataframe.filter(regex=f"^{prefix}:") for prefix in self.chosen_categorical], axis=1)
+            new_categorical_columns_dict = {str(feature) + ':' : str(i + 1) + '_' for i, feature in enumerate(self.chosen_categorical)}
+            columns = list(categorical_dataframe.columns)
+            for i in range(len(columns)):
+                for old_substring, new_substring in new_categorical_columns_dict.items():
+                    columns[i] = re.sub("^" + old_substring, new_substring, columns[i])
+            columns = [x.replace('_', ':') for x in columns]
+            categorical_dataframe.columns = columns  
+            whole_dataframe = pd.concat([numerical_dataframe, categorical_dataframe, self.dataframe['target']], axis=1)   
+        else:
+            whole_dataframe =  pd.concat([numerical_dataframe, self.dataframe['target']], axis=1)   
 
         dataset_name = str(self.no_numerical) + 'num' + str(self.no_categorical) + 'cat'
         directory = os.path.join('data', dataset_name)
@@ -144,5 +150,5 @@ class LASSOdataframe():
 
 dataframe = create_dataframe('house')
 model = LASSOdataframe(dataframe)
-model.get_features_lists(5,5)
+model.get_features_lists(2,0)
 model.save_new_dataframe()
