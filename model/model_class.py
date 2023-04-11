@@ -510,9 +510,6 @@ class BenchmarkPoisonAttackModel(pmo.block):
             for category in self.categories_sets[cat_feature]:
                 self.weights_cat[cat_feature, category] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
         
-        # TODO FIXME XXX
-        lower_bound = - 10
-        upper_bound = 10
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
         print('Variables have been created')
 
