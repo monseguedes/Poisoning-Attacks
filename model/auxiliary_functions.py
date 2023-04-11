@@ -142,7 +142,7 @@ def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
     
     return  derivative_num_weights 
 
-def loss_function_derivative_bias(model):
+def loss_function_derivative_bias(model, function):
     """
     Finds the derivetive of the loss function (follower's objective) with respect to 
     the bias of the linear regression model (to get first order optimality condition).
@@ -167,9 +167,12 @@ def loss_function_derivative_bias(model):
                                           + model.bias \
                                           - model.y_poison[k] \
                               for k in model.psamples_set)
-
-    derivative_bias =  (2 / (model.no_samples + model.no_psamples)) \
-                       * (train_samples_component + poison_samples_component)
+    
+    if function == 'MSE':
+        derivative_bias =  (2 / (model.no_samples + model.no_psamples)) \
+                        * (train_samples_component + poison_samples_component)
+    elif function == 'SLS':
+        derivative_bias = 2  * (train_samples_component + poison_samples_component)
 
     return derivative_bias  
 

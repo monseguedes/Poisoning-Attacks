@@ -132,7 +132,6 @@ class PoisonAttackModel():
 
         # Defining bounds for lower-level variables (regression parameters)
         self.upper_bound = bnd.find_bounds(instance_data, self)
-        # self.upper_bound = 1
         self.lower_bound = - self.upper_bound
         print(f'UPPER BOUND: {self.upper_bound:.2f}')
 
@@ -240,7 +239,7 @@ class PoisonAttackModel():
                 self.model.addConstr(aux.loss_function_derivative_cat_weights(self, True, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_pcat_weights[%s,%s]' % (catfeature, category))
 
         print('Building bias constraints')
-        self.model.addConstr(aux.loss_function_derivative_bias(self) == 0, name='cons_first_order_optimality_conditions_bias')
+        self.model.addConstr(aux.loss_function_derivative_bias(self, self.function) == 0, name='cons_first_order_optimality_conditions_bias')
 
         print('Building trilinear constraints')
         for k in self.psamples_set:

@@ -20,6 +20,7 @@ def find_bounds(dataset: data.InstanceData, model):
     
     # Define matrix to be used (X^0^T X^0)
     data_matrix = dataset.x_train_dataframe.to_numpy()
+    data_matrix = np.concatenate([data_matrix, np.ones((len(data_matrix), 1))], axis=1)
     transpose_data_matrix = np.transpose(data_matrix)
     matrix = transpose_data_matrix @ data_matrix
 

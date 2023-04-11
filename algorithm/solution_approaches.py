@@ -205,6 +205,7 @@ def solving_MINLP(dataset_name: str,
                                    no_poison_subsets=1,
                                    seed=seed)
     
+    
     # Create model
     gurobi_model = gp.Model('Poisoning_Attack')
     my_model = PoisonAttackModel(gurobi_model, instance_data, function=function)
@@ -234,6 +235,7 @@ def solving_MINLP(dataset_name: str,
     m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
     print('Model has been solved')
+    print(m.Status)
     print(m)
     m.write('out.lp')
 
