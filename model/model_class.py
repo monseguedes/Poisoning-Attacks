@@ -132,6 +132,7 @@ class PoisonAttackModel():
 
         # Defining bounds for lower-level variables (regression parameters)
         self.upper_bound = bnd.find_bounds(instance_data, self)
+        self.upper_bound = 10  # TODO FIXME XXX DEBUG
         self.lower_bound = - self.upper_bound
         print(f'UPPER BOUND: {self.upper_bound:.2f}')
 
@@ -164,6 +165,7 @@ class PoisonAttackModel():
         self.weights_cat = self.model.addVars(cc_indices, vtype=GRB.CONTINUOUS, lb=self.lower_bound, ub=self.upper_bound, name='self.weights_cat')   
 
         self.bias = self.model.addVar(vtype=GRB.CONTINUOUS, lb=self.lower_bound, ub=self.upper_bound, name='bias')                     
+        #self.bias.lb = self.bias.ub = 0  # TODO XXX DEBUG
         
         # Indices for trilinear terms
         sccn_indices = [(sample, cat_feature, category, num_feature)    
@@ -191,8 +193,8 @@ class PoisonAttackModel():
         # Bilinear terms
         self.ln_numweight_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='ln_numweight_times_numsample')
         self.lc_catweight_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='lc_catweight_times_catsample')
-        self.zn_bias_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='zn_bias_times_numsample')
-        self.zc_bias_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='zc_bias_times_catsample')
+        # self.zn_bias_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='zn_bias_times_numsample')
+        # self.zc_bias_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='zc_bias_times_catsample')
         
         print('Variables have been created')
 
@@ -494,6 +496,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
                 self.x_poison_num[psample,numfeature] = pmo.variable(domain=pmo.PercentFraction)
 
         upper_bound =  bnd.find_bounds(instance_data, self)
+        upper_bound = 10
         lower_bound = - upper_bound
         print(upper_bound)
         
@@ -510,6 +513,7 @@ class BenchmarkPoisonAttackModel(pmo.block):
             for category in self.categories_sets[cat_feature]:
                 self.weights_cat[cat_feature, category] = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0)
         
+        #lower_bound = upper_bound = 0  # TODO XXX DEBUG
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
         print('Variables have been created')
 

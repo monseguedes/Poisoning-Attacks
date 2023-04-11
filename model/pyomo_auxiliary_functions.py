@@ -68,10 +68,14 @@ def loss_function_derivative_num_weights(model, j, function):
                                    - model.y_poison_data[q]) 
                                    * model.x_poison_num[q,j] * model.flag_array[q]
                                    for q in model.psamples_set) 
+    
     regularization_component = 2 * model.regularization * model.weights_num[j] #Component involving the regularization
     
     if function == 'MSE':
-        final = (2 / (model.no_samples + model.no_psamples)) * (train_samples_component + poison_samples_component) + regularization_component 
+        final = (2 / (model.no_samples + model.no_psamples)) * \
+                (train_samples_component + poison_samples_component) \
+                + regularization_component 
+    
     if function == 'SLS':
         final = 2 * (train_samples_component + poison_samples_component) + regularization_component 
 
@@ -100,6 +104,7 @@ def loss_function_derivative_cat_weights(model, j, w, function):
                                    - model.y_poison_data[q]) 
                                    * model.x_poison_cat[q,j,w] * model.flag_array[q]
                                    for q in model.psamples_set) #Component involving the sum of poison samples errors
+    
     regularization_component = 2 * model.regularization * model.weights_cat[j,w] #Component involving the regularization
     
     if function == 'MSE':

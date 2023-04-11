@@ -238,6 +238,7 @@ def solving_MINLP(dataset_name: str,
     print(m.Status)
     print(m)
     m.write('out.lp')
+    m.write('solut.sol')
 
     # Save bounds in file
     file_name = '_'.join(['bounds',
@@ -308,6 +309,7 @@ def solving_MINLP(dataset_name: str,
     print(instance_data.poison_dataframe)
     print(solutions_dict['weights_cat'])
     print(solutions_dict['weights_num'])
+    print(solutions_dict['bias'])
 
     return my_model, instance_data, solutions_dict
     
@@ -442,9 +444,6 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         # Solve model
         results = opt.solve(model, load_solutions=True, tee=False)
 
-        print(instance_data.train_dataframe)
-        print(instance_data.poison_dataframe)
-
         ### Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
         poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
@@ -501,10 +500,6 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
         iteration += 1
 
         print(objectives)
-
-    print("Poisoning completed")
-    print(instance_data.train_dataframe)
-    print(instance_data.num_x_poison_dataframe)
 
     return model, instance_data, final_solutions
 

@@ -56,11 +56,16 @@ class InstanceData():
 
         # Run all necessary methods
         self.create_dataframes(training_samples, self.seed)
+        print('Splitting daframe')
         self.split_dataframe()
+        print('Num cta split')
         self.num_cat_split()
+        print('Choosing features')
         if not no_nfeatures == 'all' and not no_cfeatures == 'all':
             self.feature_selection(no_nfeatures, no_cfeatures)
+        print('Posisoning split')
         self.poison_samples()
+        print('Sets')
         self.inital_sets_size()
         self.regularization_parameter()
 
@@ -82,6 +87,7 @@ class InstanceData():
         self.train_dataframe = self.whole_dataframe.sample(frac=None, 
                                                            n=training_samples, 
                                                            random_state=seed) # The indexes are not reset, but randomly shuffled 
+        print(self.train_dataframe)
     
         # Store rest of samples, which will be further divided into testing and validating sets
         self.test_validation_dataframe = self.whole_dataframe.drop(self.train_dataframe.index)  
@@ -126,7 +132,8 @@ class InstanceData():
 
         # Dataframe with all samples to be poisoned
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
-                                                            random_state=self.seed).reset_index(drop=True)  
+                                                            random_state=self.seed).reset_index(drop=True)
+        print(self.poison_dataframe)  
         # Total number of poisoned samples (rate applied to training data)
         self.no_total_psamples = self.poison_dataframe.index.size 
         # Get the biggest number of samples per subset that makes possible the desired number of subsets
@@ -255,7 +262,7 @@ class InstanceData():
         self.y_poison_dataframe.rename(columns={'target': 'y_poison'}, 
                                                 inplace=True)  # y_poison is the name of the pyomo parameter
         self.y_poison_dataframe.index += 1
-        self.y_poison_dataframe = round(1 - self.y_poison_dataframe)
+        #self.y_poison_dataframe = round(1 - self.y_poison_dataframe)
         
         return self.y_poison_dataframe
 

@@ -103,7 +103,7 @@ def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
        multiplier = model.x_poison_cat
     else:
        multiplier = model.x_data_poison_cat
-
+    
     #Component involving the sum of training samples errors
     train_samples_component = gp.quicksum(
                                           gp.quicksum(model.weights_num[r] * model.x_train_num[i, r] 
