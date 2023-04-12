@@ -10,23 +10,24 @@ import model.model_class as model
 from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import * 
 
-model_parameters = {'dataset_name': '10num0cat',
-                    'no_nfeatures': 10,
-                    'no_cfeatures': 0, 
-                    'poison_rate': 4,
-                    'training_samples': 20,
+model_parameters = {'dataset_name': '5num5cat',
+                    'no_nfeatures': 0,
+                    'no_cfeatures': 4, 
+                    'poison_rate': 1,
+                    'training_samples': 100,
                     'seed': 2,
-                    'function': 'SLS',
+                    'function': 'MSE',
                     'no_psubsets': 1,
+                    'heuristic_subset': 2,
                     'datatype': 'test',
                     'feasibility': 0.000001,
                     'time_limit': 100}
 
 # # Solve models
-bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
+# bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
-benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
-# benchmark_plus_optimising_heuristic(model_parameters)
+# benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
+benchmark_plus_optimising_heuristic(model_parameters)
 # benchmark_plus_optimising_subset_heuristic(model_parameters)
 # flipping_heuristic(model_parameters)
 

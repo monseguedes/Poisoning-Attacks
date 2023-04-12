@@ -36,6 +36,8 @@ import model.instance_class
 import model.pyomo_instance_class
 import algorithm.bounding_procedure as bnd
 
+long_space = 70
+short_space = 60
 
 class PoisonAttackModel():
     """
@@ -54,11 +56,19 @@ class PoisonAttackModel():
         super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
         self.model = m
         self.function = function
+        print('' * 2)
+        print('*' * long_space)
+        print('MIXED-INTEGER NONLINEAR MODEL')
+        print('*' * long_space)
         self.build_parameters(instance_data)
+        print('*' * short_space)
         self.build_variables(instance_data)
+        print('*' * short_space)
         self.build_constraints()
+        print('*' * long_space)
         self.build_objective()
-        #self.model.update()
+        print('*' * long_space)
+        print('' * 2)
         
     def __repr__(self) -> str:
         return super().__repr__()
@@ -114,8 +124,6 @@ class PoisonAttackModel():
         self.y_poison = instance_data.y_poison_dataframe.to_dict()['y_poison']
         self.regularization = instance_data.regularization
 
-        print('Parameters have been defined')
-
     def build_variables(self, instance_data: model.instance_class.InstanceData):
         """
         Decision variables of single level model: 
@@ -134,7 +142,8 @@ class PoisonAttackModel():
         self.upper_bound = bnd.find_bounds(instance_data, self)
         self.upper_bound = 10  # TODO FIXME XXX DEBUG
         self.lower_bound = - self.upper_bound
-        print(f'UPPER BOUND: {self.upper_bound:.2f}')
+        print(f'Upper bound is: {self.upper_bound:.2f}')
+        print(f'Lower bound is: {self.lower_bound:.2f}')
 
         self.x_poison_num = self.model.addVars(self.psamples_set, self.chosen_numfeatures, vtype=GRB.CONTINUOUS, lb=0, ub=1, name='x_poison_num') #, start=instance_data.num_x_poison_dataframe.to_dict())
         # for psample, nfeature in itertools.product(self.psamples_set, self.chosen_numfeatures):
@@ -143,7 +152,6 @@ class PoisonAttackModel():
                        for sample in self.psamples_set 
                        for cat_feature in self.catfeatures_set 
                        for category in range(1, self.no_categories[cat_feature] + 1)]
-        
         scc_p_indices = [(sample, cat_feature, category)    # Index of variables for categorical features
                         for sample in self.psamples_set 
                         for cat_feature in self.chosen_catfeatures 
@@ -196,8 +204,6 @@ class PoisonAttackModel():
         # self.zn_bias_times_numsample = self.model.addVars(self.psamples_set, self.numfeatures_set, lb=self.lower_bound, ub=self.upper_bound, name='zn_bias_times_numsample')
         # self.zc_bias_times_catsample = self.model.addVars(scc_indices, lb=self.lower_bound, ub=self.upper_bound, name='zc_bias_times_catsample')
         
-        print('Variables have been created')
-
     def build_constraints(self, trilinear_envelopes=False):
         """
         Constraints of the single-level reformulation: 
@@ -210,8 +216,6 @@ class PoisonAttackModel():
         - optional trilinear envelopes.
         """
 
-        print('Building contraints')
-
         num_gen = tuple(numfeature for numfeature in self.numfeatures_set if numfeature not in self.chosen_numfeatures)
         cat_gen = tuple(catfeature for catfeature in self.catfeatures_set if catfeature not in self.chosen_catfeatures)
 
@@ -222,22 +226,16 @@ class PoisonAttackModel():
 
         print('Building num weights contraints')
         for numfeature in num_gen:
-            print(numfeature)
             self.model.addConstr(aux.loss_function_derivative_num_weights(self, False, self.function, numfeature) == 0, name='cons_first_order_optimality_conditions_num_weights[%s]' % (numfeature))
         for numfeature in self.chosen_numfeatures:
-            print(numfeature)
             self.model.addConstr(aux.loss_function_derivative_num_weights(self, True, self.function, numfeature) == 0, name='cons_first_order_optimality_conditions_pnum_weights[%s]' % (numfeature))
 
         print('Building cat weights constraints')
         for catfeature in cat_gen:
-            print(catfeature)
             for category in range(1, self.no_categories[catfeature] + 1):
-                print(category)
                 self.model.addConstr(aux.loss_function_derivative_cat_weights(self, False, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_cat_weights[%s,%s]' % (catfeature, category))
         for catfeature in self.chosen_catfeatures:
-            print(catfeature)
             for category in range(1, self.no_categories[catfeature] + 1):
-                print(category)
                 self.model.addConstr(aux.loss_function_derivative_cat_weights(self, True, self.function, catfeature, category) == 0, name='cons_first_order_optimality_conditions_pcat_weights[%s,%s]' % (catfeature, category))
 
         print('Building bias constraints')
@@ -326,7 +324,6 @@ class PoisonAttackModel():
                         self.model.addConstr(self.tnn_ln_times_numsamples[k,r,s] <= self.upper_bound * self.x_poison_num[k,r] , name='concave_envelope_3')
                         self.model.addConstr(self.tnn_ln_times_numsamples[k,r,s] <= 1/2 * self.weights_num[r] + 1/2 * self.upper_bound , name='concave_envelope_4')
 
-        print('Constraints have been built')
 
     def build_objective(self):
         """
@@ -430,10 +427,18 @@ class BenchmarkPoisonAttackModel(pmo.block):
         super().__init__(**kwds)  # Gives access to methods in a superclass from the subclass that inherits from it
         # Initialize the whole abstract model whenever PoisonAttackModel is created:
         self.function = function
+        print('' * 2)
+        print('*' * long_space)
+        print('CONTINUOUS NONLINEAR MODEL')
+        print('*' * long_space)
         self.build_parameters(instance_data)
+        print('*' * short_space)
         self.build_variables(instance_data)
+        print('*' * short_space)
         self.build_constraints()
+        print('*' * long_space)
         self.build_objective()
+        print('*' * long_space)
 
     def __repr__(self) -> str:
         return super().__repr__()
@@ -479,8 +484,6 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         self.regularization = instance_data.regularization
 
-        print('Parameters have been defined')
-
     def build_variables(self, instance_data: model.pyomo_instance_class.InstanceData):
         """
         PYOMO
@@ -498,7 +501,8 @@ class BenchmarkPoisonAttackModel(pmo.block):
         upper_bound =  bnd.find_bounds(instance_data, self)
         upper_bound = 10
         lower_bound = - upper_bound
-        print(upper_bound)
+        print(f'Upper bound is: {upper_bound:.2f}')
+        print(f'Lower bound is: {lower_bound:.2f}')
         
         self.weights_num = pmo.variable_dict() # Weights for numerical features
         for numfeature in self.numfeatures_set:
@@ -515,7 +519,6 @@ class BenchmarkPoisonAttackModel(pmo.block):
         
         #lower_bound = upper_bound = 0  # TODO XXX DEBUG
         self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound) # Bias of the linear regresion model
-        print('Variables have been created')
 
     def build_constraints(self):
         """
@@ -527,21 +530,16 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print('Building num weights contraints')
         self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()  # There is one constraint per feature
         for numfeature in self.numfeatures_set:
-            print(numfeature)
             self.cons_first_order_optimality_conditions_num_weights[numfeature] = pmo.constraint(body=paux.loss_function_derivative_num_weights(self, numfeature, self.function), rhs=0)
         print('Building cat weights contraints') 
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
         for cat_feature in self.catfeatures_set:
-            print(cat_feature)
             for category in self.categories_sets[cat_feature]:
-                print(category)
                 self.cons_first_order_optimality_conditions_cat_weights[cat_feature, category] = pmo.constraint(body=paux.loss_function_derivative_cat_weights(self, cat_feature, category, self.function), rhs=0)
 
         print('Building bias constraints')
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(body=paux.loss_function_derivative_bias(self, self.function), rhs=0)
-        
-        print('Constraints have been built')
-            
+                    
     def build_objective(self):
         """
         PYOMO

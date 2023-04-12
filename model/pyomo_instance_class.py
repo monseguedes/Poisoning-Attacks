@@ -22,7 +22,7 @@ class InstanceData():
         self.iteration_count = 1    # To keep track of iteration count
         self.dataset_directory = ''.join(['data/', dataset_name])    # e.g., data/pharm
         
-    def prepare_instance(self, poison_rate: int, training_samples: int, N: int, seed: int):
+    def prepare_instance(self, poison_rate: int, training_samples: int, no_psubsets: int, seed: int):
         """
         Prepares the instance by creating dataframe, dividing it into poisoning samples and 
         standard samples, defining the sizes of the sets involved in the model, and the 
@@ -37,13 +37,17 @@ class InstanceData():
 
         # Poisoning parameters
         self.poison_rate = poison_rate / 100    # 4, 8, 12, 16, or 20
-        self.no_poison_subsets = N    # no. of subsets in which the total poison samples (gotten after applying rate to training data) is divided
+        self.no_psubsets = no_psubsets    # no. of subsets in which the total poison samples (gotten after applying rate to training data) is divided
         
         # Run all necessary methods
         self.create_dataframes(training_samples, self.seed)
+        print('Splitting daframe')
         self.split_dataframe()
+        print('Numerical and categorical split')
         self.num_cat_split()
+        print('Splitting poisoning data')
         self.poison_samples()
+        print('Defining sets')
         self.inital_sets_size()
         self.regularization_parameter()
 
@@ -160,12 +164,12 @@ class InstanceData():
         # Total number of poisoned samples (rate applied to training data)
         self.no_total_psamples = self.poison_dataframe.index.size 
         # Get the biggest number of samples per subset that makes possible the desired number of subsets
-        if self.no_poison_subsets == 0:
+        if self.no_psubsets == 0:
             self.no_psamples_per_subset = 0
         else:
-            self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_poison_subsets)
+            self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_psubsets)
         # Now multiplies the no. samples per subset and no. of subset to get total poisoned samples 
-        self.no_total_psamples = self.no_psamples_per_subset * self.no_poison_subsets 
+        self.no_total_psamples = self.no_psamples_per_subset * self.no_psubsets 
         # If the initial poison data had a non divisible number of samples, update it to be divisible
         self.poison_dataframe = self.poison_dataframe.iloc[:self.no_total_psamples]   
 
@@ -248,7 +252,6 @@ class InstanceData():
         categorical_names = set([name.split(':')[0] for name in self.categorical_columns]) 
         self.categories_dict = {int(cat_name) : [int(category.split(':')[1]) for category in self.categorical_columns if category.startswith(cat_name + ':')] for cat_name in categorical_names}
         self.no_categories_dict = {int(cat_name) : len(self.categories_dict[int(cat_name)]) for cat_name in categorical_names}
-        print(self.no_categories_dict)
 
     def regularization_parameter(self):
         """

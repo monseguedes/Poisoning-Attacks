@@ -29,6 +29,10 @@ import csv
 import matplotlib.pyplot as plt
 import pyomo.environ as pyo
 
+middle_space = long_space
+long_space = 80
+short_space = 60
+
 def create_matrix(data):
     # get the unique row and column labels from the dictionary keys
     rows, cols = np.array(list(data.keys())).T
@@ -104,20 +108,30 @@ def solve_ridge(model_parameters: dict, checking_bilevel: bool):
 
     return ridge_model, ridge_instance, ridge_solution
 
-def solve_benchmark(model_parameters: dict, checking_bilevel: bool):
+def solve_benchmark(model_parameters: dict, checking_bilevel= False):
     """
     Function to solve and store benchmark results
     """
     # Solve benchmark 
     opt = pyo.SolverFactory('ipopt')
-    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
-                                                                                        dataset_name=model_parameters['dataset_name'], 
-                                                                                        poison_rate=model_parameters['poison_rate'],
-                                                                                        training_samples=model_parameters['training_samples'],
-                                                                                        no_psubsets = model_parameters['no_psubsets'], 
-                                                                                        seed=model_parameters['seed'],
-                                                                                        function=model_parameters['function'])
+
+    print('' * 2)
+    print('*' * long_space)
+    print('ITERATIVE CONTINUOUS NONLINEAR ALGORITHM')
+    print('*' * long_space)
+
+    print('Building data class')
+    instance_data = benchmark_data.InstanceData(dataset_name=model_parameters['dataset_name'])
+    instance_data.prepare_instance(poison_rate=model_parameters['poison_rate'],
+                                   training_samples=model_parameters['training_samples'],
+                                   no_psubsets = model_parameters['no_psubsets'],
+                                   seed=model_parameters['seed'])
     
+    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
+                                                                                        instance_data=instance_data,
+                                                                                        model_parameters=model_parameters)
+    print('*' * middle_space)
+
     return benchmark_model, benchmark_instance, benchmark_solution
 
 def solve_gurobi(model_parameters: dict, instance_data):
@@ -157,7 +171,7 @@ def solve_gurobi(model_parameters: dict, instance_data):
     return my_model, solutions_dict
 
 def solve_pyomo(opt, model_parameters: dict, instance_data):
-    new_model = BenchmarkPoisonAttackModel(instance_data)
+    new_model = BenchmarkPoisonAttackModel(instance_data, function=model_parameters['function'])
 
     # Initialise solutions
     for psample, numfeature in itertools.product(new_model.psamples_set, new_model.numfeatures_set):
@@ -178,7 +192,7 @@ def solve_pyomo(opt, model_parameters: dict, instance_data):
                         'weights_cat': {(cat_feature,category) : new_model.weights_cat[(cat_feature,category)].value for cat_feature in new_model.catfeatures_set for category in new_model.categories_sets[cat_feature]},
                         'bias': new_model.bias.value,
                         'objective': pyo.value(new_model.objective_function)}
-    
+        
     return new_model, solutions_dict
  
 
@@ -196,6 +210,12 @@ def solving_MINLP(dataset_name: str,
     Algorithm for solving the MINLP bilevel model.
     """
 
+    print('' * 2)
+    print('*' * long_space)
+    print('MIXED-INTEGER NONLINEAR ALGORITHM')
+    print('*' * long_space)
+    
+    print('Building data class')
     # Initialise data (ready for building first instance)
     instance_data = data.InstanceData(dataset_name=dataset_name)
     instance_data.prepare_instance(poison_rate=poison_rate, 
@@ -204,7 +224,8 @@ def solving_MINLP(dataset_name: str,
                                    no_cfeatures=no_cfeatures, 
                                    no_poison_subsets=1,
                                    seed=seed)
-    
+    print('*' * middle_space)
+    print('')
     
     # Create model
     gurobi_model = gp.Model('Poisoning_Attack')
@@ -229,16 +250,22 @@ def solving_MINLP(dataset_name: str,
     m._data = []
     m._start = time.time()
 
-    print('Solving model...')
+    print('*' * middle_space)
+    print('SOLVING MODEL')
+    print('*' * middle_space)
+
     m.params.NonConvex = 2
     m.params.FeasibilityTol = feasibility
     m.params.TimeLimit = time_limit
     results = m.optimize(callback=data_cb)
+
+    print('*' * middle_space)
     print('Model has been solved')
-    print(m.Status)
-    print(m)
-    m.write('out.lp')
-    m.write('solut.sol')
+    print('*' * middle_space)
+    print('' * 2)
+
+    #m.write('out.lp')
+    #m.write('solut.sol')
 
     # Save bounds in file
     file_name = '_'.join(['bounds',
@@ -304,12 +331,17 @@ def solving_MINLP(dataset_name: str,
                       'weights_cat': [element.X for element in my_model.weights_cat.values()],
                       'bias': my_model.bias.X}
 
+    print('*' * middle_space)
+    print('RESULTS')
+    print('*' * middle_space)
+    print('Numerical weights are ', solutions_dict['weights_cat'])
+    print('Categorical weights are ', solutions_dict['weights_num'])
+    print('Bias is ', solutions_dict['bias'])
+    print('*' * middle_space)
     print('Objective value is ', m.ObjVal)
-    print(instance_data.train_dataframe)
-    print(instance_data.poison_dataframe)
-    print(solutions_dict['weights_cat'])
-    print(solutions_dict['weights_num'])
-    print(solutions_dict['bias'])
+    print('*' * middle_space)
+    print('*' * long_space)
+    print('' * 2)
 
     return my_model, instance_data, solutions_dict
     
@@ -399,12 +431,8 @@ def single_attack_strategy(opt: pyo.SolverFactory,
     return model, instance_data, solutions_dict
 
 def iterative_attack_strategy(opt: pyo.SolverFactory, 
-                              dataset_name: str, 
-                              poison_rate: int,
-                              training_samples: int, 
-                              no_psubsets: int, 
-                              function,
-                              seed: int):
+                              instance_data,
+                              model_parameters):
     """
     Algorithm for iterative attack strategy. 
 
@@ -416,40 +444,30 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
     of while loop and process is repeated for all subsets/iterations.
     """
 
-    # Initializa data (ready for building first instance)
-    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name)
-    instance_data.prepare_instance(poison_rate=poison_rate,
-                                   training_samples=training_samples,
-                                   N=no_psubsets, 
-                                   seed=seed)
-
+    print('' * 2)
+    print('*' * long_space)
+    print('ITERATIVE ATTACK STRATEGY')
+    print('*' * long_space)
+    
     # Iteration count
     iteration = 1
-
     iterations_solutions = []
 
-    model = BenchmarkPoisonAttackModel(instance_data, function)
+    model = BenchmarkPoisonAttackModel(instance_data, model_parameters['function'])
 
     # Initialise variables
     for psample, numfeature in itertools.product(model.psamples_set, model.numfeatures_set):
         model.x_poison_num[psample, numfeature].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
 
-
-    # TODO DEBUG XXX
-    no_psubsets = 1
-
-
-    while iteration <= no_psubsets: # There is an iteration for each poison subset
-
+    while iteration <= instance_data.no_psubsets: # There is an iteration for each poison subset
         # Solve model
         results = opt.solve(model, load_solutions=True, tee=False)
 
-        ### Store results of the poison subset found during this iteration
+        # Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
         poison_solution = pd.Series([variable._value for variable in model.x_poison_num.values()], index=index)  # Make a dataframe with solutions and desires index
         new_x_poison_num = poison_solution
         new_x_poison_num.name = 'x_poison_num'
-
         solutions_dict = {'x_poison_num': poison_solution.to_dict(),
                          'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
                          'weights_cat': {(cat_feature,category) : model.weights_cat[(cat_feature,category)].value for cat_feature in model.catfeatures_set for category in model.categories_sets[cat_feature]},
@@ -457,14 +475,9 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                          'objective': pyo.value(model.objective_function)}
         iterations_solutions.append(solutions_dict)
 
-        print(solutions_dict['weights_cat'])
-        print(solutions_dict['weights_num'])
-        print(solutions_dict['bias'])
-
         # Modify data dataframes with results
-        if iteration != no_psubsets:
+        if iteration != instance_data.no_psubsets:
             instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
-
             # Update parameter from data
             for k, v in enumerate(instance_data.flag_array): 
                 model.flag_array[k + 1].value = v 
@@ -482,24 +495,34 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
             for psample in model.psamples_per_subset_set:
                 for numfeature in  model.numfeatures_set:
                     model.x_poison_num[psample,numfeature].set_value(dataframe.to_dict()[psample,numfeature])
-            
+
         instance_data.num_x_poison_dataframe.to_numpy()[(iteration - 1) * model.no_numfeatures * model.no_psamples_per_subset:
                                                iteration * model.no_numfeatures * model.no_psamples_per_subset] = new_x_poison_num.to_numpy()
         
-        final_solutions = {'x_poison_num': instance_data.num_x_poison_dataframe.to_dict(),
-                         'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
-                         'weights_cat': {(cat_feature,category) : model.weights_cat[(cat_feature,category)].value for cat_feature in model.catfeatures_set for category in model.categories_sets[cat_feature]},
-                         'bias': model.bias.value,
-                         'objective': pyo.value(model.objective_function)}
-        
         print('Iteration no. {} is finished'.format(iteration))
-        print('Objective value is ', pyo.value(model.objective_function))
-        solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)} 
-        objectives = {'iteration no.' + str(iteration + 1): solution['objective'] for iteration, solution in enumerate(iterations_solutions)} 
-
         iteration += 1
 
-        print(objectives)
+    final_solutions = {'x_poison_num': instance_data.num_x_poison_dataframe.to_dict(),
+                        'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
+                        'weights_cat': {(cat_feature,category) : model.weights_cat[(cat_feature,category)].value for cat_feature in model.catfeatures_set for category in model.categories_sets[cat_feature]},
+                        'bias': model.bias.value,
+                        'objective': pyo.value(model.objective_function)}
+
+    print('')
+    print('*' * middle_space)
+    print('RESULTS')
+    print('*' * middle_space)
+    print('Numerical weights are ', final_solutions['weights_cat'])
+    print('Categorical weights are ', final_solutions['weights_num'])
+    print('Bias is ', final_solutions['bias'])
+    print('*' * middle_space)
+    print('Objective value is ',pyo.value(model.objective_function))
+    print('*' * middle_space)
+    print('*' * long_space)
+    print('' * 2)
+
+    solutions = {'iteration no.' + str(iteration + 1): solution for iteration, solution in enumerate(iterations_solutions)} 
+    objectives = {'iteration no.' + str(iteration + 1): solution['objective'] for iteration, solution in enumerate(iterations_solutions)} 
 
     return model, instance_data, final_solutions
 
@@ -517,23 +540,23 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
     SOLUTION: Chop earlier and iterate over num features. 
     """
     
-    # Solve model using benchmark method.
-    opt = pyo.SolverFactory('ipopt')
-    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
-                                                                                        dataset_name=model_parameters['dataset_name'], 
-                                                                                        poison_rate=model_parameters['poison_rate'],
-                                                                                        training_samples=model_parameters['training_samples'],
-                                                                                        no_psubsets = model_parameters['no_psubsets'], 
-                                                                                        seed=model_parameters['seed'])
+    print('' * 2)
+    print('-' * long_space)
+    print('-' * long_space)
+    print('HEURISTIC ALGORITHM: CONTINOUS + SUBSET MIXED-INTEGER')
+    print('-' * long_space)
+    print('-' * long_space)
 
-    print('Bnechmark has been solved, now let us add this solution to data')
+    # Optimise numerical features locally
+    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(model_parameters)
+    print('Benchmark has been solved, now adding this solution to data')
+
     # Get poisoning samples as data
     benchmark_data = benchmark_solution['x_poison_num']
-
     matrix = create_matrix(benchmark_data)
 
-    # Optimise now categorical features separately (MINLP)
-    print('We now build the original data...')
+    # Prepare data to optimise categorical features separately (MINLP)
+    print('We first build a data class for a mixed-integer model')
     instance_data = data.InstanceData(dataset_name=model_parameters['dataset_name'])
     instance_data.prepare_instance(poison_rate=model_parameters['poison_rate'],
                                    training_samples=model_parameters['training_samples'],
@@ -542,10 +565,9 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
                                    no_poison_subsets=model_parameters['no_psubsets'],
                                    seed=model_parameters['seed'])
     # Change the necessary dataframes to have benchmark as columns in data dataframes (x_poison_dataframe)
-    print('And change old columns for benchmark solution')
+    print('And then change old columns for solution from continuous nonlinear model')
     instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
-    # update x_poison_dataframe
     print('Now select new features to be optimised using Gurobi')
     instance_data.feature_selection(no_nfeatures=model_parameters['no_nfeatures'],
                                     no_cfeatures=model_parameters['no_cfeatures'])
@@ -553,22 +575,29 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
 
     chosen_features = instance_data.chosen_categorical
 
-    my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
+    #my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
     
-    # for feature in chosen_features:
-    #     instance_data.chosen_categorical = [feature]
-    #     my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
-    #     # Upfate categorical column just solved
-    #     for key, value in solutions_dict['x_poison_cat'].items():
-    #         instance_data.cat_x_poison_dataframe.loc[key] = value
+    # TODO fix update of last iteration
+    for i in range(0, len(chosen_features), model_parameters['heuristic_subset']):
+        instance_data.chosen_categorical = chosen_features[i:i+ model_parameters['heuristic_subset']]
+        print('Subset of features is', instance_data.chosen_categorical)
+        my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
+        
+        # Update categorical column just solved
+        for key, value in solutions_dict['x_poison_cat'].items():
+            instance_data.cat_x_poison_dataframe.loc[key] = value
+        benchmark_instance.cat_poison_dataframe_data['x_poison_cat'] = instance_data.cat_x_poison_dataframe['x_data_poison_cat']
+        
+        opt = pyo.SolverFactory('ipopt')
+        model, instance, solution = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
+        # Get poisoning samples as data
+        benchmark_data = benchmark_solution['x_poison_num']
+        matrix = create_matrix(benchmark_data)
+        instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
-    # benchmark_instance.cat_poison_dataframe_data['x_poison_cat'] = instance_data.cat_x_poison_dataframe['x_data_poison_cat']
-
-    # model, solution = solve_pyomo(opt, model_parameters, benchmark_instance)
-
-    print('Objective value is ',solutions_dict['objective'])
-    # print('New benchmark bjective value is ',solution['objective']) 
-    print('Benchmark bjective value is ',benchmark_solution['objective'])    
+    print('Heuristic objective value is ',solutions_dict['objective'])
+    # print('New benchmark objective value is ',solution['objective']) 
+    print('Benchmark objective value is ',benchmark_solution['objective'])    
 
     return my_model, instance_data, solutions_dict
 
@@ -675,53 +704,40 @@ def flipping_heuristic(model_parameters: dict):
     PROBLEM: 
     """
 
-    # Solve model using benchmark method.
-    opt = pyo.SolverFactory('ipopt')
-    benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
-                                                                                        dataset_name=model_parameters['dataset_name'], 
-                                                                                        poison_rate=model_parameters['poison_rate'],
-                                                                                        training_samples=model_parameters['training_samples'],
-                                                                                        no_psubsets = model_parameters['no_psubsets'], 
-                                                                                        seed=model_parameters['seed'])
+    print('' * 2)
+    print('-' * long_space)
+    print('-' * long_space)
+    print('HEURISTIC ALGORITHM: CONTINOUS + FLIPPING CATEGORICAL')
+    print('-' * long_space)
+    print('-' * long_space)
 
+    # Solve numerical features locally
+    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(model_parameters)
     print('Benchmark has been solved, now let us add this solution to data')
 
-    a = benchmark_instance.cat_poison_dataframe
-
+    # TODO MAKE ITERATIVE
     # Flip all categorical features. 
     for psample in range(1, benchmark_instance.no_psamples + 1):
         for feature in list(benchmark_instance.categories_dict.keys()):
+            # Find column with highest weight
+            my_dict = benchmark_solution['weights_cat']
+            # Given values for first two elements of tuple
+            given_values = feature
+            # Filter the keys based on given values for first two elements
+            filtered_keys = [k for k in my_dict.keys() if k[0] == given_values]
             if benchmark_instance.y_poison_dataframe['y_poison'].iloc[psample - 1] < 0.5:
-                # Find column with highest weight
-                my_dict = benchmark_solution['weights_cat']
-                # Given values for first two elements of tuple
-                given_values = (psample, feature)
-                # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in my_dict.keys() if k[:2] == given_values]
-                # Get the second element of the tuple for which the associated value is higher
-                max_value_key = max(filtered_keys, key=my_dict.get)
-                max_value_second_element = max_value_key[1]
-                # Change features as desired
-                benchmark_instance.cat_poison_dataframe.loc[psample, feature, max_value_second_element] = 1
-                other_features = [k[1] for k in filtered_keys if k[1] != max_value_second_element] 
-                for i in other_features:
-                    benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] = 0
-            else:    # (if geq 0.5)
-                # Find column with highest weight
-                my_dict = benchmark_solution['weights_cat']
-                # Given values for first two elements of tuple
-                given_values = feature
-                # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in my_dict.keys() if k[0] == given_values]
-                # Get the second element of the tuple for which the associated value is higher
-                min_value_key = min(filtered_keys, key=my_dict.get)
-                min_value_second_element = min_value_key[1]
-                # Change features as desired
-                benchmark_instance.cat_poison_dataframe.loc[psample, feature, min_value_second_element] = 1
-                other_features = [k[1] for k in filtered_keys if k[1] != min_value_second_element] 
-                for i in other_features:
-                    benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] =  0
+                value_key = max(filtered_keys, key=my_dict.get)
+            else:
+                value_key = min(filtered_keys, key=my_dict.get) 
+            value_second_element = value_key[1]
+            # Change features as desired
+            benchmark_instance.cat_poison_dataframe.loc[psample, feature, value_second_element] = 1
+            other_features = [k[1] for k in filtered_keys if k[1] != value_second_element] 
+            for i in other_features:
+                benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] = 0
+
     
+    opt = pyo.SolverFactory('ipopt')
     new_model, solutions_dict = solve_pyomo(opt, model_parameters, benchmark_instance)
 
     print('Objective value is ', solutions_dict['objective'])

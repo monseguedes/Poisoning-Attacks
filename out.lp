@@ -1,582 +1,3438 @@
 \ Model Poisoning_Attack
 \ LP format - for model browsing. Use MPS format to capture full model detail.
 Maximize
-  - 1.830786363448961 weights_num[1] - 0.5723908051713622 weights_num[2]
-   - 6.999058772701321 weights_num[3] - 5.942820441605331 weights_num[4]
-   - 8.012721663054043 weights_num[5] - 8.144429014488729 weights_num[6]
-   - 1.336355413934704 weights_num[7] - 1.35412651648283 weights_num[8]
-   - 0.6470305475257392 weights_num[9] - 3.096660376317596 weights_num[10]
-   - 10.30579086238022 bias + 1.513904248937327 Constant + [
-   1.334204279222422 weights_num[1] ^2
-   + 0.8104909680100096 weights_num[1] * weights_num[2]
-   + 8.631049467909163 weights_num[1] * weights_num[3]
-   + 7.845033533699085 weights_num[1] * weights_num[4]
-   + 10.27384259064108 weights_num[1] * weights_num[5]
-   + 10.32308122226911 weights_num[1] * weights_num[6]
-   + 1.618874159433467 weights_num[1] * weights_num[7]
-   + 1.70097688503149 weights_num[1] * weights_num[8]
-   + 1.098613590349416 weights_num[1] * weights_num[9]
-   + 4.112101773651749 weights_num[1] * weights_num[10]
-   + 13.5904098183021 weights_num[1] * bias
-   + 0.1788792070797679 weights_num[2] ^2
-   + 2.639644145302141 weights_num[2] * weights_num[3]
-   + 2.639278786604032 weights_num[2] * weights_num[4]
-   + 2.91417955515453 weights_num[2] * weights_num[5]
-   + 3.204359687458612 weights_num[2] * weights_num[6]
-   + 0.4443955620497193 weights_num[2] * weights_num[7]
-   + 0.5088674089491999 weights_num[2] * weights_num[8]
-   + 0.2622583725338579 weights_num[2] * weights_num[9]
-   + 1.372347689218551 weights_num[2] * weights_num[10]
-   + 4.266704059454528 weights_num[2] * bias
-   + 16.93827160493828 weights_num[3] ^2
-   + 28.94444444444445 weights_num[3] * weights_num[4]
-   + 40.45410628019323 weights_num[3] * weights_num[5]
-   + 40.4 weights_num[3] * weights_num[6]
-   + 6.665304369452095 weights_num[3] * weights_num[7]
-   + 6.474096547349752 weights_num[3] * weights_num[8]
-   + 3.189983251034161 weights_num[3] * weights_num[9]
-   + 15.08770928462709 weights_num[3] * weights_num[10]
-   + 50.66666666666668 weights_num[3] * bias + 14.1875 weights_num[4] ^2
-   + 34.39492753623188 weights_num[4] * weights_num[5]
-   + 36.66666666666667 weights_num[4] * weights_num[6]
-   + 5.700539127066113 weights_num[4] * weights_num[7]
-   + 5.527873217284933 weights_num[4] * weights_num[8]
-   + 3.18217226445605 weights_num[4] * weights_num[9]
-   + 12.62970890410959 weights_num[4] * weights_num[10]
-   + 46 weights_num[4] * bias + 25.87114051669818 weights_num[5] ^2
-   + 50.10338164251208 weights_num[5] * weights_num[6]
-   + 8.080702728869724 weights_num[5] * weights_num[7]
-   + 7.883588989317462 weights_num[5] * weights_num[8]
-   + 3.90375950665213 weights_num[5] * weights_num[9]
-   + 18.5911628945801 weights_num[5] * weights_num[10]
-   + 61.76811594202898 weights_num[5] * bias
-   + 26.44833333333333 weights_num[6] ^2
-   + 8.03542151629936 weights_num[6] * weights_num[7]
-   + 7.666610616519259 weights_num[6] * weights_num[8]
-   + 4.39607157239952 weights_num[6] * weights_num[9]
-   + 17.90256849315069 weights_num[6] * weights_num[10]
-   + 61.53333333333333 weights_num[6] * bias
-   + 0.9653586468465886 weights_num[7] ^2
-   + 1.218133799298307 weights_num[7] * weights_num[8]
-   + 0.6263915556940579 weights_num[7] * weights_num[9]
-   + 2.998683686324247 weights_num[7] * weights_num[10]
-   + 9.833705234159778 weights_num[7] * bias
-   + 0.7309381712696021 weights_num[8] ^2
-   + 0.5785349464277185 weights_num[8] * weights_num[9]
-   + 2.756573484393791 weights_num[8] * weights_num[10]
-   + 9.688049862625359 weights_num[8] * bias
-   + 0.5873936999352183 weights_num[9] ^2
-   + 1.652107315569069 weights_num[9] * weights_num[10]
-   + 5.2235757699671 weights_num[9] * bias
-   + 4.437594925759992 weights_num[10] ^2
-   + 23.26198630136987 weights_num[10] * bias + 40 bias ^2 ] / 2 
+  - 0.3499529386350661 weights_num[1] - 0.4072214507244367 weights_num[2]
+   - 0.3309401472017775 weights_num[3] - 0.2246169513493497 weights_num[4]
+   - 0.2751648838726736 weights_num[5]
+   - 0.0284821552562144 self.weights_cat[1,2]
+   - 0.3531315095125676 self.weights_cat[1,4]
+   - 0.1193167615608943 self.weights_cat[2,1]
+   - 0.2196639355645049 self.weights_cat[2,3]
+   - 0.0623941119288988 self.weights_cat[3,3]
+   - 0.2880988751562282 self.weights_cat[3,4]
+   - 0.0714206360227746 self.weights_cat[4,3]
+   - 0.1258297458686294 self.weights_cat[4,4]
+   - 0.2462019164004999 self.weights_cat[4,5]
+   - 0.189890293014859 self.weights_cat[5,2]
+   - 0.250229134842383 self.weights_cat[5,3]
+   - 0.0751701152617692 self.weights_cat[5,4] - 0.5152895431190111 bias
+   + 0.0756952124468664 Constant + [ 0.8469135802469135 weights_num[1] ^2
+   + 2.02 weights_num[1] * weights_num[2]
+   + 1.562962962962962 weights_num[1] * weights_num[3]
+   + 1.051851851851852 weights_num[1] * weights_num[4]
+   + 1.328158295281583 weights_num[1] * weights_num[5]
+   + 0.1111111111111111 weights_num[1] * self.weights_cat[1,2]
+   + 1.733333333333333 weights_num[1] * self.weights_cat[1,4]
+   + 0.7111111111111111 weights_num[1] * self.weights_cat[2,1]
+   + 1.022222222222222 weights_num[1] * self.weights_cat[2,3]
+   + 0.3555555555555556 weights_num[1] * self.weights_cat[3,3]
+   + 1.488888888888888 weights_num[1] * self.weights_cat[3,4]
+   + 0.2888888888888889 weights_num[1] * self.weights_cat[4,3]
+   + 0.6444444444444445 weights_num[1] * self.weights_cat[4,4]
+   + 1.244444444444444 weights_num[1] * self.weights_cat[4,5]
+   + 0.9111111111111111 weights_num[1] * self.weights_cat[5,2]
+   + 1.244444444444444 weights_num[1] * self.weights_cat[5,3]
+   + 0.3777777777777778 weights_num[1] * self.weights_cat[5,4]
+   + 2.533333333333334 weights_num[1] * bias
+   + 1.322416666666667 weights_num[2] ^2
+   + 1.855555555555556 weights_num[2] * weights_num[3]
+   + 1.250833333333333 weights_num[2] * weights_num[4]
+   + 1.571632420091324 weights_num[2] * weights_num[5]
+   + 0.1566666666666667 weights_num[2] * self.weights_cat[1,2]
+   + 2.096666666666667 weights_num[2] * self.weights_cat[1,4]
+   + 1.04 weights_num[2] * self.weights_cat[2,1]
+   + 1.246666666666667 weights_num[2] * self.weights_cat[2,3]
+   + 0.5166666666666667 weights_num[2] * self.weights_cat[3,3]
+   + 1.96 weights_num[2] * self.weights_cat[3,4]
+   + 0.17 weights_num[2] * self.weights_cat[4,3]
+   + 0.7933333333333334 weights_num[2] * self.weights_cat[4,4]
+   + 1.6 weights_num[2] * self.weights_cat[4,5]
+   + 1.036666666666667 weights_num[2] * self.weights_cat[5,2]
+   + 1.493333333333333 weights_num[2] * self.weights_cat[5,3]
+   + 0.5466666666666667 weights_num[2] * self.weights_cat[5,4]
+   + 3.076666666666666 weights_num[2] * bias
+   + 0.7777777777777777 weights_num[3] ^2
+   + 1.038888888888889 weights_num[3] * weights_num[4]
+   + 1.262785388127854 weights_num[3] * weights_num[5]
+   + 0.2 weights_num[3] * self.weights_cat[1,2]
+   + 1.533333333333333 weights_num[3] * self.weights_cat[1,4]
+   + 0.6666666666666666 weights_num[3] * self.weights_cat[2,1]
+   + 0.9333333333333332 weights_num[3] * self.weights_cat[2,3]
+   + 0.3333333333333333 weights_num[3] * self.weights_cat[3,3]
+   + 1.266666666666667 weights_num[3] * self.weights_cat[3,4]
+   + 0.2666666666666667 weights_num[3] * self.weights_cat[4,3]
+   + 0.7333333333333333 weights_num[3] * self.weights_cat[4,4]
+   + 1.066666666666667 weights_num[3] * self.weights_cat[4,5]
+   + 0.8666666666666666 weights_num[3] * self.weights_cat[5,2]
+   + 1.133333333333333 weights_num[3] * self.weights_cat[5,3]
+   + 0.4 weights_num[3] * self.weights_cat[5,4] + 2.4 weights_num[3] * bias
+   + 0.3638888888888889 weights_num[4] ^2
+   + 0.8627853881278541 weights_num[4] * weights_num[5]
+   + 0.1333333333333333 weights_num[4] * self.weights_cat[1,2]
+   + 1.05 weights_num[4] * self.weights_cat[1,4]
+   + 0.4833333333333333 weights_num[4] * self.weights_cat[2,1]
+   + 0.6166666666666667 weights_num[4] * self.weights_cat[2,3]
+   + 0.2333333333333333 weights_num[4] * self.weights_cat[3,3]
+   + 0.8333333333333331 weights_num[4] * self.weights_cat[3,4]
+   + 0.2166666666666667 weights_num[4] * self.weights_cat[4,3]
+   + 0.5166666666666667 weights_num[4] * self.weights_cat[4,4]
+   + 0.6833333333333332 weights_num[4] * self.weights_cat[4,5]
+   + 0.65 weights_num[4] * self.weights_cat[5,2]
+   + 0.75 weights_num[4] * self.weights_cat[5,3]
+   + 0.2333333333333333 weights_num[4] * self.weights_cat[5,4]
+   + 1.633333333333334 weights_num[4] * bias
+   + 0.5695170294614376 weights_num[5] ^2
+   + 0.1 weights_num[5] * self.weights_cat[1,2]
+   + 1.438356164383562 weights_num[5] * self.weights_cat[1,4]
+   + 0.6883561643835616 weights_num[5] * self.weights_cat[2,1]
+   + 0.8 weights_num[5] * self.weights_cat[2,3]
+   + 0.25 weights_num[5] * self.weights_cat[3,3]
+   + 1.188356164383562 weights_num[5] * self.weights_cat[3,4]
+   + 0.2 weights_num[5] * self.weights_cat[4,3]
+   + 0.6383561643835618 weights_num[5] * self.weights_cat[4,4]
+   + weights_num[5] * self.weights_cat[4,5]
+   + 0.8383561643835618 weights_num[5] * self.weights_cat[5,2]
+   + 0.95 weights_num[5] * self.weights_cat[5,3]
+   + 0.3 weights_num[5] * self.weights_cat[5,4]
+   + 2.088356164383562 weights_num[5] * bias + 0.1 self.weights_cat[1,2] ^2
+   + 0.2 self.weights_cat[1,2] * self.weights_cat[2,3]
+   + 0.2 self.weights_cat[1,2] * self.weights_cat[4,4]
+   + 0.2 self.weights_cat[1,2] * self.weights_cat[5,2]
+   + 0.2 self.weights_cat[1,2] * bias + 1.3 self.weights_cat[1,4] ^2
+   + self.weights_cat[1,4] * self.weights_cat[2,1]
+   + 1.2 self.weights_cat[1,4] * self.weights_cat[2,3]
+   + 0.2 self.weights_cat[1,4] * self.weights_cat[3,3]
+   + 2 self.weights_cat[1,4] * self.weights_cat[3,4]
+   + 0.2 self.weights_cat[1,4] * self.weights_cat[4,3]
+   + 0.8 self.weights_cat[1,4] * self.weights_cat[4,4]
+   + 1.6 self.weights_cat[1,4] * self.weights_cat[4,5]
+   + 0.8 self.weights_cat[1,4] * self.weights_cat[5,2]
+   + 1.4 self.weights_cat[1,4] * self.weights_cat[5,3]
+   + 0.4 self.weights_cat[1,4] * self.weights_cat[5,4]
+   + 2.6 self.weights_cat[1,4] * bias + 0.7 self.weights_cat[2,1] ^2
+   + 0.4 self.weights_cat[2,1] * self.weights_cat[3,3]
+   + 0.8 self.weights_cat[2,1] * self.weights_cat[3,4]
+   + 0.6 self.weights_cat[2,1] * self.weights_cat[4,4]
+   + 0.6 self.weights_cat[2,1] * self.weights_cat[4,5]
+   + 0.6 self.weights_cat[2,1] * self.weights_cat[5,2]
+   + 0.8 self.weights_cat[2,1] * self.weights_cat[5,3]
+   + 1.4 self.weights_cat[2,1] * bias + 0.7 self.weights_cat[2,3] ^2
+   + self.weights_cat[2,3] * self.weights_cat[3,4]
+   + 0.2 self.weights_cat[2,3] * self.weights_cat[4,3]
+   + 0.2 self.weights_cat[2,3] * self.weights_cat[4,4]
+   + self.weights_cat[2,3] * self.weights_cat[4,5]
+   + 0.6 self.weights_cat[2,3] * self.weights_cat[5,2]
+   + 0.4 self.weights_cat[2,3] * self.weights_cat[5,3]
+   + 0.4 self.weights_cat[2,3] * self.weights_cat[5,4]
+   + 1.4 self.weights_cat[2,3] * bias + 0.3 self.weights_cat[3,3] ^2
+   + 0.2 self.weights_cat[3,3] * self.weights_cat[4,4]
+   + 0.4 self.weights_cat[3,3] * self.weights_cat[5,3]
+   + 0.2 self.weights_cat[3,3] * self.weights_cat[5,4]
+   + 0.6 self.weights_cat[3,3] * bias + 1.1 self.weights_cat[3,4] ^2
+   + 0.4 self.weights_cat[3,4] * self.weights_cat[4,4]
+   + 1.8 self.weights_cat[3,4] * self.weights_cat[4,5]
+   + 0.6 self.weights_cat[3,4] * self.weights_cat[5,2]
+   + 1.2 self.weights_cat[3,4] * self.weights_cat[5,3]
+   + 0.4 self.weights_cat[3,4] * self.weights_cat[5,4]
+   + 2.2 self.weights_cat[3,4] * bias + 0.2 self.weights_cat[4,3] ^2
+   + 0.4 self.weights_cat[4,3] * self.weights_cat[5,2]
+   + 0.4 self.weights_cat[4,3] * bias + 0.6 self.weights_cat[4,4] ^2
+   + 0.6 self.weights_cat[4,4] * self.weights_cat[5,2]
+   + 0.6 self.weights_cat[4,4] * self.weights_cat[5,3]
+   + 1.2 self.weights_cat[4,4] * bias + 0.9 self.weights_cat[4,5] ^2
+   + 0.4 self.weights_cat[4,5] * self.weights_cat[5,2]
+   + self.weights_cat[4,5] * self.weights_cat[5,3]
+   + 0.4 self.weights_cat[4,5] * self.weights_cat[5,4]
+   + 1.8 self.weights_cat[4,5] * bias + 0.8 self.weights_cat[5,2] ^2
+   + 1.6 self.weights_cat[5,2] * bias + 0.9 self.weights_cat[5,3] ^2
+   + 1.8 self.weights_cat[5,3] * bias + 0.3 self.weights_cat[5,4] ^2
+   + 0.6 self.weights_cat[5,4] * bias + 2 bias ^2 ] / 2 
 Subject To
+ SOSconstraints[1,2]: x_poison_cat[1,2,1] + x_poison_cat[1,2,2]
+   + x_poison_cat[1,2,3] + x_poison_cat[1,2,4] + x_poison_cat[1,2,5] = 1
+ cons_first_order_optimality_conditions_num_weights[1]:
+   2.129033341731754 weights_num[1] + 0.9619047619047619 weights_num[2]
+   + 0.7442680776014109 weights_num[3] + 0.5008818342151676 weights_num[4]
+   + 0.6324563310864679 weights_num[5]
+   + 0.0529100529100529 self.weights_cat[1,2]
+   + 0.8253968253968254 self.weights_cat[1,4]
+   + 0.3386243386243386 self.weights_cat[2,1]
+   + 0.4867724867724867 self.weights_cat[2,3]
+   + 0.1693121693121693 self.weights_cat[3,3]
+   + 0.708994708994709 self.weights_cat[3,4]
+   + 0.1375661375661376 self.weights_cat[4,3]
+   + 0.3068783068783069 self.weights_cat[4,4]
+   + 0.5925925925925926 self.weights_cat[4,5]
+   + 0.4338624338624338 self.weights_cat[5,2]
+   + 0.5925925925925926 self.weights_cat[5,3]
+   + 0.1798941798941799 self.weights_cat[5,4] + 1.259259259259259 bias
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,1,1]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,2,1]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,3,1]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,4,1]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,5,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,1,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,2,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,3,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,4,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,5,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,1,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,2,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,3,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,4,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,5,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,1,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,2,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,3,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,4,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,1,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,2,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,3,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,4,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,5,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,6,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,1,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,2,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,3,1]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,4,1]
+   = 0.339394366890548
+ cons_first_order_optimality_conditions_num_weights[2]:
+   0.9619047619047618 weights_num[1] + 2.581893424036281 weights_num[2]
+   + 0.8835978835978835 weights_num[3] + 0.5956349206349205 weights_num[4]
+   + 0.748396390519678 weights_num[5]
+   + 0.0746031746031746 self.weights_cat[1,2]
+   + 0.9984126984126984 self.weights_cat[1,4]
+   + 0.4952380952380953 self.weights_cat[2,1]
+   + 0.5936507936507937 self.weights_cat[2,3]
+   + 0.246031746031746 self.weights_cat[3,3]
+   + 0.9333333333333335 self.weights_cat[3,4]
+   + 0.080952380952381 self.weights_cat[4,3]
+   + 0.3777777777777778 self.weights_cat[4,4]
+   + 0.7619047619047619 self.weights_cat[4,5]
+   + 0.4936507936507936 self.weights_cat[5,2]
+   + 0.7111111111111111 self.weights_cat[5,3]
+   + 0.2603174603174603 self.weights_cat[5,4] + 1.555555555555555 bias
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,1,2]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,2,2]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,3,2]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,4,2]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,5,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,1,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,2,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,3,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,4,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,5,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,1,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,2,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,3,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,4,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,5,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,1,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,2,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,3,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,4,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,1,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,2,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,3,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,4,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,5,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,6,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,1,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,2,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,3,2]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,4,2]
+   = 0.3982709632480498
+ cons_first_order_optimality_conditions_num_weights[3]:
+   0.7442680776014109 weights_num[1] + 0.8835978835978836 weights_num[2]
+   + 2.063189720332578 weights_num[3] + 0.4947089947089947 weights_num[4]
+   + 0.6013263752989779 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,2]
+   + 0.7301587301587301 self.weights_cat[1,4]
+   + 0.3174603174603174 self.weights_cat[2,1]
+   + 0.4444444444444444 self.weights_cat[2,3]
+   + 0.1587301587301587 self.weights_cat[3,3]
+   + 0.6031746031746031 self.weights_cat[3,4]
+   + 0.126984126984127 self.weights_cat[4,3]
+   + 0.3492063492063492 self.weights_cat[4,4]
+   + 0.5079365079365079 self.weights_cat[4,5]
+   + 0.4126984126984127 self.weights_cat[5,2]
+   + 0.5396825396825397 self.weights_cat[5,3]
+   + 0.1904761904761905 self.weights_cat[5,4] + 1.174603174603174 bias
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,1,3]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,2,3]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,3,3]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,4,3]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,5,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,1,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,2,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,3,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,4,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,5,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,1,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,2,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,3,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,4,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,5,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,1,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,2,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,3,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,4,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,1,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,2,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,3,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,4,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,5,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,6,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,1,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,2,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,3,3]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,4,3]
+   = 0.3188446049159839
+ cons_first_order_optimality_conditions_num_weights[4]:
+   0.5008818342151675 weights_num[1] + 0.5956349206349206 weights_num[2]
+   + 0.4947089947089947 weights_num[3] + 1.669009826152684 weights_num[4]
+   + 0.4108501848227875 weights_num[5]
+   + 0.0634920634920635 self.weights_cat[1,2] + 0.5 self.weights_cat[1,4]
+   + 0.2301587301587301 self.weights_cat[2,1]
+   + 0.2936507936507937 self.weights_cat[2,3]
+   + 0.1111111111111111 self.weights_cat[3,3]
+   + 0.3968253968253969 self.weights_cat[3,4]
+   + 0.1031746031746032 self.weights_cat[4,3]
+   + 0.246031746031746 self.weights_cat[4,4]
+   + 0.3253968253968254 self.weights_cat[4,5]
+   + 0.3095238095238095 self.weights_cat[5,2]
+   + 0.3571428571428571 self.weights_cat[5,3]
+   + 0.1111111111111111 self.weights_cat[5,4] + 0.8015873015873014 bias
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,1,4]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,2,4]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,3,4]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,4,4]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,5,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,1,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,2,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,3,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,4,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,5,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,1,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,2,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,3,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,4,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,5,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,1,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,2,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,3,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,4,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,1,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,2,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,3,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,4,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,5,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,6,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,1,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,2,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,3,4]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,4,4]
+   = 0.2166685403041464
+ cons_first_order_optimality_conditions_num_weights[5]:
+   0.632456331086468 weights_num[1] + 0.7483963905196782 weights_num[2]
+   + 0.6013263752989778 weights_num[3] + 0.4108501848227875 weights_num[4]
+   + 1.86484615050749 weights_num[5]
+   + 0.0476190476190476 self.weights_cat[1,2]
+   + 0.6849315068493151 self.weights_cat[1,4]
+   + 0.3277886497064579 self.weights_cat[2,1]
+   + 0.3809523809523809 self.weights_cat[2,3]
+   + 0.119047619047619 self.weights_cat[3,3]
+   + 0.5658838878016961 self.weights_cat[3,4]
+   + 0.0952380952380952 self.weights_cat[4,3]
+   + 0.3039791258969341 self.weights_cat[4,4]
+   + 0.4761904761904761 self.weights_cat[4,5]
+   + 0.3992172211350293 self.weights_cat[5,2]
+   + 0.4523809523809523 self.weights_cat[5,3]
+   + 0.1428571428571428 self.weights_cat[5,4] + 1.018264840182648 bias
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,1,5]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,2,5]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,3,5]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,4,5]
+   + 0.0952380952380952 tnn_ln_times_numsamples[1,5,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,1,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,2,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,3,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,4,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,1,5,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,1,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,2,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,3,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,4,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,2,5,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,1,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,2,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,3,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,3,4,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,1,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,2,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,3,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,4,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,5,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,4,6,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,1,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,2,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,3,5]
+   + 0.0952380952380952 tcn_lc_times_numsamples[1,5,4,5]
+   = 0.264809428421598
+ cons_first_order_optimality_conditions_cat_weights[1,1]:
+   1.322448979591837 self.weights_cat[1,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,1,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,1,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,1,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,1,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,1,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,1,1] = 0
+ cons_first_order_optimality_conditions_cat_weights[1,2]:
+   0.0529100529100529 weights_num[1] + 0.0746031746031746 weights_num[2]
+   + 0.0952380952380952 weights_num[3] + 0.0634920634920635 weights_num[4]
+   + 0.0476190476190476 weights_num[5]
+   + 1.417687074829932 self.weights_cat[1,2]
+   + 0.0952380952380952 self.weights_cat[2,3]
+   + 0.0952380952380952 self.weights_cat[4,4]
+   + 0.0952380952380952 self.weights_cat[5,2] + 0.0952380952380952 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,1,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,1,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,1,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,1,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,1,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,1,2]
+   = 0.0271258621487756
+ cons_first_order_optimality_conditions_cat_weights[1,3]:
+   1.322448979591837 self.weights_cat[1,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,1,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,1,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,1,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,1,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,1,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,1,3] = 0
+ cons_first_order_optimality_conditions_cat_weights[1,4]:
+   0.8253968253968254 weights_num[1] + 0.9984126984126984 weights_num[2]
+   + 0.7301587301587301 weights_num[3] + 0.5 weights_num[4]
+   + 0.6849315068493149 weights_num[5]
+   + 2.560544217687076 self.weights_cat[1,4]
+   + 0.4761904761904762 self.weights_cat[2,1]
+   + 0.5714285714285714 self.weights_cat[2,3]
+   + 0.0952380952380952 self.weights_cat[3,3]
+   + 0.9523809523809523 self.weights_cat[3,4]
+   + 0.0952380952380952 self.weights_cat[4,3]
+   + 0.3809523809523809 self.weights_cat[4,4]
+   + 0.7619047619047619 self.weights_cat[4,5]
+   + 0.3809523809523809 self.weights_cat[5,2]
+   + 0.6666666666666666 self.weights_cat[5,3]
+   + 0.1904761904761905 self.weights_cat[5,4] + 1.238095238095238 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,1,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,1,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,1,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,1,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,1,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,1,4]
+   = 0.3363157233453025
+ cons_first_order_optimality_conditions_cat_weights[1,5]:
+   1.322448979591837 self.weights_cat[1,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,1,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,1,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,1,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,1,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,1,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,1,5] = 0
+ cons_first_order_optimality_conditions_cat_weights[3,1]:
+   1.322448979591837 self.weights_cat[3,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,3,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,3,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,3,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,3,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,3,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,3,1] = 0
+ cons_first_order_optimality_conditions_cat_weights[3,2]:
+   1.322448979591837 self.weights_cat[3,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,3,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,3,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,3,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,3,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,3,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,3,2] = 0
+ cons_first_order_optimality_conditions_cat_weights[3,3]:
+   0.1693121693121693 weights_num[1] + 0.246031746031746 weights_num[2]
+   + 0.1587301587301587 weights_num[3] + 0.1111111111111111 weights_num[4]
+   + 0.119047619047619 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,4]
+   + 0.1904761904761905 self.weights_cat[2,1]
+   + 1.608163265306123 self.weights_cat[3,3]
+   + 0.0952380952380952 self.weights_cat[4,4]
+   + 0.1904761904761905 self.weights_cat[5,3]
+   + 0.0952380952380952 self.weights_cat[5,4] + 0.3809523809523809 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,3,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,3,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,3,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,3,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,3,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,3,3]
+   = 0.0704135007703956
+ cons_first_order_optimality_conditions_cat_weights[3,4]:
+   0.708994708994709 weights_num[1] + 0.9333333333333335 weights_num[2]
+   + 0.6031746031746031 weights_num[3] + 0.3968253968253967 weights_num[4]
+   + 0.565883887801696 weights_num[5]
+   + 0.9523809523809523 self.weights_cat[1,4]
+   + 0.3809523809523809 self.weights_cat[2,1]
+   + 0.4761904761904762 self.weights_cat[2,3]
+   + 2.370068027210884 self.weights_cat[3,4]
+   + 0.1904761904761905 self.weights_cat[4,4]
+   + 0.8571428571428571 self.weights_cat[4,5]
+   + 0.2857142857142857 self.weights_cat[5,2]
+   + 0.5714285714285714 self.weights_cat[5,3]
+   + 0.1904761904761905 self.weights_cat[5,4] + 1.047619047619047 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,3,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,3,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,3,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,3,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,3,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,3,4]
+   = 0.2743798811011697
+ cons_first_order_optimality_conditions_cat_weights[4,1]:
+   1.322448979591837 self.weights_cat[4,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,1] = 0
+ cons_first_order_optimality_conditions_cat_weights[4,2]:
+   1.322448979591837 self.weights_cat[4,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,2] = 0
+ cons_first_order_optimality_conditions_cat_weights[4,3]:
+   0.1375661375661376 weights_num[1] + 0.080952380952381 weights_num[2]
+   + 0.126984126984127 weights_num[3] + 0.1031746031746032 weights_num[4]
+   + 0.0952380952380952 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,4]
+   + 0.0952380952380952 self.weights_cat[2,3]
+   + 1.512925170068027 self.weights_cat[4,3]
+   + 0.1904761904761905 self.weights_cat[5,2] + 0.1904761904761905 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,3]
+   = 0.0680196533550234
+ cons_first_order_optimality_conditions_cat_weights[4,4]:
+   0.3068783068783069 weights_num[1] + 0.3777777777777777 weights_num[2]
+   + 0.3492063492063492 weights_num[3] + 0.246031746031746 weights_num[4]
+   + 0.3039791258969341 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,2]
+   + 0.3809523809523809 self.weights_cat[1,4]
+   + 0.2857142857142857 self.weights_cat[2,1]
+   + 0.0952380952380952 self.weights_cat[2,3]
+   + 0.0952380952380952 self.weights_cat[3,3]
+   + 0.1904761904761905 self.weights_cat[3,4]
+   + 1.893877551020408 self.weights_cat[4,4]
+   + 0.2857142857142857 self.weights_cat[5,2]
+   + 0.2857142857142857 self.weights_cat[5,3] + 0.5714285714285714 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,4]
+   = 0.1198378532082184
+ cons_first_order_optimality_conditions_cat_weights[4,5]:
+   0.5925925925925926 weights_num[1] + 0.761904761904762 weights_num[2]
+   + 0.5079365079365079 weights_num[3] + 0.3253968253968254 weights_num[4]
+   + 0.4761904761904762 weights_num[5]
+   + 0.7619047619047619 self.weights_cat[1,4]
+   + 0.2857142857142857 self.weights_cat[2,1]
+   + 0.4761904761904762 self.weights_cat[2,3]
+   + 0.8571428571428571 self.weights_cat[3,4]
+   + 2.179591836734694 self.weights_cat[4,5]
+   + 0.1904761904761905 self.weights_cat[5,2]
+   + 0.4761904761904762 self.weights_cat[5,3]
+   + 0.1904761904761905 self.weights_cat[5,4] + 0.8571428571428571 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,5]
+   = 0.2344780156195237
+ cons_first_order_optimality_conditions_cat_weights[4,6]:
+   1.322448979591837 self.weights_cat[4,6]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,4,6]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,4,6]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,4,6]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,4,6]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,4,6]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,4,6] = 0
+ cons_first_order_optimality_conditions_cat_weights[5,1]:
+   1.322448979591837 self.weights_cat[5,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,5,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,5,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,5,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,5,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,5,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,5,1] = 0
+ cons_first_order_optimality_conditions_cat_weights[5,2]:
+   0.4338624338624338 weights_num[1] + 0.4936507936507936 weights_num[2]
+   + 0.4126984126984127 weights_num[3] + 0.3095238095238095 weights_num[4]
+   + 0.3992172211350293 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,2]
+   + 0.3809523809523809 self.weights_cat[1,4]
+   + 0.2857142857142857 self.weights_cat[2,1]
+   + 0.2857142857142857 self.weights_cat[2,3]
+   + 0.2857142857142857 self.weights_cat[3,4]
+   + 0.1904761904761905 self.weights_cat[4,3]
+   + 0.2857142857142857 self.weights_cat[4,4]
+   + 0.1904761904761905 self.weights_cat[4,5]
+   + 2.084353741496599 self.weights_cat[5,2] + 0.7619047619047619 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,5,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,5,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,5,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,5,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,5,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,5,2]
+   = 0.1808478981093895
+ cons_first_order_optimality_conditions_cat_weights[5,3]:
+   0.5925925925925926 weights_num[1] + 0.7111111111111112 weights_num[2]
+   + 0.5396825396825397 weights_num[3] + 0.3571428571428571 weights_num[4]
+   + 0.4523809523809523 weights_num[5]
+   + 0.6666666666666666 self.weights_cat[1,4]
+   + 0.3809523809523809 self.weights_cat[2,1]
+   + 0.1904761904761905 self.weights_cat[2,3]
+   + 0.1904761904761905 self.weights_cat[3,3]
+   + 0.5714285714285714 self.weights_cat[3,4]
+   + 0.2857142857142857 self.weights_cat[4,4]
+   + 0.4761904761904762 self.weights_cat[4,5]
+   + 2.179591836734695 self.weights_cat[5,3] + 0.9523809523809523 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,5,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,5,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,5,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,5,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,5,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,5,3]
+   = 0.2493039987832378
+ cons_first_order_optimality_conditions_cat_weights[5,4]:
+   0.1798941798941799 weights_num[1] + 0.2603174603174603 weights_num[2]
+   + 0.1904761904761905 weights_num[3] + 0.1111111111111111 weights_num[4]
+   + 0.1428571428571428 weights_num[5]
+   + 0.1904761904761905 self.weights_cat[1,4]
+   + 0.1904761904761905 self.weights_cat[2,3]
+   + 0.0952380952380952 self.weights_cat[3,3]
+   + 0.1904761904761905 self.weights_cat[3,4]
+   + 0.1904761904761905 self.weights_cat[4,5]
+   + 1.608163265306122 self.weights_cat[5,4] + 0.2857142857142857 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,5,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,5,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,5,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,5,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,5,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,5,4]
+   = 0.0715905859635897
  cons_first_order_optimality_conditions_bias:
-   6.795204909151048 weights_num[1] + 2.133352029727265 weights_num[2]
-   + 25.33333333333334 weights_num[3] + 23 weights_num[4]
-   + 30.88405797101449 weights_num[5] + 30.76666666666667 weights_num[6]
-   + 4.916852617079889 weights_num[7] + 4.844024931312678 weights_num[8]
-   + 2.61178788498355 weights_num[9] + 11.63099315068493 weights_num[10]
-   + 42 bias + 2 ln_numweight_times_numsample[1,1]
-   + 2 ln_numweight_times_numsample[1,2]
-   + 2 ln_numweight_times_numsample[1,3]
-   + 2 ln_numweight_times_numsample[1,4]
-   + 2 ln_numweight_times_numsample[1,5]
-   + 2 ln_numweight_times_numsample[1,6]
-   + 2 ln_numweight_times_numsample[1,7]
-   + 2 ln_numweight_times_numsample[1,8]
-   + 2 ln_numweight_times_numsample[1,9]
-   + 2 ln_numweight_times_numsample[1,10] = 10.53659213998056
- cons_first_order_optimality_conditions_pnum_weights[1]:
-   - 0.2308012776003332 x_poison_num[1,1]
-   + 2.656653258814259 weights_num[1] + 0.4052454840050049 weights_num[2]
-   + 4.315524733954581 weights_num[3] + 3.922516766849542 weights_num[4]
-   + 5.136921295320539 weights_num[5] + 5.161540611134557 weights_num[6]
-   + 0.8094370797167334 weights_num[7] + 0.8504884425157446 weights_num[8]
-   + 0.5493067951747078 weights_num[9] + 2.056050886825874 weights_num[10]
-   + 6.795204909151049 bias + 2 tnn_ln_times_numsamples[1,1,1]
-   + 2 tnn_ln_times_numsamples[1,2,1] + 2 tnn_ln_times_numsamples[1,3,1]
-   + 2 tnn_ln_times_numsamples[1,4,1] + 2 tnn_ln_times_numsamples[1,5,1]
-   + 2 tnn_ln_times_numsamples[1,6,1] + 2 tnn_ln_times_numsamples[1,7,1]
-   + 2 tnn_ln_times_numsamples[1,8,1] + 2 tnn_ln_times_numsamples[1,9,1]
-   + 2 tnn_ln_times_numsamples[1,10,1] + [ 2 x_poison_num[1,1] * bias ]
-   = 1.830786363448961
- cons_first_order_optimality_conditions_pnum_weights[2]:
-   - 0.2308012776003332 x_poison_num[1,2]
-   + 0.4052454840050049 weights_num[1] + 1.501328186671604 weights_num[2]
-   + 1.31982207265107 weights_num[3] + 1.319639393302016 weights_num[4]
-   + 1.457089777577265 weights_num[5] + 1.602179843729306 weights_num[6]
-   + 0.2221977810248597 weights_num[7] + 0.2544337044746 weights_num[8]
-   + 0.131129186266929 weights_num[9] + 0.6861738446092752 weights_num[10]
-   + 2.133352029727265 bias + 2 tnn_ln_times_numsamples[1,1,2]
-   + 2 tnn_ln_times_numsamples[1,2,2] + 2 tnn_ln_times_numsamples[1,3,2]
-   + 2 tnn_ln_times_numsamples[1,4,2] + 2 tnn_ln_times_numsamples[1,5,2]
-   + 2 tnn_ln_times_numsamples[1,6,2] + 2 tnn_ln_times_numsamples[1,7,2]
-   + 2 tnn_ln_times_numsamples[1,8,2] + 2 tnn_ln_times_numsamples[1,9,2]
-   + 2 tnn_ln_times_numsamples[1,10,2] + [ 2 x_poison_num[1,2] * bias ]
-   = 0.5723908051713622
- cons_first_order_optimality_conditions_pnum_weights[3]:
-   - 0.2308012776003332 x_poison_num[1,3]
-   + 4.315524733954581 weights_num[1] + 1.31982207265107 weights_num[2]
-   + 18.26072058453011 weights_num[3] + 14.47222222222222 weights_num[4]
-   + 20.22705314009662 weights_num[5] + 20.2 weights_num[6]
-   + 3.332652184726048 weights_num[7] + 3.237048273674877 weights_num[8]
-   + 1.594991625517081 weights_num[9] + 7.543854642313547 weights_num[10]
-   + 25.33333333333333 bias + 2 tnn_ln_times_numsamples[1,1,3]
-   + 2 tnn_ln_times_numsamples[1,2,3] + 2 tnn_ln_times_numsamples[1,3,3]
-   + 2 tnn_ln_times_numsamples[1,4,3] + 2 tnn_ln_times_numsamples[1,5,3]
-   + 2 tnn_ln_times_numsamples[1,6,3] + 2 tnn_ln_times_numsamples[1,7,3]
-   + 2 tnn_ln_times_numsamples[1,8,3] + 2 tnn_ln_times_numsamples[1,9,3]
-   + 2 tnn_ln_times_numsamples[1,10,3] + [ 2 x_poison_num[1,3] * bias ]
-   = 6.999058772701322
- cons_first_order_optimality_conditions_pnum_weights[4]:
-   - 0.2308012776003332 x_poison_num[1,4]
-   + 3.922516766849543 weights_num[1] + 1.319639393302016 weights_num[2]
-   + 14.47222222222222 weights_num[3] + 15.50994897959184 weights_num[4]
-   + 17.19746376811595 weights_num[5] + 18.33333333333334 weights_num[6]
-   + 2.850269563533057 weights_num[7] + 2.763936608642466 weights_num[8]
-   + 1.591086132228025 weights_num[9] + 6.314854452054794 weights_num[10]
-   + 23 bias + 2 tnn_ln_times_numsamples[1,1,4]
-   + 2 tnn_ln_times_numsamples[1,2,4] + 2 tnn_ln_times_numsamples[1,3,4]
-   + 2 tnn_ln_times_numsamples[1,4,4] + 2 tnn_ln_times_numsamples[1,5,4]
-   + 2 tnn_ln_times_numsamples[1,6,4] + 2 tnn_ln_times_numsamples[1,7,4]
-   + 2 tnn_ln_times_numsamples[1,8,4] + 2 tnn_ln_times_numsamples[1,9,4]
-   + 2 tnn_ln_times_numsamples[1,10,4] + [ 2 x_poison_num[1,4] * bias ]
-   = 5.942820441605332
- cons_first_order_optimality_conditions_pnum_weights[5]:
-   - 0.2308012776003332 x_poison_num[1,5] + 5.13692129532054 weights_num[1]
-   + 1.457089777577265 weights_num[2] + 20.22705314009662 weights_num[3]
-   + 17.19746376811595 weights_num[4] + 27.19358949629001 weights_num[5]
-   + 25.05169082125604 weights_num[6] + 4.040351364434862 weights_num[7]
-   + 3.941794494658731 weights_num[8] + 1.951879753326065 weights_num[9]
-   + 9.295581447290052 weights_num[10] + 30.88405797101449 bias
-   + 2 tnn_ln_times_numsamples[1,1,5] + 2 tnn_ln_times_numsamples[1,2,5]
-   + 2 tnn_ln_times_numsamples[1,3,5] + 2 tnn_ln_times_numsamples[1,4,5]
-   + 2 tnn_ln_times_numsamples[1,5,5] + 2 tnn_ln_times_numsamples[1,6,5]
-   + 2 tnn_ln_times_numsamples[1,7,5] + 2 tnn_ln_times_numsamples[1,8,5]
-   + 2 tnn_ln_times_numsamples[1,9,5] + 2 tnn_ln_times_numsamples[1,10,5]
-   + [ 2 x_poison_num[1,5] * bias ] = 8.012721663054043
- cons_first_order_optimality_conditions_pnum_weights[6]:
-   - 0.2308012776003332 x_poison_num[1,6]
-   + 5.161540611134556 weights_num[1] + 1.602179843729306 weights_num[2]
-   + 20.2 weights_num[3] + 18.33333333333334 weights_num[4]
-   + 25.05169082125604 weights_num[5] + 27.77078231292517 weights_num[6]
-   + 4.017710758149677 weights_num[7] + 3.833305308259629 weights_num[8]
-   + 2.19803578619976 weights_num[9] + 8.951284246575341 weights_num[10]
-   + 30.76666666666667 bias + 2 tnn_ln_times_numsamples[1,1,6]
-   + 2 tnn_ln_times_numsamples[1,2,6] + 2 tnn_ln_times_numsamples[1,3,6]
-   + 2 tnn_ln_times_numsamples[1,4,6] + 2 tnn_ln_times_numsamples[1,5,6]
-   + 2 tnn_ln_times_numsamples[1,6,6] + 2 tnn_ln_times_numsamples[1,7,6]
-   + 2 tnn_ln_times_numsamples[1,8,6] + 2 tnn_ln_times_numsamples[1,9,6]
-   + 2 tnn_ln_times_numsamples[1,10,6] + [ 2 x_poison_num[1,6] * bias ]
-   = 8.144429014488729
- cons_first_order_optimality_conditions_pnum_weights[7]:
-   - 0.2308012776003332 x_poison_num[1,7]
-   + 0.8094370797167333 weights_num[1] + 0.2221977810248596 weights_num[2]
-   + 3.332652184726047 weights_num[3] + 2.850269563533058 weights_num[4]
-   + 4.040351364434861 weights_num[5] + 4.017710758149679 weights_num[6]
-   + 2.287807626438425 weights_num[7] + 0.6090668996491538 weights_num[8]
-   + 0.3131957778470288 weights_num[9] + 1.499341843162124 weights_num[10]
-   + 4.91685261707989 bias + 2 tnn_ln_times_numsamples[1,1,7]
-   + 2 tnn_ln_times_numsamples[1,2,7] + 2 tnn_ln_times_numsamples[1,3,7]
-   + 2 tnn_ln_times_numsamples[1,4,7] + 2 tnn_ln_times_numsamples[1,5,7]
-   + 2 tnn_ln_times_numsamples[1,6,7] + 2 tnn_ln_times_numsamples[1,7,7]
-   + 2 tnn_ln_times_numsamples[1,8,7] + 2 tnn_ln_times_numsamples[1,9,7]
-   + 2 tnn_ln_times_numsamples[1,10,7] + [ 2 x_poison_num[1,7] * bias ]
-   = 1.336355413934703
- cons_first_order_optimality_conditions_pnum_weights[8]:
-   - 0.2308012776003332 x_poison_num[1,8]
-   + 0.8504884425157446 weights_num[1] + 0.2544337044746 weights_num[2]
-   + 3.237048273674876 weights_num[3] + 2.763936608642466 weights_num[4]
-   + 3.941794494658732 weights_num[5] + 3.83330530825963 weights_num[6]
-   + 0.6090668996491538 weights_num[7] + 2.053387150861439 weights_num[8]
-   + 0.2892674732138591 weights_num[9] + 1.378286742196895 weights_num[10]
-   + 4.844024931312679 bias + 2 tnn_ln_times_numsamples[1,1,8]
-   + 2 tnn_ln_times_numsamples[1,2,8] + 2 tnn_ln_times_numsamples[1,3,8]
-   + 2 tnn_ln_times_numsamples[1,4,8] + 2 tnn_ln_times_numsamples[1,5,8]
-   + 2 tnn_ln_times_numsamples[1,6,8] + 2 tnn_ln_times_numsamples[1,7,8]
-   + 2 tnn_ln_times_numsamples[1,8,8] + 2 tnn_ln_times_numsamples[1,9,8]
-   + 2 tnn_ln_times_numsamples[1,10,8] + [ 2 x_poison_num[1,8] * bias ]
-   = 1.35412651648283
- cons_first_order_optimality_conditions_pnum_weights[9]:
-   - 0.2308012776003332 x_poison_num[1,9]
-   + 0.5493067951747078 weights_num[1] + 0.131129186266929 weights_num[2]
-   + 1.59499162551708 weights_num[3] + 1.591086132228025 weights_num[4]
-   + 1.951879753326065 weights_num[5] + 2.198035786199761 weights_num[6]
-   + 0.3131957778470288 weights_num[7] + 0.2892674732138591 weights_num[8]
-   + 1.909842679527054 weights_num[9] + 0.8260536577845347 weights_num[10]
-   + 2.61178788498355 bias + 2 tnn_ln_times_numsamples[1,1,9]
-   + 2 tnn_ln_times_numsamples[1,2,9] + 2 tnn_ln_times_numsamples[1,3,9]
-   + 2 tnn_ln_times_numsamples[1,4,9] + 2 tnn_ln_times_numsamples[1,5,9]
-   + 2 tnn_ln_times_numsamples[1,6,9] + 2 tnn_ln_times_numsamples[1,7,9]
-   + 2 tnn_ln_times_numsamples[1,8,9] + 2 tnn_ln_times_numsamples[1,9,9]
-   + 2 tnn_ln_times_numsamples[1,10,9] + [ 2 x_poison_num[1,9] * bias ]
-   = 0.6470305475257391
- cons_first_order_optimality_conditions_pnum_weights[10]:
-   - 0.2308012776003332 x_poison_num[1,10]
-   + 2.056050886825874 weights_num[1] + 0.6861738446092754 weights_num[2]
-   + 7.543854642313547 weights_num[3] + 6.314854452054794 weights_num[4]
-   + 9.295581447290054 weights_num[5] + 8.951284246575343 weights_num[6]
-   + 1.499341843162124 weights_num[7] + 1.378286742196895 weights_num[8]
-   + 0.8260536577845347 weights_num[9] + 5.76004390535183 weights_num[10]
-   + 11.63099315068493 bias + 2 tnn_ln_times_numsamples[1,1,10]
-   + 2 tnn_ln_times_numsamples[1,2,10] + 2 tnn_ln_times_numsamples[1,3,10]
-   + 2 tnn_ln_times_numsamples[1,4,10] + 2 tnn_ln_times_numsamples[1,5,10]
-   + 2 tnn_ln_times_numsamples[1,6,10] + 2 tnn_ln_times_numsamples[1,7,10]
-   + 2 tnn_ln_times_numsamples[1,8,10] + 2 tnn_ln_times_numsamples[1,9,10]
-   + 2 tnn_ln_times_numsamples[1,10,10] + [ 2 x_poison_num[1,10] * bias ]
-   = 3.096660376317597
- pons_tnn[1,1,1]: - tnn_ln_times_numsamples[1,1,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,2]: - tnn_ln_times_numsamples[1,1,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,3]: - tnn_ln_times_numsamples[1,1,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,4]: - tnn_ln_times_numsamples[1,1,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,5]: - tnn_ln_times_numsamples[1,1,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,6]: - tnn_ln_times_numsamples[1,1,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,7]: - tnn_ln_times_numsamples[1,1,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,8]: - tnn_ln_times_numsamples[1,1,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,9]: - tnn_ln_times_numsamples[1,1,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,1,10]: - tnn_ln_times_numsamples[1,1,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,1] ] = 0
- pons_tnn[1,2,1]: - tnn_ln_times_numsamples[1,2,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,2]: - tnn_ln_times_numsamples[1,2,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,3]: - tnn_ln_times_numsamples[1,2,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,4]: - tnn_ln_times_numsamples[1,2,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,5]: - tnn_ln_times_numsamples[1,2,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,6]: - tnn_ln_times_numsamples[1,2,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,7]: - tnn_ln_times_numsamples[1,2,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,8]: - tnn_ln_times_numsamples[1,2,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,9]: - tnn_ln_times_numsamples[1,2,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,2,10]: - tnn_ln_times_numsamples[1,2,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,2] ] = 0
- pons_tnn[1,3,1]: - tnn_ln_times_numsamples[1,3,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,2]: - tnn_ln_times_numsamples[1,3,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,3]: - tnn_ln_times_numsamples[1,3,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,4]: - tnn_ln_times_numsamples[1,3,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,5]: - tnn_ln_times_numsamples[1,3,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,6]: - tnn_ln_times_numsamples[1,3,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,7]: - tnn_ln_times_numsamples[1,3,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,8]: - tnn_ln_times_numsamples[1,3,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,9]: - tnn_ln_times_numsamples[1,3,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,3,10]: - tnn_ln_times_numsamples[1,3,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,3] ] = 0
- pons_tnn[1,4,1]: - tnn_ln_times_numsamples[1,4,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,2]: - tnn_ln_times_numsamples[1,4,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,3]: - tnn_ln_times_numsamples[1,4,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,4]: - tnn_ln_times_numsamples[1,4,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,5]: - tnn_ln_times_numsamples[1,4,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,6]: - tnn_ln_times_numsamples[1,4,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,7]: - tnn_ln_times_numsamples[1,4,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,8]: - tnn_ln_times_numsamples[1,4,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,9]: - tnn_ln_times_numsamples[1,4,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,4,10]: - tnn_ln_times_numsamples[1,4,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,4] ] = 0
- pons_tnn[1,5,1]: - tnn_ln_times_numsamples[1,5,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,2]: - tnn_ln_times_numsamples[1,5,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,3]: - tnn_ln_times_numsamples[1,5,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,4]: - tnn_ln_times_numsamples[1,5,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,5]: - tnn_ln_times_numsamples[1,5,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,6]: - tnn_ln_times_numsamples[1,5,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,7]: - tnn_ln_times_numsamples[1,5,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,8]: - tnn_ln_times_numsamples[1,5,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,9]: - tnn_ln_times_numsamples[1,5,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,5,10]: - tnn_ln_times_numsamples[1,5,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,5] ] = 0
- pons_tnn[1,6,1]: - tnn_ln_times_numsamples[1,6,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,2]: - tnn_ln_times_numsamples[1,6,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,3]: - tnn_ln_times_numsamples[1,6,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,4]: - tnn_ln_times_numsamples[1,6,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,5]: - tnn_ln_times_numsamples[1,6,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,6]: - tnn_ln_times_numsamples[1,6,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,7]: - tnn_ln_times_numsamples[1,6,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,8]: - tnn_ln_times_numsamples[1,6,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,9]: - tnn_ln_times_numsamples[1,6,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,6,10]: - tnn_ln_times_numsamples[1,6,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,6] ] = 0
- pons_tnn[1,7,1]: - tnn_ln_times_numsamples[1,7,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,2]: - tnn_ln_times_numsamples[1,7,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,3]: - tnn_ln_times_numsamples[1,7,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,4]: - tnn_ln_times_numsamples[1,7,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,5]: - tnn_ln_times_numsamples[1,7,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,6]: - tnn_ln_times_numsamples[1,7,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,7]: - tnn_ln_times_numsamples[1,7,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,8]: - tnn_ln_times_numsamples[1,7,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,9]: - tnn_ln_times_numsamples[1,7,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,7,10]: - tnn_ln_times_numsamples[1,7,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,7] ] = 0
- pons_tnn[1,8,1]: - tnn_ln_times_numsamples[1,8,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,2]: - tnn_ln_times_numsamples[1,8,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,3]: - tnn_ln_times_numsamples[1,8,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,4]: - tnn_ln_times_numsamples[1,8,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,5]: - tnn_ln_times_numsamples[1,8,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,6]: - tnn_ln_times_numsamples[1,8,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,7]: - tnn_ln_times_numsamples[1,8,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,8]: - tnn_ln_times_numsamples[1,8,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,9]: - tnn_ln_times_numsamples[1,8,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,8,10]: - tnn_ln_times_numsamples[1,8,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,8] ] = 0
- pons_tnn[1,9,1]: - tnn_ln_times_numsamples[1,9,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,2]: - tnn_ln_times_numsamples[1,9,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,3]: - tnn_ln_times_numsamples[1,9,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,4]: - tnn_ln_times_numsamples[1,9,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,5]: - tnn_ln_times_numsamples[1,9,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,6]: - tnn_ln_times_numsamples[1,9,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,7]: - tnn_ln_times_numsamples[1,9,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,8]: - tnn_ln_times_numsamples[1,9,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,9]: - tnn_ln_times_numsamples[1,9,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,9,10]: - tnn_ln_times_numsamples[1,9,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,9] ] = 0
- pons_tnn[1,10,1]: - tnn_ln_times_numsamples[1,10,1] + [
-   x_poison_num[1,1] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,2]: - tnn_ln_times_numsamples[1,10,2] + [
-   x_poison_num[1,2] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,3]: - tnn_ln_times_numsamples[1,10,3] + [
-   x_poison_num[1,3] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,4]: - tnn_ln_times_numsamples[1,10,4] + [
-   x_poison_num[1,4] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,5]: - tnn_ln_times_numsamples[1,10,5] + [
-   x_poison_num[1,5] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,6]: - tnn_ln_times_numsamples[1,10,6] + [
-   x_poison_num[1,6] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,7]: - tnn_ln_times_numsamples[1,10,7] + [
-   x_poison_num[1,7] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,8]: - tnn_ln_times_numsamples[1,10,8] + [
-   x_poison_num[1,8] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,9]: - tnn_ln_times_numsamples[1,10,9] + [
-   x_poison_num[1,9] * ln_numweight_times_numsample[1,10] ] = 0
- pons_tnn[1,10,10]: - tnn_ln_times_numsamples[1,10,10] + [
-   x_poison_num[1,10] * ln_numweight_times_numsample[1,10] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,1] + [
-   x_poison_num[1,1] * weights_num[1] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,2] + [
-   x_poison_num[1,2] * weights_num[2] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,3] + [
-   x_poison_num[1,3] * weights_num[3] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,4] + [
-   x_poison_num[1,4] * weights_num[4] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,5] + [
-   x_poison_num[1,5] * weights_num[5] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,6] + [
-   x_poison_num[1,6] * weights_num[6] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,7] + [
-   x_poison_num[1,7] * weights_num[7] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,8] + [
-   x_poison_num[1,8] * weights_num[8] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,9] + [
-   x_poison_num[1,9] * weights_num[9] ] = 0
- pcons_ln: - ln_numweight_times_numsample[1,10] + [
-   x_poison_num[1,10] * weights_num[10] ] = 0
+   1.206349206349206 weights_num[1] + 1.465079365079365 weights_num[2]
+   + 1.142857142857143 weights_num[3] + 0.7777777777777777 weights_num[4]
+   + 0.9944553163731249 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,2]
+   + 1.238095238095238 self.weights_cat[1,4]
+   + 0.6666666666666666 self.weights_cat[2,1]
+   + 0.6666666666666666 self.weights_cat[2,3]
+   + 0.2857142857142857 self.weights_cat[3,3]
+   + 1.047619047619047 self.weights_cat[3,4]
+   + 0.1904761904761905 self.weights_cat[4,3]
+   + 0.5714285714285714 self.weights_cat[4,4]
+   + 0.8571428571428571 self.weights_cat[4,5]
+   + 0.7619047619047619 self.weights_cat[5,2]
+   + 0.8571428571428571 self.weights_cat[5,3]
+   + 0.2857142857142857 self.weights_cat[5,4] + 2 bias
+   + 0.0952380952380952 ln_numweight_times_numsample[1,1]
+   + 0.0952380952380952 ln_numweight_times_numsample[1,2]
+   + 0.0952380952380952 ln_numweight_times_numsample[1,3]
+   + 0.0952380952380952 ln_numweight_times_numsample[1,4]
+   + 0.0952380952380952 ln_numweight_times_numsample[1,5]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,1,1]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,1,2]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,1,3]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,1,4]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,1,5]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,2,1]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,2,2]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,2,3]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,2,4]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,2,5]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,3,1]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,3,2]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,3,3]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,3,4]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,1]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,2]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,3]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,4]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,5]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,4,6]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,5,1]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,5,2]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,5,3]
+   + 0.0952380952380952 lc_catweight_times_catsample[1,5,4]
+   = 0.5017424828562171
+ cons_tnn[1,1,1]: - tnn_ln_times_numsamples[1,1,1]
+   + 0.5555555555555556 ln_numweight_times_numsample[1,1] = 0
+ cons_tnn[1,1,2]: - tnn_ln_times_numsamples[1,1,2]
+   + 0.95 ln_numweight_times_numsample[1,1] = 0
+ cons_tnn[1,1,3]: - tnn_ln_times_numsamples[1,1,3]
+   + 0.3333333333333333 ln_numweight_times_numsample[1,1] = 0
+ cons_tnn[1,1,4]: - tnn_ln_times_numsamples[1,1,4]
+   + 0.25 ln_numweight_times_numsample[1,1] = 0
+ cons_tnn[1,1,5]: - tnn_ln_times_numsamples[1,1,5]
+   + 0.25 ln_numweight_times_numsample[1,1] = 0
+ cons_tnn[1,2,1]: - tnn_ln_times_numsamples[1,2,1]
+   + 0.5555555555555556 ln_numweight_times_numsample[1,2] = 0
+ cons_tnn[1,2,2]: - tnn_ln_times_numsamples[1,2,2]
+   + 0.95 ln_numweight_times_numsample[1,2] = 0
+ cons_tnn[1,2,3]: - tnn_ln_times_numsamples[1,2,3]
+   + 0.3333333333333333 ln_numweight_times_numsample[1,2] = 0
+ cons_tnn[1,2,4]: - tnn_ln_times_numsamples[1,2,4]
+   + 0.25 ln_numweight_times_numsample[1,2] = 0
+ cons_tnn[1,2,5]: - tnn_ln_times_numsamples[1,2,5]
+   + 0.25 ln_numweight_times_numsample[1,2] = 0
+ cons_tnn[1,3,1]: - tnn_ln_times_numsamples[1,3,1]
+   + 0.5555555555555556 ln_numweight_times_numsample[1,3] = 0
+ cons_tnn[1,3,2]: - tnn_ln_times_numsamples[1,3,2]
+   + 0.95 ln_numweight_times_numsample[1,3] = 0
+ cons_tnn[1,3,3]: - tnn_ln_times_numsamples[1,3,3]
+   + 0.3333333333333333 ln_numweight_times_numsample[1,3] = 0
+ cons_tnn[1,3,4]: - tnn_ln_times_numsamples[1,3,4]
+   + 0.25 ln_numweight_times_numsample[1,3] = 0
+ cons_tnn[1,3,5]: - tnn_ln_times_numsamples[1,3,5]
+   + 0.25 ln_numweight_times_numsample[1,3] = 0
+ cons_tnn[1,4,1]: - tnn_ln_times_numsamples[1,4,1]
+   + 0.5555555555555556 ln_numweight_times_numsample[1,4] = 0
+ cons_tnn[1,4,2]: - tnn_ln_times_numsamples[1,4,2]
+   + 0.95 ln_numweight_times_numsample[1,4] = 0
+ cons_tnn[1,4,3]: - tnn_ln_times_numsamples[1,4,3]
+   + 0.3333333333333333 ln_numweight_times_numsample[1,4] = 0
+ cons_tnn[1,4,4]: - tnn_ln_times_numsamples[1,4,4]
+   + 0.25 ln_numweight_times_numsample[1,4] = 0
+ cons_tnn[1,4,5]: - tnn_ln_times_numsamples[1,4,5]
+   + 0.25 ln_numweight_times_numsample[1,4] = 0
+ cons_tnn[1,5,1]: - tnn_ln_times_numsamples[1,5,1]
+   + 0.5555555555555556 ln_numweight_times_numsample[1,5] = 0
+ cons_tnn[1,5,2]: - tnn_ln_times_numsamples[1,5,2]
+   + 0.95 ln_numweight_times_numsample[1,5] = 0
+ cons_tnn[1,5,3]: - tnn_ln_times_numsamples[1,5,3]
+   + 0.3333333333333333 ln_numweight_times_numsample[1,5] = 0
+ cons_tnn[1,5,4]: - tnn_ln_times_numsamples[1,5,4]
+   + 0.25 ln_numweight_times_numsample[1,5] = 0
+ cons_tnn[1,5,5]: - tnn_ln_times_numsamples[1,5,5]
+   + 0.25 ln_numweight_times_numsample[1,5] = 0
+ cons_tcn[1,1,1,1]: - tcn_lc_times_numsamples[1,1,1,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcn[1,1,1,2]: - tcn_lc_times_numsamples[1,1,1,2]
+   + 0.95 lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcn[1,1,1,3]: - tcn_lc_times_numsamples[1,1,1,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcn[1,1,1,4]: - tcn_lc_times_numsamples[1,1,1,4]
+   + 0.25 lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcn[1,1,1,5]: - tcn_lc_times_numsamples[1,1,1,5]
+   + 0.25 lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcn[1,1,2,1]: - tcn_lc_times_numsamples[1,1,2,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcn[1,1,2,2]: - tcn_lc_times_numsamples[1,1,2,2]
+   + 0.95 lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcn[1,1,2,3]: - tcn_lc_times_numsamples[1,1,2,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcn[1,1,2,4]: - tcn_lc_times_numsamples[1,1,2,4]
+   + 0.25 lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcn[1,1,2,5]: - tcn_lc_times_numsamples[1,1,2,5]
+   + 0.25 lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcn[1,1,3,1]: - tcn_lc_times_numsamples[1,1,3,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcn[1,1,3,2]: - tcn_lc_times_numsamples[1,1,3,2]
+   + 0.95 lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcn[1,1,3,3]: - tcn_lc_times_numsamples[1,1,3,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcn[1,1,3,4]: - tcn_lc_times_numsamples[1,1,3,4]
+   + 0.25 lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcn[1,1,3,5]: - tcn_lc_times_numsamples[1,1,3,5]
+   + 0.25 lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcn[1,1,4,1]: - tcn_lc_times_numsamples[1,1,4,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcn[1,1,4,2]: - tcn_lc_times_numsamples[1,1,4,2]
+   + 0.95 lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcn[1,1,4,3]: - tcn_lc_times_numsamples[1,1,4,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcn[1,1,4,4]: - tcn_lc_times_numsamples[1,1,4,4]
+   + 0.25 lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcn[1,1,4,5]: - tcn_lc_times_numsamples[1,1,4,5]
+   + 0.25 lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcn[1,1,5,1]: - tcn_lc_times_numsamples[1,1,5,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcn[1,1,5,2]: - tcn_lc_times_numsamples[1,1,5,2]
+   + 0.95 lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcn[1,1,5,3]: - tcn_lc_times_numsamples[1,1,5,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcn[1,1,5,4]: - tcn_lc_times_numsamples[1,1,5,4]
+   + 0.25 lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcn[1,1,5,5]: - tcn_lc_times_numsamples[1,1,5,5]
+   + 0.25 lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcn[1,2,1,1]: - tcn_lc_times_numsamples[1,2,1,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcn[1,2,1,2]: - tcn_lc_times_numsamples[1,2,1,2]
+   + 0.95 lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcn[1,2,1,3]: - tcn_lc_times_numsamples[1,2,1,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcn[1,2,1,4]: - tcn_lc_times_numsamples[1,2,1,4]
+   + 0.25 lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcn[1,2,1,5]: - tcn_lc_times_numsamples[1,2,1,5]
+   + 0.25 lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcn[1,2,2,1]: - tcn_lc_times_numsamples[1,2,2,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcn[1,2,2,2]: - tcn_lc_times_numsamples[1,2,2,2]
+   + 0.95 lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcn[1,2,2,3]: - tcn_lc_times_numsamples[1,2,2,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcn[1,2,2,4]: - tcn_lc_times_numsamples[1,2,2,4]
+   + 0.25 lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcn[1,2,2,5]: - tcn_lc_times_numsamples[1,2,2,5]
+   + 0.25 lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcn[1,2,3,1]: - tcn_lc_times_numsamples[1,2,3,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcn[1,2,3,2]: - tcn_lc_times_numsamples[1,2,3,2]
+   + 0.95 lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcn[1,2,3,3]: - tcn_lc_times_numsamples[1,2,3,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcn[1,2,3,4]: - tcn_lc_times_numsamples[1,2,3,4]
+   + 0.25 lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcn[1,2,3,5]: - tcn_lc_times_numsamples[1,2,3,5]
+   + 0.25 lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcn[1,2,4,1]: - tcn_lc_times_numsamples[1,2,4,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcn[1,2,4,2]: - tcn_lc_times_numsamples[1,2,4,2]
+   + 0.95 lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcn[1,2,4,3]: - tcn_lc_times_numsamples[1,2,4,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcn[1,2,4,4]: - tcn_lc_times_numsamples[1,2,4,4]
+   + 0.25 lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcn[1,2,4,5]: - tcn_lc_times_numsamples[1,2,4,5]
+   + 0.25 lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcn[1,2,5,1]: - tcn_lc_times_numsamples[1,2,5,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcn[1,2,5,2]: - tcn_lc_times_numsamples[1,2,5,2]
+   + 0.95 lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcn[1,2,5,3]: - tcn_lc_times_numsamples[1,2,5,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcn[1,2,5,4]: - tcn_lc_times_numsamples[1,2,5,4]
+   + 0.25 lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcn[1,2,5,5]: - tcn_lc_times_numsamples[1,2,5,5]
+   + 0.25 lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcn[1,3,1,1]: - tcn_lc_times_numsamples[1,3,1,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcn[1,3,1,2]: - tcn_lc_times_numsamples[1,3,1,2]
+   + 0.95 lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcn[1,3,1,3]: - tcn_lc_times_numsamples[1,3,1,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcn[1,3,1,4]: - tcn_lc_times_numsamples[1,3,1,4]
+   + 0.25 lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcn[1,3,1,5]: - tcn_lc_times_numsamples[1,3,1,5]
+   + 0.25 lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcn[1,3,2,1]: - tcn_lc_times_numsamples[1,3,2,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcn[1,3,2,2]: - tcn_lc_times_numsamples[1,3,2,2]
+   + 0.95 lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcn[1,3,2,3]: - tcn_lc_times_numsamples[1,3,2,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcn[1,3,2,4]: - tcn_lc_times_numsamples[1,3,2,4]
+   + 0.25 lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcn[1,3,2,5]: - tcn_lc_times_numsamples[1,3,2,5]
+   + 0.25 lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcn[1,3,3,1]: - tcn_lc_times_numsamples[1,3,3,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcn[1,3,3,2]: - tcn_lc_times_numsamples[1,3,3,2]
+   + 0.95 lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcn[1,3,3,3]: - tcn_lc_times_numsamples[1,3,3,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcn[1,3,3,4]: - tcn_lc_times_numsamples[1,3,3,4]
+   + 0.25 lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcn[1,3,3,5]: - tcn_lc_times_numsamples[1,3,3,5]
+   + 0.25 lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcn[1,3,4,1]: - tcn_lc_times_numsamples[1,3,4,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcn[1,3,4,2]: - tcn_lc_times_numsamples[1,3,4,2]
+   + 0.95 lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcn[1,3,4,3]: - tcn_lc_times_numsamples[1,3,4,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcn[1,3,4,4]: - tcn_lc_times_numsamples[1,3,4,4]
+   + 0.25 lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcn[1,3,4,5]: - tcn_lc_times_numsamples[1,3,4,5]
+   + 0.25 lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcn[1,4,1,1]: - tcn_lc_times_numsamples[1,4,1,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcn[1,4,1,2]: - tcn_lc_times_numsamples[1,4,1,2]
+   + 0.95 lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcn[1,4,1,3]: - tcn_lc_times_numsamples[1,4,1,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcn[1,4,1,4]: - tcn_lc_times_numsamples[1,4,1,4]
+   + 0.25 lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcn[1,4,1,5]: - tcn_lc_times_numsamples[1,4,1,5]
+   + 0.25 lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcn[1,4,2,1]: - tcn_lc_times_numsamples[1,4,2,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcn[1,4,2,2]: - tcn_lc_times_numsamples[1,4,2,2]
+   + 0.95 lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcn[1,4,2,3]: - tcn_lc_times_numsamples[1,4,2,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcn[1,4,2,4]: - tcn_lc_times_numsamples[1,4,2,4]
+   + 0.25 lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcn[1,4,2,5]: - tcn_lc_times_numsamples[1,4,2,5]
+   + 0.25 lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcn[1,4,3,1]: - tcn_lc_times_numsamples[1,4,3,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcn[1,4,3,2]: - tcn_lc_times_numsamples[1,4,3,2]
+   + 0.95 lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcn[1,4,3,3]: - tcn_lc_times_numsamples[1,4,3,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcn[1,4,3,4]: - tcn_lc_times_numsamples[1,4,3,4]
+   + 0.25 lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcn[1,4,3,5]: - tcn_lc_times_numsamples[1,4,3,5]
+   + 0.25 lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcn[1,4,4,1]: - tcn_lc_times_numsamples[1,4,4,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcn[1,4,4,2]: - tcn_lc_times_numsamples[1,4,4,2]
+   + 0.95 lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcn[1,4,4,3]: - tcn_lc_times_numsamples[1,4,4,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcn[1,4,4,4]: - tcn_lc_times_numsamples[1,4,4,4]
+   + 0.25 lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcn[1,4,4,5]: - tcn_lc_times_numsamples[1,4,4,5]
+   + 0.25 lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcn[1,4,5,1]: - tcn_lc_times_numsamples[1,4,5,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcn[1,4,5,2]: - tcn_lc_times_numsamples[1,4,5,2]
+   + 0.95 lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcn[1,4,5,3]: - tcn_lc_times_numsamples[1,4,5,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcn[1,4,5,4]: - tcn_lc_times_numsamples[1,4,5,4]
+   + 0.25 lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcn[1,4,5,5]: - tcn_lc_times_numsamples[1,4,5,5]
+   + 0.25 lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcn[1,4,6,1]: - tcn_lc_times_numsamples[1,4,6,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcn[1,4,6,2]: - tcn_lc_times_numsamples[1,4,6,2]
+   + 0.95 lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcn[1,4,6,3]: - tcn_lc_times_numsamples[1,4,6,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcn[1,4,6,4]: - tcn_lc_times_numsamples[1,4,6,4]
+   + 0.25 lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcn[1,4,6,5]: - tcn_lc_times_numsamples[1,4,6,5]
+   + 0.25 lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcn[1,5,1,1]: - tcn_lc_times_numsamples[1,5,1,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcn[1,5,1,2]: - tcn_lc_times_numsamples[1,5,1,2]
+   + 0.95 lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcn[1,5,1,3]: - tcn_lc_times_numsamples[1,5,1,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcn[1,5,1,4]: - tcn_lc_times_numsamples[1,5,1,4]
+   + 0.25 lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcn[1,5,1,5]: - tcn_lc_times_numsamples[1,5,1,5]
+   + 0.25 lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcn[1,5,2,1]: - tcn_lc_times_numsamples[1,5,2,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcn[1,5,2,2]: - tcn_lc_times_numsamples[1,5,2,2]
+   + 0.95 lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcn[1,5,2,3]: - tcn_lc_times_numsamples[1,5,2,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcn[1,5,2,4]: - tcn_lc_times_numsamples[1,5,2,4]
+   + 0.25 lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcn[1,5,2,5]: - tcn_lc_times_numsamples[1,5,2,5]
+   + 0.25 lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcn[1,5,3,1]: - tcn_lc_times_numsamples[1,5,3,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcn[1,5,3,2]: - tcn_lc_times_numsamples[1,5,3,2]
+   + 0.95 lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcn[1,5,3,3]: - tcn_lc_times_numsamples[1,5,3,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcn[1,5,3,4]: - tcn_lc_times_numsamples[1,5,3,4]
+   + 0.25 lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcn[1,5,3,5]: - tcn_lc_times_numsamples[1,5,3,5]
+   + 0.25 lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcn[1,5,4,1]: - tcn_lc_times_numsamples[1,5,4,1]
+   + 0.5555555555555556 lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcn[1,5,4,2]: - tcn_lc_times_numsamples[1,5,4,2]
+   + 0.95 lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcn[1,5,4,3]: - tcn_lc_times_numsamples[1,5,4,3]
+   + 0.3333333333333333 lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcn[1,5,4,4]: - tcn_lc_times_numsamples[1,5,4,4]
+   + 0.25 lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcn[1,5,4,5]: - tcn_lc_times_numsamples[1,5,4,5]
+   + 0.25 lc_catweight_times_catsample[1,5,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,3,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,3,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,3,3]
+   + ln_numweight_times_numsample[1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,3,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,4,6] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,5,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,5,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,5,3]
+   + ln_numweight_times_numsample[1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,1,5,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,3,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,3,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,3,3]
+   + ln_numweight_times_numsample[1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,3,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,4,6] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,5,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,5,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,5,3]
+   + ln_numweight_times_numsample[1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,2,5,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,3,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,3,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,3,3]
+   + ln_numweight_times_numsample[1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,3,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,4,6] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,5,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,5,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,5,3]
+   + ln_numweight_times_numsample[1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,3,5,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,3,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,3,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,3,3]
+   + ln_numweight_times_numsample[1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,3,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,4,6] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,5,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,5,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,5,3]
+   + ln_numweight_times_numsample[1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,4,5,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,1,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,1,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,1,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,1,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,3,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,3,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,3,3]
+   + ln_numweight_times_numsample[1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,3,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,3] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,4] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,4,6] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,5,1] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,5,2] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,5,3]
+   + ln_numweight_times_numsample[1,5] = 0
+ cons_tnc: - tnc_ln_times_catsamples[1,5,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,3,3]
+   + lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,5,3]
+   + lc_catweight_times_catsample[1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,3,3]
+   + lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,5,3]
+   + lc_catweight_times_catsample[1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,2,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,3,3]
+   + lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,5,3]
+   + lc_catweight_times_catsample[1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,3,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,3,3]
+   + lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,5,3]
+   + lc_catweight_times_catsample[1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,4,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,3,3]
+   + lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,5,3]
+   + lc_catweight_times_catsample[1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,1,5,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,3,3]
+   + lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,5,3]
+   + lc_catweight_times_catsample[1,2,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,3,3]
+   + lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,5,3]
+   + lc_catweight_times_catsample[1,2,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,2,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,3,3]
+   + lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,5,3]
+   + lc_catweight_times_catsample[1,2,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,3,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,3,3]
+   + lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,5,3]
+   + lc_catweight_times_catsample[1,2,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,4,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,3,3]
+   + lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,5,3]
+   + lc_catweight_times_catsample[1,2,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,2,5,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,3,3]
+   + lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,5,3]
+   + lc_catweight_times_catsample[1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,3,3]
+   + lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,5,3]
+   + lc_catweight_times_catsample[1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,2,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,3,3]
+   + lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,5,3]
+   + lc_catweight_times_catsample[1,3,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,3,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,3,3]
+   + lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,5,3]
+   + lc_catweight_times_catsample[1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,3,4,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,3,3]
+   + lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,5,3]
+   + lc_catweight_times_catsample[1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,3,3]
+   + lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,5,3]
+   + lc_catweight_times_catsample[1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,2,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,3,3]
+   + lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,5,3]
+   + lc_catweight_times_catsample[1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,3,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,3,3]
+   + lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,5,3]
+   + lc_catweight_times_catsample[1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,4,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,3,3]
+   + lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,5,3]
+   + lc_catweight_times_catsample[1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,5,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,3,3]
+   + lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,5,3]
+   + lc_catweight_times_catsample[1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,4,6,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,3,3]
+   + lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,5,3]
+   + lc_catweight_times_catsample[1,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,3,3]
+   + lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,5,3]
+   + lc_catweight_times_catsample[1,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,2,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,3,3]
+   + lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,5,3]
+   + lc_catweight_times_catsample[1,5,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,3,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,1,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,1,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,1,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,1,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,1,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,3,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,3,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,3,3]
+   + lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,3,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,3] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,5] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,4,6] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,5,1] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,5,2] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,5,3]
+   + lc_catweight_times_catsample[1,5,4] = 0
+ cons_tcc: - tcc_lc_times_catsample[1,5,4,5,4] = 0
+ cons_ln: 0.5555555555555556 weights_num[1]
+   - ln_numweight_times_numsample[1,1] = 0
+ cons_ln: 0.95 weights_num[2] - ln_numweight_times_numsample[1,2] = 0
+ cons_ln: 0.3333333333333333 weights_num[3]
+   - ln_numweight_times_numsample[1,3] = 0
+ cons_ln: 0.25 weights_num[4] - ln_numweight_times_numsample[1,4] = 0
+ cons_ln: 0.25 weights_num[5] - ln_numweight_times_numsample[1,5] = 0
+ cons_lc: - lc_catweight_times_catsample[1,1,1] = 0
+ cons_lc: - lc_catweight_times_catsample[1,1,2] = 0
+ cons_lc: - lc_catweight_times_catsample[1,1,3] = 0
+ cons_lc: - lc_catweight_times_catsample[1,1,4] = 0
+ cons_lc: - lc_catweight_times_catsample[1,1,5] = 0
+ cons_lc: - lc_catweight_times_catsample[1,3,1] = 0
+ cons_lc: - lc_catweight_times_catsample[1,3,2] = 0
+ cons_lc: self.weights_cat[3,3] - lc_catweight_times_catsample[1,3,3] = 0
+ cons_lc: - lc_catweight_times_catsample[1,3,4] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,1] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,2] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,3] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,4] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,5] = 0
+ cons_lc: - lc_catweight_times_catsample[1,4,6] = 0
+ cons_lc: - lc_catweight_times_catsample[1,5,1] = 0
+ cons_lc: - lc_catweight_times_catsample[1,5,2] = 0
+ cons_lc: self.weights_cat[5,3] - lc_catweight_times_catsample[1,5,3] = 0
+ cons_lc: - lc_catweight_times_catsample[1,5,4] = 0
+ cons_first_order_optimality_conditions_pcat_weights[2,1]:
+   - 0.0109905370285873 x_poison_cat[1,2,1]
+   + 0.3386243386243386 weights_num[1] + 0.4952380952380952 weights_num[2]
+   + 0.3174603174603174 weights_num[3] + 0.2301587301587301 weights_num[4]
+   + 0.3277886497064579 weights_num[5]
+   + 0.4761904761904762 self.weights_cat[1,4]
+   + 1.989115646258504 self.weights_cat[2,1]
+   + 0.1904761904761905 self.weights_cat[3,3]
+   + 0.3809523809523809 self.weights_cat[3,4]
+   + 0.2857142857142857 self.weights_cat[4,4]
+   + 0.2857142857142857 self.weights_cat[4,5]
+   + 0.2857142857142857 self.weights_cat[5,2]
+   + 0.3809523809523809 self.weights_cat[5,3] + 0.6666666666666666 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,2,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,2,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,2,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,2,1]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,2,1]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,2,1] + [
+   0.0952380952380952 x_poison_cat[1,2,1] * bias ] = 0.1136350110103755
+ cons_first_order_optimality_conditions_pcat_weights[2,2]:
+   - 0.0109905370285873 x_poison_cat[1,2,2]
+   + 1.322448979591837 self.weights_cat[2,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,2,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,2,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,2,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,2,2]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,2,2]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,2,2] + [
+   0.0952380952380952 x_poison_cat[1,2,2] * bias ] = 0
+ cons_first_order_optimality_conditions_pcat_weights[2,3]:
+   - 0.0109905370285873 x_poison_cat[1,2,3]
+   + 0.4867724867724867 weights_num[1] + 0.5936507936507935 weights_num[2]
+   + 0.4444444444444444 weights_num[3] + 0.2936507936507936 weights_num[4]
+   + 0.3809523809523809 weights_num[5]
+   + 0.0952380952380952 self.weights_cat[1,2]
+   + 0.5714285714285714 self.weights_cat[1,4]
+   + 1.989115646258504 self.weights_cat[2,3]
+   + 0.4761904761904762 self.weights_cat[3,4]
+   + 0.0952380952380952 self.weights_cat[4,3]
+   + 0.0952380952380952 self.weights_cat[4,4]
+   + 0.4761904761904762 self.weights_cat[4,5]
+   + 0.2857142857142857 self.weights_cat[5,2]
+   + 0.1904761904761905 self.weights_cat[5,3]
+   + 0.1904761904761905 self.weights_cat[5,4] + 0.6666666666666666 bias
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,2,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,2,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,2,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,2,3]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,2,3]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,2,3] + [
+   0.0952380952380952 x_poison_cat[1,2,3] * bias ] = 0.2092037481566713
+ cons_first_order_optimality_conditions_pcat_weights[2,4]:
+   - 0.0109905370285873 x_poison_cat[1,2,4]
+   + 1.322448979591837 self.weights_cat[2,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,2,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,2,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,2,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,2,4]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,2,4]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,2,4] + [
+   0.0952380952380952 x_poison_cat[1,2,4] * bias ] = 0
+ cons_first_order_optimality_conditions_pcat_weights[2,5]:
+   - 0.0109905370285873 x_poison_cat[1,2,5]
+   + 1.322448979591837 self.weights_cat[2,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,1,2,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,2,2,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,3,2,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,4,2,5]
+   + 0.0952380952380952 tnc_ln_times_catsamples[1,5,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,1,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,2,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,3,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,4,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,1,5,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,1,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,2,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,3,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,4,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,2,5,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,1,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,2,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,3,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,3,4,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,1,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,2,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,3,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,4,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,5,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,4,6,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,1,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,2,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,3,2,5]
+   + 0.0952380952380952 tcc_lc_times_catsample[1,5,4,2,5] + [
+   0.0952380952380952 x_poison_cat[1,2,5] * bias ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,1,2,1] + [
+   x_poison_cat[1,2,1] * ln_numweight_times_numsample[1,1] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,1,2,2] + [
+   x_poison_cat[1,2,2] * ln_numweight_times_numsample[1,1] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,1,2,3] + [
+   x_poison_cat[1,2,3] * ln_numweight_times_numsample[1,1] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,1,2,4] + [
+   x_poison_cat[1,2,4] * ln_numweight_times_numsample[1,1] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,1,2,5] + [
+   x_poison_cat[1,2,5] * ln_numweight_times_numsample[1,1] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,2,2,1] + [
+   x_poison_cat[1,2,1] * ln_numweight_times_numsample[1,2] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,2,2,2] + [
+   x_poison_cat[1,2,2] * ln_numweight_times_numsample[1,2] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,2,2,3] + [
+   x_poison_cat[1,2,3] * ln_numweight_times_numsample[1,2] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,2,2,4] + [
+   x_poison_cat[1,2,4] * ln_numweight_times_numsample[1,2] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,2,2,5] + [
+   x_poison_cat[1,2,5] * ln_numweight_times_numsample[1,2] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,3,2,1] + [
+   x_poison_cat[1,2,1] * ln_numweight_times_numsample[1,3] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,3,2,2] + [
+   x_poison_cat[1,2,2] * ln_numweight_times_numsample[1,3] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,3,2,3] + [
+   x_poison_cat[1,2,3] * ln_numweight_times_numsample[1,3] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,3,2,4] + [
+   x_poison_cat[1,2,4] * ln_numweight_times_numsample[1,3] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,3,2,5] + [
+   x_poison_cat[1,2,5] * ln_numweight_times_numsample[1,3] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,4,2,1] + [
+   x_poison_cat[1,2,1] * ln_numweight_times_numsample[1,4] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,4,2,2] + [
+   x_poison_cat[1,2,2] * ln_numweight_times_numsample[1,4] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,4,2,3] + [
+   x_poison_cat[1,2,3] * ln_numweight_times_numsample[1,4] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,4,2,4] + [
+   x_poison_cat[1,2,4] * ln_numweight_times_numsample[1,4] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,4,2,5] + [
+   x_poison_cat[1,2,5] * ln_numweight_times_numsample[1,4] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,5,2,1] + [
+   x_poison_cat[1,2,1] * ln_numweight_times_numsample[1,5] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,5,2,2] + [
+   x_poison_cat[1,2,2] * ln_numweight_times_numsample[1,5] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,5,2,3] + [
+   x_poison_cat[1,2,3] * ln_numweight_times_numsample[1,5] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,5,2,4] + [
+   x_poison_cat[1,2,4] * ln_numweight_times_numsample[1,5] ] = 0
+ pcons_tnc: - tnc_ln_times_catsamples[1,5,2,5] + [
+   x_poison_cat[1,2,5] * ln_numweight_times_numsample[1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,1,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,1,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,1,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,1,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,1,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,1,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,1,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,1,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,1,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,1,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,2,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,1,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,2,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,1,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,2,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,1,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,2,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,1,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,2,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,1,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,3,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,1,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,3,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,1,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,3,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,1,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,3,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,1,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,3,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,1,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,4,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,1,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,4,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,1,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,4,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,1,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,4,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,1,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,4,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,1,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,5,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,5,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,5,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,5,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,1,5,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,1,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,1,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,2,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,1,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,2,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,1,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,2,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,1,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,2,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,1,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,2,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,2,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,2,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,2,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,2,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,2,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,2,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,2,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,2,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,2,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,2,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,3,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,2,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,3,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,2,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,3,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,2,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,3,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,2,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,3,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,2,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,4,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,2,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,4,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,2,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,4,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,2,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,4,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,2,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,4,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,2,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,5,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,2,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,5,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,2,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,5,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,2,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,5,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,2,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,2,5,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,2,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,1,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,3,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,1,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,3,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,1,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,3,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,1,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,3,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,1,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,3,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,2,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,3,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,2,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,3,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,2,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,3,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,2,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,3,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,2,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,3,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,3,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,3,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,3,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,3,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,3,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,3,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,3,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,3,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,3,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,3,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,4,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,3,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,4,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,3,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,4,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,3,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,4,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,3,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,3,4,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,3,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,1,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,1,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,1,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,1,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,1,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,2,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,2,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,2,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,2,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,2,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,3,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,3,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,3,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,3,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,3,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,4,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,4,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,4,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,4,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,4,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,5,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,5,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,5,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,5,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,5,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,5] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,6,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,4,6] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,6,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,4,6] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,6,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,4,6] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,6,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,4,6] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,4,6,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,4,6] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,1,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,5,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,1,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,5,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,1,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,5,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,1,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,5,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,1,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,5,1] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,2,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,5,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,2,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,5,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,2,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,5,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,2,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,5,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,2,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,5,2] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,3,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,5,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,3,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,5,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,3,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,5,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,3,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,5,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,3,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,5,3] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,4,2,1] + [
+   x_poison_cat[1,2,1] * lc_catweight_times_catsample[1,5,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,4,2,2] + [
+   x_poison_cat[1,2,2] * lc_catweight_times_catsample[1,5,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,4,2,3] + [
+   x_poison_cat[1,2,3] * lc_catweight_times_catsample[1,5,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,4,2,4] + [
+   x_poison_cat[1,2,4] * lc_catweight_times_catsample[1,5,4] ] = 0
+ pcons_tcc: - tcc_lc_times_catsample[1,5,4,2,5] + [
+   x_poison_cat[1,2,5] * lc_catweight_times_catsample[1,5,4] ] = 0
+ pcons_lc: - lc_catweight_times_catsample[1,2,1] + [
+   x_poison_cat[1,2,1] * self.weights_cat[2,1] ] = 0
+ pcons_lc: - lc_catweight_times_catsample[1,2,2] + [
+   x_poison_cat[1,2,2] * self.weights_cat[2,2] ] = 0
+ pcons_lc: - lc_catweight_times_catsample[1,2,3] + [
+   x_poison_cat[1,2,3] * self.weights_cat[2,3] ] = 0
+ pcons_lc: - lc_catweight_times_catsample[1,2,4] + [
+   x_poison_cat[1,2,4] * self.weights_cat[2,4] ] = 0
+ pcons_lc: - lc_catweight_times_catsample[1,2,5] + [
+   x_poison_cat[1,2,5] * self.weights_cat[2,5] ] = 0
 Bounds
- x_poison_num[1,1] <= 1
- x_poison_num[1,2] <= 1
- x_poison_num[1,3] <= 1
- x_poison_num[1,4] <= 1
- x_poison_num[1,5] <= 1
- x_poison_num[1,6] <= 1
- x_poison_num[1,7] <= 1
- x_poison_num[1,8] <= 1
- x_poison_num[1,9] <= 1
- x_poison_num[1,10] <= 1
  -10 <= weights_num[1] <= 10
  -10 <= weights_num[2] <= 10
  -10 <= weights_num[3] <= 10
  -10 <= weights_num[4] <= 10
  -10 <= weights_num[5] <= 10
- -10 <= weights_num[6] <= 10
- -10 <= weights_num[7] <= 10
- -10 <= weights_num[8] <= 10
- -10 <= weights_num[9] <= 10
- -10 <= weights_num[10] <= 10
+ -10 <= self.weights_cat[1,1] <= 10
+ -10 <= self.weights_cat[1,2] <= 10
+ -10 <= self.weights_cat[1,3] <= 10
+ -10 <= self.weights_cat[1,4] <= 10
+ -10 <= self.weights_cat[1,5] <= 10
+ -10 <= self.weights_cat[2,1] <= 10
+ -10 <= self.weights_cat[2,2] <= 10
+ -10 <= self.weights_cat[2,3] <= 10
+ -10 <= self.weights_cat[2,4] <= 10
+ -10 <= self.weights_cat[2,5] <= 10
+ -10 <= self.weights_cat[3,1] <= 10
+ -10 <= self.weights_cat[3,2] <= 10
+ -10 <= self.weights_cat[3,3] <= 10
+ -10 <= self.weights_cat[3,4] <= 10
+ -10 <= self.weights_cat[4,1] <= 10
+ -10 <= self.weights_cat[4,2] <= 10
+ -10 <= self.weights_cat[4,3] <= 10
+ -10 <= self.weights_cat[4,4] <= 10
+ -10 <= self.weights_cat[4,5] <= 10
+ -10 <= self.weights_cat[4,6] <= 10
+ -10 <= self.weights_cat[5,1] <= 10
+ -10 <= self.weights_cat[5,2] <= 10
+ -10 <= self.weights_cat[5,3] <= 10
+ -10 <= self.weights_cat[5,4] <= 10
  -10 <= bias <= 10
  -10 <= tnn_ln_times_numsamples[1,1,1] <= 10
  -10 <= tnn_ln_times_numsamples[1,1,2] <= 10
  -10 <= tnn_ln_times_numsamples[1,1,3] <= 10
  -10 <= tnn_ln_times_numsamples[1,1,4] <= 10
  -10 <= tnn_ln_times_numsamples[1,1,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,1,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,1,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,1,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,1,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,1,10] <= 10
  -10 <= tnn_ln_times_numsamples[1,2,1] <= 10
  -10 <= tnn_ln_times_numsamples[1,2,2] <= 10
  -10 <= tnn_ln_times_numsamples[1,2,3] <= 10
  -10 <= tnn_ln_times_numsamples[1,2,4] <= 10
  -10 <= tnn_ln_times_numsamples[1,2,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,2,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,2,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,2,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,2,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,2,10] <= 10
  -10 <= tnn_ln_times_numsamples[1,3,1] <= 10
  -10 <= tnn_ln_times_numsamples[1,3,2] <= 10
  -10 <= tnn_ln_times_numsamples[1,3,3] <= 10
  -10 <= tnn_ln_times_numsamples[1,3,4] <= 10
  -10 <= tnn_ln_times_numsamples[1,3,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,3,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,3,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,3,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,3,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,3,10] <= 10
  -10 <= tnn_ln_times_numsamples[1,4,1] <= 10
  -10 <= tnn_ln_times_numsamples[1,4,2] <= 10
  -10 <= tnn_ln_times_numsamples[1,4,3] <= 10
  -10 <= tnn_ln_times_numsamples[1,4,4] <= 10
  -10 <= tnn_ln_times_numsamples[1,4,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,4,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,4,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,4,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,4,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,4,10] <= 10
  -10 <= tnn_ln_times_numsamples[1,5,1] <= 10
  -10 <= tnn_ln_times_numsamples[1,5,2] <= 10
  -10 <= tnn_ln_times_numsamples[1,5,3] <= 10
  -10 <= tnn_ln_times_numsamples[1,5,4] <= 10
  -10 <= tnn_ln_times_numsamples[1,5,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,5,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,5,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,5,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,5,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,5,10] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,1] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,2] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,3] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,4] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,6,10] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,1] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,2] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,3] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,4] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,7,10] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,1] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,2] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,3] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,4] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,8,10] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,1] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,2] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,3] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,4] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,9,10] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,1] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,2] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,3] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,4] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,5] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,6] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,7] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,8] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,9] <= 10
- -10 <= tnn_ln_times_numsamples[1,10,10] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,1,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,2,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,3,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,4,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,5,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,1,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,2,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,3,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,4,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,5,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,1,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,2,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,3,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,4,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,1,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,2,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,3,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,4,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,5,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,6,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,1,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,2,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,3,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,4,1] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,1,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,2,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,3,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,4,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,5,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,1,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,2,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,3,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,4,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,5,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,1,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,2,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,3,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,4,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,1,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,2,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,3,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,4,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,5,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,6,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,1,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,2,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,3,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,4,2] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,1,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,2,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,3,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,4,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,5,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,1,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,2,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,3,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,4,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,5,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,1,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,2,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,3,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,4,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,1,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,2,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,3,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,4,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,5,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,6,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,1,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,2,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,3,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,4,3] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,1,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,2,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,3,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,4,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,5,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,1,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,2,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,3,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,4,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,5,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,1,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,2,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,3,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,4,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,1,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,2,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,3,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,4,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,5,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,6,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,1,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,2,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,3,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,4,4] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,1,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,2,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,3,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,4,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,1,5,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,1,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,2,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,3,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,4,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,2,5,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,1,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,2,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,3,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,3,4,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,1,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,2,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,3,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,4,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,5,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,4,6,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,1,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,2,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,3,5] <= 10
+ -10 <= tcn_lc_times_numsamples[1,5,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,1,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,1,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,1,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,1,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,1,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,2,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,2,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,2,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,2,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,2,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,3,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,3,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,3,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,3,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,4,6] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,5,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,5,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,5,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,1,5,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,1,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,1,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,1,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,1,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,1,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,2,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,2,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,2,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,2,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,2,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,3,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,3,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,3,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,3,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,4,6] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,5,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,5,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,5,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,2,5,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,1,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,1,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,1,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,1,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,1,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,2,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,2,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,2,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,2,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,2,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,3,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,3,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,3,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,3,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,4,6] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,5,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,5,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,5,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,3,5,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,1,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,1,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,1,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,1,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,1,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,2,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,2,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,2,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,2,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,2,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,3,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,3,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,3,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,3,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,4,6] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,5,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,5,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,5,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,4,5,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,1,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,1,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,1,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,1,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,1,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,2,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,2,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,2,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,2,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,2,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,3,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,3,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,3,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,3,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,4] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,5] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,4,6] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,5,1] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,5,2] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,5,3] <= 10
+ -10 <= tnc_ln_times_catsamples[1,5,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,1,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,2,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,3,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,4,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,1,5,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,1,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,2,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,3,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,4,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,2,5,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,1,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,2,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,3,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,3,4,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,1,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,2,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,3,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,4,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,5,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,4,6,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,1,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,2,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,3,5,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,1,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,1,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,1,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,1,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,1,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,2,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,2,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,2,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,2,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,2,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,3,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,3,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,3,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,3,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,4] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,5] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,4,6] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,5,1] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,5,2] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,5,3] <= 10
+ -10 <= tcc_lc_times_catsample[1,5,4,5,4] <= 10
  -10 <= ln_numweight_times_numsample[1,1] <= 10
  -10 <= ln_numweight_times_numsample[1,2] <= 10
  -10 <= ln_numweight_times_numsample[1,3] <= 10
  -10 <= ln_numweight_times_numsample[1,4] <= 10
  -10 <= ln_numweight_times_numsample[1,5] <= 10
- -10 <= ln_numweight_times_numsample[1,6] <= 10
- -10 <= ln_numweight_times_numsample[1,7] <= 10
- -10 <= ln_numweight_times_numsample[1,8] <= 10
- -10 <= ln_numweight_times_numsample[1,9] <= 10
- -10 <= ln_numweight_times_numsample[1,10] <= 10
+ -10 <= lc_catweight_times_catsample[1,1,1] <= 10
+ -10 <= lc_catweight_times_catsample[1,1,2] <= 10
+ -10 <= lc_catweight_times_catsample[1,1,3] <= 10
+ -10 <= lc_catweight_times_catsample[1,1,4] <= 10
+ -10 <= lc_catweight_times_catsample[1,1,5] <= 10
+ -10 <= lc_catweight_times_catsample[1,2,1] <= 10
+ -10 <= lc_catweight_times_catsample[1,2,2] <= 10
+ -10 <= lc_catweight_times_catsample[1,2,3] <= 10
+ -10 <= lc_catweight_times_catsample[1,2,4] <= 10
+ -10 <= lc_catweight_times_catsample[1,2,5] <= 10
+ -10 <= lc_catweight_times_catsample[1,3,1] <= 10
+ -10 <= lc_catweight_times_catsample[1,3,2] <= 10
+ -10 <= lc_catweight_times_catsample[1,3,3] <= 10
+ -10 <= lc_catweight_times_catsample[1,3,4] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,1] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,2] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,3] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,4] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,5] <= 10
+ -10 <= lc_catweight_times_catsample[1,4,6] <= 10
+ -10 <= lc_catweight_times_catsample[1,5,1] <= 10
+ -10 <= lc_catweight_times_catsample[1,5,2] <= 10
+ -10 <= lc_catweight_times_catsample[1,5,3] <= 10
+ -10 <= lc_catweight_times_catsample[1,5,4] <= 10
  Constant = 1
+Binaries
+ x_poison_cat[1,2,1] x_poison_cat[1,2,2] x_poison_cat[1,2,3]
+ x_poison_cat[1,2,4] x_poison_cat[1,2,5]
 End
