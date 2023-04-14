@@ -12,16 +12,16 @@ from solutions_handler.regression_comparison import *
 
 model_parameters = {'dataset_name': '5num5cat',
                     'no_nfeatures': 0,
-                    'no_cfeatures': 4, 
-                    'poison_rate': 1,
-                    'training_samples': 100,
-                    'seed': 2,
+                    'no_cfeatures': 5, 
+                    'poison_rate': 4,
+                    'training_samples': 40,
+                    'seed': 3,
                     'function': 'MSE',
                     'no_psubsets': 1,
-                    'heuristic_subset': 2,
+                    'heuristic_subset': 1,
                     'datatype': 'test',
-                    'feasibility': 0.000001,
-                    'time_limit': 100}
+                    'feasibility': 0.0001,
+                    'time_limit': 1200}
 
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
