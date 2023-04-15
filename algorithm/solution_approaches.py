@@ -19,6 +19,7 @@ import model.pyomo_instance_class as benchmark_data
 
 
 # Python Libraries
+import copy
 from os import path
 import pandas as pd
 import numpy as np
@@ -684,7 +685,7 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
 
     return new_model, benchmark_data, solutions_dict
 
-def flipping_heuristic(model_parameters: dict):
+def flipping_heuristic(model_parameters: dict, instance, solution):
     """
      This is the heuristic algorithm we use to get feasible 
     solutions. It works as follows. We quickly optimise numerical 
@@ -705,51 +706,63 @@ def flipping_heuristic(model_parameters: dict):
     print('-' * long_space)
     print('-' * long_space)
 
-    # Solve numerical features locally
-    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(model_parameters)
-    print('Benchmark has been solved, now let us add this solution to data')
+    # # Solve numerical features locally
+    # _, instance, solution = solve_benchmark(model_parameters)
+    # print('Benchmark has been solved, now let us add this solution to data')
+
+    benchmark_objective = solution['objective']
 
     # Flip all categorical features. 
-    for i in range(0, benchmark_instance.no_psamples, model_parameters['heuristic_subset']):
-        print(benchmark_instance.cat_poison_dataframe_data['x_poison_cat'])
-        chosen_samples = list(range(1,benchmark_instance.no_total_psamples + 1))[i:i+ model_parameters['heuristic_subset']]
+    for i in range(0, instance.no_psamples, model_parameters['heuristic_subset']):
+        # Save the original data and try flipping. If the flipping does not improve,
+        # we restore the data.
+        original_instance = copy.deepcopy(instance)
+        original_solution = copy.deepcopy(solution)
+
+        chosen_samples = list(range(1, instance.no_psamples + 1))[i:i+ model_parameters['heuristic_subset']]
         print('Subset of samples is', chosen_samples)
+
         for psample in chosen_samples:
-            for feature in list(benchmark_instance.categories_dict.keys()):
-                # Find column with highest weight
-                my_dict = benchmark_solution['weights_cat']
-                # Given values for first two elements of tuple
-                given_values = feature
+            # Make (just num) prediction
+            cat_weights = solution['weights_cat']
+            num_weights = solution['weights_num']
+            num_features = {k: v for k, v in solution['x_poison_num'].items() if k[0] == psample}
+            num_y = np.array(list(num_weights.values())) @ np.array(list(num_features.values())) + solution['bias']
+            target_y =  instance.y_poison_dataframe.loc[psample, 'y_poison']
+            difference = num_y - target_y
+
+            for feature in list(instance.categories_dict.keys()):
                 # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in my_dict.keys() if k[0] == given_values]
-                if benchmark_instance.y_poison_dataframe['y_poison'].iloc[psample - 1] < 0.5:
-                    value_key = max(filtered_keys, key=my_dict.get)
+                filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
+                if difference >= 0:
+                    chosen_category = max(filtered_keys, key=cat_weights.get)[1]
                 else:
-                    value_key = min(filtered_keys, key=my_dict.get) 
-                value_second_element = value_key[1]
+                    chosen_category = min(filtered_keys, key=cat_weights.get)[1]
+
                 # Change features as desired
-                benchmark_instance.cat_poison_dataframe_data.loc[psample, feature, value_second_element] = 1
-                other_features = [k[1] for k in filtered_keys if k[1] != value_second_element] 
-                for i in other_features:
-                    benchmark_instance.cat_poison_dataframe_data.loc[psample, feature, i] = 0
+                instance.cat_poison_dataframe_data.loc[psample, feature , :] = 0
+                instance.cat_poison_dataframe_data.loc[psample, feature, chosen_category] = 1
 
-
-                benchmark_instance.complete_cat_poison_dataframe.to_numpy()[:] = benchmark_instance.cat_poison_dataframe_data['x_poison_cat'].to_numpy().reshape(
-                                                                                                 benchmark_instance.complete_cat_poison_dataframe.shape)
+                instance.complete_cat_poison_dataframe.to_numpy()[:] = instance.cat_poison_dataframe_data['x_poison_cat'].to_numpy().reshape(
+                                                                                                 instance.complete_cat_poison_dataframe.shape)
                 
-                opt = pyo.SolverFactory('ipopt')
-                benchmark_instance.update_cat_poison_dataframe()
-                model, instance, solution = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
-                # TODO Add as data
+                instance.update_cat_poison_dataframe()
+        
+        opt = pyo.SolverFactory('ipopt')
+        _, instance, solution = iterative_attack_strategy(opt, instance, model_parameters)
 
-    opt = pyo.SolverFactory('ipopt')
-    new_model, solutions_dict = solve_pyomo(opt, model_parameters, benchmark_instance)
+        if original_solution['objective'] > solution['objective']:
+            # The flipping actually made the poisoning attack worse.
+            # We will restore the original data and try flipping the next sample.
+            solution = original_solution
+            instance = original_instance
 
-    print('Objective value is           ', solutions_dict['objective'])
-    print('Benchmark objective value is ', benchmark_solution['objective'])
+    print('Objective value is           ', solution['objective'])
+    print('Benchmark objective value is ', benchmark_objective)
 
-    return new_model, benchmark_data, solutions_dict
+    return instance, solution
 
-
+def IP_heuristic(model_parameters: dict):
+    pass
 
 

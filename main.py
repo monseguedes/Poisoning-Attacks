@@ -10,6 +10,8 @@ import model.model_class as model
 from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import * 
 
+import numpy as np
+
 model_parameters = {'dataset_name': '10num10cat',
                     'no_nfeatures': 0,
                     'no_cfeatures': 5, 
@@ -18,7 +20,7 @@ model_parameters = {'dataset_name': '10num10cat',
                     'seed': 3,
                     'function': 'MSE',
                     'no_psubsets': 3,
-                    'heuristic_subset': 2,
+                    'heuristic_subset': 1,
                     'datatype': 'test',
                     'feasibility': 0.00001,
                     'time_limit': 100}
@@ -29,7 +31,19 @@ model_parameters = {'dataset_name': '10num10cat',
 # benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
 # benchmark_plus_optimising_heuristic(model_parameters)
 # benchmark_plus_optimising_subset_heuristic(model_parameters)
-flipping_heuristic(model_parameters)
+objectives = []
+_, instance, solution = solve_benchmark(model_parameters)
+objectives.append(solution['objective'])
+instance, solution = flipping_heuristic(model_parameters, instance, solution)
+objectives.append(solution['objective'])
+instance, solution = flipping_heuristic(model_parameters, instance, solution)
+objectives.append(solution['objective'])
+
+objectives = np.array(objectives)
+print('objectives')
+print(objectives)
+print('improvement (%)')
+print((objectives[1:] - objectives[0]) / objectives[0] * 100)
 
 # Compare models
 # comparison = ComparisonModel(model_parameters)
