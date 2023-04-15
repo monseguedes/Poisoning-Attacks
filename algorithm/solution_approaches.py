@@ -731,21 +731,36 @@ def flipping_heuristic(model_parameters: dict, instance, solution):
             target_y =  instance.y_poison_dataframe.loc[psample, 'y_poison']
             difference = num_y - target_y
 
-            for feature in list(instance.categories_dict.keys()):
+            # We consider two case: Make prediction as large as possible and make prediction
+            # as small as possible. We then take the best one.
+
+            # categories_up/down[feature] is the category to push prediction up/down.
+            cat_features = list(instance.categories_dict.keys())
+            categories_up = dict()
+            categories_down = dict()
+            for feature in cat_features:
                 # Filter the keys based on given values for first two elements
                 filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
-                if difference >= 0:
-                    chosen_category = max(filtered_keys, key=cat_weights.get)[1]
-                else:
-                    chosen_category = min(filtered_keys, key=cat_weights.get)[1]
+                categories_up[feature] = max(filtered_keys, key=cat_weights.get)[1]
+                categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
+                
+            # Let's compute the prediction of each case.
+            pred_up = num_y + sum(cat_weights[(feature, categories_up[feature])] for feature in cat_features)
+            pred_down = num_y + sum(cat_weights[(feature, categories_down[feature])] for feature in cat_features)
 
-                # Change features as desired
-                instance.cat_poison_dataframe_data.loc[psample, feature , :] = 0
-                instance.cat_poison_dataframe_data.loc[psample, feature, chosen_category] = 1
+            if np.abs(pred_up - target_y) < np.abs(pred_down - target_y):
+                # Pushing down is more effective.
+                categories_chosen = categories_down
+            else:
+                # Pushing up is more effective.
+                categories_chosen = categories_up
 
+            # Update the dataframes.
+            instance.cat_poison_dataframe_data.loc[psample, : , :] = 0        
+            for feature in cat_features:
+                instance.cat_poison_dataframe_data.loc[psample, feature, categories_chosen[feature]] = 1
                 instance.complete_cat_poison_dataframe.to_numpy()[:] = instance.cat_poison_dataframe_data['x_poison_cat'].to_numpy().reshape(
                                                                                                  instance.complete_cat_poison_dataframe.shape)
-                
                 instance.update_cat_poison_dataframe()
         
         opt = pyo.SolverFactory('ipopt')
