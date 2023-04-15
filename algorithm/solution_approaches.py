@@ -461,7 +461,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
 
     while iteration <= instance_data.no_psubsets: # There is an iteration for each poison subset
         # Solve model
-        results = opt.solve(model, load_solutions=True, tee=False)
+        results = opt.solve(model, load_solutions=True, tee=True)
 
         # Store results of the poison subset found during this iteration
         index = pd.MultiIndex.from_tuples(model.x_poison_num.keys(), names=('sample', 'feature'))   # Create index from the keys (indexes) of the solutions of x_poison
@@ -475,37 +475,33 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
                          'objective': pyo.value(model.objective_function)}
         iterations_solutions.append(solutions_dict)
 
-        # Modify data dataframes with results
-        if iteration != instance_data.no_psubsets:
-            instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
-            # Update parameter from data
-            for k, v in enumerate(instance_data.flag_array): 
-                model.flag_array[k + 1].value = v 
-            for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
-                model.x_poison_num_data[k].value = v
-            for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
-                model.x_poison_cat[k].value = v
-            for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
-                model.y_poison[k].value = v
+        instance_data.update_data(iteration, new_x_poison_num=new_x_poison_num)
+        # Update parameter from data
+        for k, v in enumerate(instance_data.flag_array): 
+            model.flag_array[k + 1].value = v 
+        for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
+            model.x_poison_num_data[k].value = v
+        for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
+            model.x_poison_cat[k].value = v
+        for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
+            model.y_poison[k].value = v
 
-            dataframe = instance_data.num_x_poison_dataframe.copy().iloc[iteration * instance_data.no_numfeatures * instance_data.no_psamples_per_subset: 
-                                                                        (iteration + 1) * instance_data.no_numfeatures * instance_data.no_psamples_per_subset]
-            dataframe.index = dataframe.index.set_levels(dataframe.index.levels[0] 
-                                                        - dataframe.index.get_level_values(0)[0] + 1, level=0)
-            for psample in model.psamples_per_subset_set:
-                for numfeature in  model.numfeatures_set:
-                    model.x_poison_num[psample,numfeature].set_value(dataframe.to_dict()[psample,numfeature])
+        next_iteration = 0 if iteration == instance_data.no_psubsets else iteration 
+
+        dataframe = instance_data.num_x_poison_dataframe.copy().iloc[next_iteration * instance_data.no_numfeatures * instance_data.no_psamples_per_subset: 
+                                                                    (next_iteration + 1) * instance_data.no_numfeatures * instance_data.no_psamples_per_subset]
+        
+        dataframe.index = dataframe.index.set_levels(dataframe.index.levels[0] 
+                                                    - dataframe.index.get_level_values(0)[0] + 1, level=0)
+        for psample in model.psamples_per_subset_set:
+            for numfeature in  model.numfeatures_set:
+                model.x_poison_num[psample,numfeature].set_value(dataframe.to_dict()[psample,numfeature])
 
         instance_data.num_x_poison_dataframe.to_numpy()[(iteration - 1) * model.no_numfeatures * model.no_psamples_per_subset:
                                                iteration * model.no_numfeatures * model.no_psamples_per_subset] = new_x_poison_num.to_numpy()
         
         print('Iteration no. {} is finished'.format(iteration))
         iteration += 1
-
-        # TODO add final update and reset iteration count?
-        if iteration == instance_data.no_psubsets:
-            pass
-
 
     final_solutions = {'x_poison_num': instance_data.num_x_poison_dataframe.to_dict(),
                         'weights_num': {index : model.weights_num[index].value for index in model.numfeatures_set},
@@ -581,20 +577,21 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
         for key, value in solutions_dict['x_poison_cat'].items():
             instance_data.cat_x_poison_dataframe.loc[key] = value
         benchmark_instance.cat_poison_dataframe_data['x_poison_cat'] = instance_data.cat_x_poison_dataframe['x_data_poison_cat']
-        
-        # Optimise numerical features again TODO improve XXX
+        benchmark_instance.complete_cat_poison_dataframe.to_numpy()[:] = instance_data.cat_x_poison_dataframe['x_data_poison_cat'].to_numpy().reshape(
+                                                                                                 benchmark_instance.complete_cat_poison_dataframe.shape)
+        benchmark_instance.update_cat_poison_dataframe()
         opt = pyo.SolverFactory('ipopt')
         benchmark_model, benchmark_instance, solution = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
         
         # Get poisoning samples as data
-        benchmark_data = benchmark_solution['x_poison_num']   # TODO is this only last one or all samples?
+        benchmark_data = solution['x_poison_num'] 
         matrix = create_matrix(benchmark_data)
         instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
 
-    print('Heuristic objective value is ',solutions_dict['objective'])
+    print('Heuristic objective value is     ',solutions_dict['objective'])
     print('New benchmark objective value is ',solution['objective']) 
-    print('Benchmark objective value is ',benchmark_solution['objective'])    
+    print('Benchmark objective value is     ',benchmark_solution['objective'])    
 
     return my_model, instance_data, solutions_dict
 
@@ -713,8 +710,9 @@ def flipping_heuristic(model_parameters: dict):
     print('Benchmark has been solved, now let us add this solution to data')
 
     # Flip all categorical features. 
-    for i in range(0, len(benchmark_instance.no_psamples), model_parameters['heuristic_subset']):
-        chosen_samples = benchmark_instance.no_total_psamples[i:i+ model_parameters['heuristic_subset']]
+    for i in range(0, benchmark_instance.no_psamples, model_parameters['heuristic_subset']):
+        print(benchmark_instance.cat_poison_dataframe_data['x_poison_cat'])
+        chosen_samples = list(range(1,benchmark_instance.no_total_psamples + 1))[i:i+ model_parameters['heuristic_subset']]
         print('Subset of samples is', chosen_samples)
         for psample in chosen_samples:
             for feature in list(benchmark_instance.categories_dict.keys()):
@@ -730,21 +728,24 @@ def flipping_heuristic(model_parameters: dict):
                     value_key = min(filtered_keys, key=my_dict.get) 
                 value_second_element = value_key[1]
                 # Change features as desired
-                benchmark_instance.cat_poison_dataframe.loc[psample, feature, value_second_element] = 1
+                benchmark_instance.cat_poison_dataframe_data.loc[psample, feature, value_second_element] = 1
                 other_features = [k[1] for k in filtered_keys if k[1] != value_second_element] 
                 for i in other_features:
-                    benchmark_instance.cat_poison_dataframe.loc[psample, feature, i] = 0
+                    benchmark_instance.cat_poison_dataframe_data.loc[psample, feature, i] = 0
 
+
+                benchmark_instance.complete_cat_poison_dataframe.to_numpy()[:] = benchmark_instance.cat_poison_dataframe_data['x_poison_cat'].to_numpy().reshape(
+                                                                                                 benchmark_instance.complete_cat_poison_dataframe.shape)
+                
                 opt = pyo.SolverFactory('ipopt')
+                benchmark_instance.update_cat_poison_dataframe()
                 model, instance, solution = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
                 # TODO Add as data
 
-
-    
     opt = pyo.SolverFactory('ipopt')
     new_model, solutions_dict = solve_pyomo(opt, model_parameters, benchmark_instance)
 
-    print('Objective value is ', solutions_dict['objective'])
+    print('Objective value is           ', solutions_dict['objective'])
     print('Benchmark objective value is ', benchmark_solution['objective'])
 
     return new_model, benchmark_data, solutions_dict

@@ -19,7 +19,6 @@ class InstanceData():
         dataset_name: 'pharm', or 'house'
         """
 
-        self.iteration_count = 1    # To keep track of iteration count
         self.dataset_directory = ''.join(['data/', dataset_name])    # e.g., data/pharm
         
     def prepare_instance(self, poison_rate: int, training_samples: int, no_psubsets: int, seed: int):
@@ -195,22 +194,7 @@ class InstanceData():
         self.cat_poison_dataframe_data = self.cat_poison_dataframe_data.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
         self.cat_poison_dataframe_data = self.cat_poison_dataframe_data.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
-        # Define poison data (x_poison_cat) for initial iteration
-        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[:self.no_psamples_per_subset].reset_index(drop=True)
-        self.cat_poison_dataframe.index.name = 'sample' 
-        self.cat_poison_dataframe.index += 1
-        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
-        self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(index={None: 'column'})   
-        self.cat_poison_dataframe.name = 'x_poison_cat'
-        self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
-        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
-        if len(self.cat_poison_dataframe) == 0:
-            self.cat_poison_dataframe['feature'] = []
-            self.cat_poison_dataframe['category'] = []
-        else:
-            self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
-        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
-        self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
+        self.update_cat_poison_dataframe()
 
         ### Initial poisoning samples-------------------------
         self.num_x_poison_dataframe = self.complete_x_poison_dataframe[self.numerical_columns]
@@ -238,6 +222,25 @@ class InstanceData():
         self.flag_array = np.ones(self.no_total_psamples)
         self.flag_array[:self.no_psamples_per_subset]=0
      
+    def update_cat_poison_dataframe(self):
+        # Define poison data (x_poison_cat) for initial iteration
+        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[:self.no_psamples_per_subset].reset_index(drop=True)
+        self.cat_poison_dataframe.index.name = 'sample' 
+        self.cat_poison_dataframe.index += 1
+        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
+        self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(index={None: 'column'})   
+        self.cat_poison_dataframe.name = 'x_poison_cat'
+        self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()   # This resets index so that current index becomes columns
+        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        if len(self.cat_poison_dataframe) == 0:
+            self.cat_poison_dataframe['feature'] = []
+            self.cat_poison_dataframe['category'] = []
+        else:
+            self.cat_poison_dataframe[['feature', 'category']] = self.cat_poison_dataframe.column.str.split(':', expand=True).astype(int)
+        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=['column'])   # Drops the columns wirth '1:1' names 
+        self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
+
+    
     def inital_sets_size(self):
         """
         Extracts size of sets from all dataframes.
@@ -270,14 +273,18 @@ class InstanceData():
         and solutions of solving model for x_poison_num as column. Here, x_poison_num becomes x_train_num since solutions to previous 
         iterations become datapoints.
         """
+        if iteration == self.no_psubsets:
+            next_iteration = 0
+        else:
+            next_iteration = iteration 
 
         ### NUMERICAL POISON (x_poison_num_data)-------------------------------
         self.num_x_poison_dataframe.to_numpy()[(iteration - 1) * self.no_numfeatures * self.no_psamples_per_subset:
                                                iteration * self.no_numfeatures * self.no_psamples_per_subset] = new_x_poison_num.to_numpy()
         
         ### ATTACK CATEGORICAL FEATURES (x_poison_cat)
-        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[iteration * self.no_psamples_per_subset:   
-                                                                            (iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)
+        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[next_iteration * self.no_psamples_per_subset:   
+                                                                            (next_iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)
         self.cat_poison_dataframe.index.name = 'sample' 
         self.cat_poison_dataframe.index += 1
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
@@ -290,14 +297,14 @@ class InstanceData():
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(['sample', 'feature', 'category'])   # Sets relevant columns as indices.
 
         ### ATTACK TARGET (y_poison)------------------------------------
-        self.y_poison_dataframe = self.complete_y_poison_dataframe[iteration * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
-                                                                    (iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
+        self.y_poison_dataframe = self.complete_y_poison_dataframe[next_iteration * self.no_psamples_per_subset:    # Get next poison samples (by slicing whole poison samples in order)
+                                                                    (next_iteration + 1) * self.no_psamples_per_subset].reset_index(drop=True)    # Depends on iteration        
         self.y_poison_dataframe.index.rename('sample')
         self.y_poison_dataframe.index += 1
 
         ### UPDATE FLAG 
         self.flag_array = np.ones(self.no_psamples_per_subset)
-        self.flag_array[iteration * self.no_psamples_per_subset: (iteration + 1) * self.no_psamples_per_subset] = 0
+        self.flag_array[next_iteration * self.no_psamples_per_subset: (next_iteration + 1) * self.no_psamples_per_subset] = 0
 
     
      
