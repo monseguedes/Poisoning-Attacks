@@ -160,6 +160,7 @@ class InstanceData():
         # Dataframe with all samples to be poisoned
         self.poison_dataframe = self.train_dataframe.sample(frac= self.poison_rate, 
                                                             random_state=self.seed).reset_index(drop=True)  
+        
         # Total number of poisoned samples (rate applied to training data)
         self.no_total_psamples = self.poison_dataframe.index.size 
         # Get the biggest number of samples per subset that makes possible the desired number of subsets
@@ -179,6 +180,7 @@ class InstanceData():
         self.complete_cat_poison_dataframe = self.poison_dataframe[self.cat_columns]
         self.complete_cat_poison_dataframe.index.name = 'sample'  
         self.complete_cat_poison_dataframe.index += 1  
+        
 
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
         self.cat_poison_dataframe_data = self.complete_cat_poison_dataframe.copy()
@@ -215,6 +217,7 @@ class InstanceData():
         self.complete_y_poison_dataframe = self.poison_dataframe[['target']].reset_index(drop=True) 
         self.complete_y_poison_dataframe.rename(columns={'target': 'y_poison'}, inplace=True)  
         self.complete_y_poison_dataframe.index += 1
+        # self.complete_y_poison_dataframe = round(1 - self.complete_y_poison_dataframe)
 
         self.y_poison_dataframe = self.complete_y_poison_dataframe[:self.no_psamples_per_subset]
 

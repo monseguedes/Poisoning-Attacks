@@ -150,5 +150,5 @@ class LASSOdataframe():
 
 dataframe = create_dataframe('house')
 model = LASSOdataframe(dataframe)
-model.get_features_lists(10,10)
+model.get_features_lists(2,2)
 model.save_new_dataframe()

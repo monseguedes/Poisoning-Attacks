@@ -12,14 +12,14 @@ from solutions_handler.regression_comparison import *
 
 import numpy as np
 
-model_parameters = {'dataset_name': '10num10cat',
+model_parameters = {'dataset_name': '2num2cat',
                     'no_nfeatures': 0,
-                    'no_cfeatures': 5, 
-                    'poison_rate': 4,
-                    'training_samples': 300,
+                    'no_cfeatures': 2, 
+                    'poison_rate': 20,
+                    'training_samples': 30,
                     'seed': 3,
                     'function': 'MSE',
-                    'no_psubsets': 3,
+                    'no_psubsets': 1,
                     'heuristic_subset': 1,
                     'datatype': 'test',
                     'feasibility': 0.00001,
@@ -29,21 +29,22 @@ model_parameters = {'dataset_name': '10num10cat',
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
 # benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
-# benchmark_plus_optimising_heuristic(model_parameters)
+benchmark_plus_optimising_heuristic(model_parameters)
+raise SystemExit
 # benchmark_plus_optimising_subset_heuristic(model_parameters)
 objectives = []
 _, instance, solution = solve_benchmark(model_parameters)
-objectives.append(solution['objective'])
+# objectives.append(solution['objective'])
 instance, solution = flipping_heuristic(model_parameters, instance, solution)
-objectives.append(solution['objective'])
-instance, solution = flipping_heuristic(model_parameters, instance, solution)
-objectives.append(solution['objective'])
+# objectives.append(solution['objective'])
+# instance, solution = flipping_heuristic(model_parameters, instance, solution)
+# objectives.append(solution['objective'])
 
-objectives = np.array(objectives)
-print('objectives')
-print(objectives)
-print('improvement (%)')
-print((objectives[1:] - objectives[0]) / objectives[0] * 100)
+# objectives = np.array(objectives)
+# print('objectives')
+# print(objectives)
+# print('improvement (%)')
+# print((objectives[1:] - objectives[0]) / objectives[0] * 100)
 
 # Compare models
 # comparison = ComparisonModel(model_parameters)

@@ -127,7 +127,7 @@ def solve_benchmark(model_parameters: dict, checking_bilevel= False):
                                    training_samples=model_parameters['training_samples'],
                                    no_psubsets = model_parameters['no_psubsets'],
                                    seed=model_parameters['seed'])
-    
+
     benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
                                                                                         instance_data=instance_data,
                                                                                         model_parameters=model_parameters)
