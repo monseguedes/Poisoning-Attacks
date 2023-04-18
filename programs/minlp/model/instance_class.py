@@ -212,7 +212,7 @@ class InstanceData():
 
         return self.chosen_numerical, self.chosen_categorical
 
-    def poison_samples(self):
+    def poison_samples(self, only_num = False):
         """
         Takes the dataframe for training data and gets data for poisoning samples
         depending on poisoning rate
@@ -240,6 +240,8 @@ class InstanceData():
         # to dictionary and used as data since matched gurobi's format.
         self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})    
         self.num_x_poison_dataframe.name = 'x_data_poison_num'
+
+        if only_num: return 
 
         ### CATEGORICAL FEATURES (x_data_poison_num)----------------------------------
         # Get only categorical columns (those that include ':' in name)

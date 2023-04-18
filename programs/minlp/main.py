@@ -12,30 +12,31 @@ from solutions_handler.regression_comparison import *
 
 import numpy as np
 
-model_parameters = {'dataset_name': '10num10cat',
+model_parameters = {'dataset_name': '5num5cat',
                     'no_nfeatures': 0,
                     'no_cfeatures': 5, 
-                    'poison_rate': 20,
-                    'training_samples': 100,
+                    'poison_rate': 12,
+                    'training_samples': 30,
                     'seed': 3,
-                    'function': 'MSE',
-                    'no_psubsets': 1,
+                    'function': 'SLS',
+                    'no_psubsets': 3,
                     'heuristic_subset': 1,
                     'datatype': 'test',
                     'feasibility': 0.00001,
-                    'time_limit': 100}
+                    'time_limit': 20}
 
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
 # benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
-benchmark_plus_optimising_heuristic(model_parameters)
-raise SystemExit
+bilevel_model, bilevel_instance, bilevel_solution = benchmark_plus_optimising_heuristic(model_parameters)
+print(bilevel_solution)
+
 # benchmark_plus_optimising_subset_heuristic(model_parameters)
-objectives = []
-_, instance, solution = solve_benchmark(model_parameters)
-# objectives.append(solution['objective'])
-instance, solution = flipping_heuristic(model_parameters, instance, solution)
+# objectives = []
+# _, instance, solution = solve_benchmark(model_parameters)
+# # objectives.append(solution['objective'])
+# instance, solution = flipping_heuristic(model_parameters, instance, solution)
 # objectives.append(solution['objective'])
 # instance, solution = flipping_heuristic(model_parameters, instance, solution)
 # objectives.append(solution['objective'])
@@ -51,7 +52,7 @@ instance, solution = flipping_heuristic(model_parameters, instance, solution)
 # comparison.compare_everything(bilevel_instance=bilevel_instance, bilevel_model=bilevel_model,
 #                               ridge_instance=ridge_instance,ridge_model=ridge_model,
 #                               benchmark_instance=benchmark_instance, benchmark_model=benchmark_model)
-raise SystemExit
+
 
 from sklearn.linear_model import Ridge
 

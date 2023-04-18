@@ -583,12 +583,15 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
                                                                                                  benchmark_instance.complete_cat_poison_dataframe.shape)
         benchmark_instance.update_cat_poison_dataframe()
         opt = pyo.SolverFactory('ipopt')
+        print(benchmark_instance.flag_array)
+        print
         benchmark_model, benchmark_instance, solution = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
         
-        # Get poisoning samples as data
-        benchmark_data = solution['x_poison_num'] 
-        matrix = create_matrix(benchmark_data)
-        instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
+        # # Get poisoning samples as data
+        # benchmark_data = solution['x_poison_num'] 
+        # matrix = create_matrix(benchmark_data)
+        # instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
+        instance_data.poison_samples(only_num=True)
 
 
     print('Heuristic objective value is     {:.5f}'.format(solutions_dict['objective']))
