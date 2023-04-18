@@ -25,6 +25,24 @@ model_parameters = {'dataset_name': '5num5cat',
                     'feasibility': 0.00001,
                     'time_limit': 20}
 
+import model.pyomo_instance_class as benchmark_data
+
+instance_data = benchmark_data.InstanceData(dataset_name=model_parameters['dataset_name'])
+instance_data.prepare_instance(poison_rate=model_parameters['poison_rate'],
+                               training_samples=model_parameters['training_samples'],
+                               no_psubsets = model_parameters['no_psubsets'],
+                               seed=model_parameters['seed'])
+
+np.testing.assert_equal(instance_data.get_num_x_train_dataframe(unstack=True).shape, (150,))
+np.testing.assert_equal(instance_data.get_num_x_train_dataframe(unstack=False).shape, (30, 5))
+np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(unstack=True).shape, (720,))
+np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(unstack=False).shape, (30, 24))
+np.testing.assert_equal(instance_data.get_num_x_poison_dataframe(unstack=True).shape, (20,))
+np.testing.assert_equal(instance_data.get_num_x_poison_dataframe(unstack=False).shape, (4, 5))
+np.testing.assert_equal(instance_data.get_cat_x_poison_dataframe(unstack=True).shape, (96,))
+np.testing.assert_equal(instance_data.get_cat_x_poison_dataframe(unstack=False).shape, (4, 24))
+raise SystemExit
+
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
