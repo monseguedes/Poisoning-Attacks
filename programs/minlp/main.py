@@ -28,7 +28,8 @@ model_parameters = {'dataset_name': '5num5cat',
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
-# benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
+benchmark_model, benchmark_instance, benchmark_solution = solve_model('benchmark', model_parameters)
+raise SystemExit
 bilevel_model, bilevel_instance, bilevel_solution = benchmark_plus_optimising_heuristic(model_parameters)
 print(bilevel_solution)
 

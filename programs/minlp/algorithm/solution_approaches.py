@@ -128,6 +128,7 @@ def solve_benchmark(model_parameters: dict, checking_bilevel= False):
                                    no_psubsets = model_parameters['no_psubsets'],
                                    seed=model_parameters['seed'])
 
+    instance_data.get_num_x_train_dataframe()
     benchmark_model, benchmark_instance, benchmark_solution = iterative_attack_strategy(opt=opt, 
                                                                                         instance_data=instance_data,
                                                                                         model_parameters=model_parameters)
@@ -482,7 +483,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
             model.flag_array[k + 1].value = v 
         for k,v in instance_data.num_x_poison_dataframe.to_dict().items():
             model.x_poison_num_data[k].value = v
-        for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items():
+        for k,v in instance_data.get_cat_poison_dataframe().to_dict()['x_poison_cat'].items():
             model.x_poison_cat[k].value = v
         for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items():
             model.y_poison[k].value = v
@@ -498,6 +499,8 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
             for numfeature in  model.numfeatures_set:
                 model.x_poison_num[psample,numfeature].set_value(dataframe.to_dict()[psample,numfeature])
 
+
+        # TODO Update the master dataframe
         instance_data.num_x_poison_dataframe.to_numpy()[(iteration - 1) * model.no_numfeatures * model.no_psamples_per_subset:
                                                iteration * model.no_numfeatures * model.no_psamples_per_subset] = new_x_poison_num.to_numpy()
         
@@ -541,7 +544,6 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
     print('' * 2 + '\n' + '-' * long_space + '\n' + '-' * long_space)
     print('HEURISTIC ALGORITHM: CONTINOUS + SUBSET MIXED-INTEGER')
     print('-' * long_space + '\n' + '-' * long_space)
-
 
     # Optimise numerical features locally
     benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(model_parameters)
@@ -681,7 +683,7 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
     instance_data.chosen_numerical = []
     instance_data.chosen_categorical= []
 
-    benchmark_instance.cat_poison_dataframe = instance_data.cat_x_poison_dataframe.rename(columns={'x_data_poison_cat': 'x_poison_cat'})
+    # benchmark_instance.cat_poison_dataframe = instance_data.cat_x_poison_dataframe.rename(columns={'x_data_poison_cat': 'x_poison_cat'}) #TODO update master dataframe
 
     new_model, solutions_dict = solve_pyomo(model_parameters, benchmark_instance)
 

@@ -324,7 +324,6 @@ class PoisonAttackModel():
                         self.model.addConstr(self.tnn_ln_times_numsamples[k,r,s] <= self.upper_bound * self.x_poison_num[k,r] , name='concave_envelope_3')
                         self.model.addConstr(self.tnn_ln_times_numsamples[k,r,s] <= 1/2 * self.weights_num[r] + 1/2 * self.upper_bound , name='concave_envelope_4')
 
-
     def build_objective(self):
         """
         Objective function of single-level reformulation, same as leader's 
@@ -473,13 +472,13 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         # Parameters
         self.flag_array = {k + 1 : pmo.parameter(v) for k, v in enumerate(instance_data.flag_array)}
-        self.x_train_num = {k: pmo.parameter(v) for k, v in instance_data.num_x_train_dataframe.to_dict().items()}
+        self.x_train_num = {k: pmo.parameter(v) for k, v in instance_data.get_num_x_train_dataframe().to_dict().items()}
         self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()['x_train_cat']
         self.y_train = instance_data.y_train_dataframe.to_dict()['y_train']
-        self.x_poison_num_data = {k :pmo.parameter(v) for k,v in instance_data.num_x_poison_dataframe.to_dict().items()}
+        self.x_poison_num_data = {k :pmo.parameter(v) for k,v in instance_data.get_num_x_poison_dataframe().to_dict().items()}
         self.x_poison_cat_data = instance_data.cat_poison_dataframe_data.to_dict()['x_poison_cat']
         self.y_poison_data = instance_data.complete_y_poison_dataframe.to_dict()['y_poison']
-        self.x_poison_cat = {k :pmo.parameter(v) for k,v in instance_data.cat_poison_dataframe.to_dict()['x_poison_cat'].items()}
+        self.x_poison_cat = {k :pmo.parameter(v) for k,v in instance_data.get_cat_poison_dataframe().to_dict()['x_poison_cat'].items()}
         self.y_poison = {k :pmo.parameter(v) for k,v in instance_data.y_poison_dataframe.to_dict()['y_poison'].items()}
 
         self.regularization = instance_data.regularization
