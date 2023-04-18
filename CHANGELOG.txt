@@ -65,3 +65,14 @@ When we access `old_var` variable, `old_var(self)` is called. This emits
 a warning and then return the value.
 
 See `no_samples` and `no_psamples` for actual use.
+
+
+5. doctest
+
+In `programs/minlp/model/pyomo_instance_class.py` functions has
+documentation which examples. We can actually run the examples
+and test if the outputs of the functions are as expected or not:
+
+```
+$ python -m doctest programs/minlp/model/pyomo_instance_class.py
+```
