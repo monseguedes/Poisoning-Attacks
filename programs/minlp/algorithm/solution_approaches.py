@@ -515,6 +515,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory,
     # print('Categorical weights are ', final_solutions['weights_num'])
     # print('Bias is ', final_solutions['bias'])
     # print('*' * middle_space)
+    print('Objectives are: ', [dict['objective'] for dict in iterations_solutions])
     print('Objective value is ',pyo.value(model.objective_function))
     print('*' * middle_space + '\n' + '*' * long_space + '\n' + '' * 2)
 
@@ -590,9 +591,10 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
         instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
 
-    print('Heuristic objective value is     ',solutions_dict['objective'])
-    print('New benchmark objective value is ',solution['objective']) 
-    print('Benchmark objective value is     ',benchmark_solution['objective'])    
+    print('Heuristic objective value is     {:.5f}'.format(solutions_dict['objective']))
+    print('New benchmark objective value is {:.5f}'.format(solution['objective'])) 
+    print('Benchmark objective value is     {:.5f}'.format(benchmark_solution['objective']))   
+    print('Increment is                     {:.5f}'.format((solutions_dict['objective'] - benchmark_solution['objective']) / benchmark_solution['objective'] * 100)) 
 
     return my_model, instance_data, solutions_dict
 

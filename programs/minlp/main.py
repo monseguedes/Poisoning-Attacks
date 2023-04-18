@@ -12,11 +12,11 @@ from solutions_handler.regression_comparison import *
 
 import numpy as np
 
-model_parameters = {'dataset_name': '2num2cat',
+model_parameters = {'dataset_name': '10num10cat',
                     'no_nfeatures': 0,
-                    'no_cfeatures': 2, 
+                    'no_cfeatures': 5, 
                     'poison_rate': 20,
-                    'training_samples': 30,
+                    'training_samples': 100,
                     'seed': 3,
                     'function': 'MSE',
                     'no_psubsets': 1,

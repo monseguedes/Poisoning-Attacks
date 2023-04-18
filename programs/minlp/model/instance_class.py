@@ -15,7 +15,7 @@ import itertools
 
 # Add path to be able to use module from other folder
 import sys
-sys.path.append('./algorithm')                
+sys.path.append('./programs/minlp/algorithm')                
 import choosing_features as choose
 
 long_space = 80

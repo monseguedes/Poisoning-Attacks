@@ -168,6 +168,8 @@ class InstanceData():
             self.no_psamples_per_subset = 0
         else:
             self.no_psamples_per_subset = floor(self.no_total_psamples / self.no_psubsets)
+            if self.no_psamples_per_subset == 0:
+                raise SystemError('The ratio between poisoning samples and poisoning subset is not feasible')
         # Now multiplies the no. samples per subset and no. of subset to get total poisoned samples 
         self.no_total_psamples = self.no_psamples_per_subset * self.no_psubsets 
         # If the initial poison data had a non divisible number of samples, update it to be divisible
