@@ -50,6 +50,7 @@ class InstanceData:
         # no. of subsets in which the total poison samples (gotten after
         # applying rate to training data) is divided
         self.no_psubsets = no_psubsets
+        self.regularization = 0.6612244897959183
 
         # Run all necessary methods
         self.create_dataframes(training_samples, self.seed)
@@ -60,8 +61,6 @@ class InstanceData:
         # print('Splitting poisoning data')
         # self.poison_samples()
         # print("Defining sets")
-        self.inital_sets_size()
-        self.regularization_parameter()
 
     def create_dataframes(self, training_samples: int, seed: int):
         """
@@ -85,11 +84,8 @@ class InstanceData:
             frac=None, n=training_samples, random_state=seed
         )
 
-        # Set no. of samples variables.
-        # self.no_samples = len(self.train_dataframe.index)
-        self.no_total_features = (
-            len(self.train_dataframe.columns) - 1
-        )  # Remove target column
+        # Remove target column
+        self.no_total_features = len(self.train_dataframe.columns) - 1
 
         # Store rest of samples, which will be further divided into testing and
         # validating sets
@@ -331,36 +327,37 @@ class InstanceData:
         warnings.warn("no_psamples is deprecated. Use no_poison_samples", stacklevel=2)
         return self.no_poison_samples
 
-    def inital_sets_size(self):
-        """
-        Extracts size of sets from all dataframes.
-        """
-        # Initial size of sets
-        self.no_train_samples = len(self.train_dataframe)
-        self.no_poison_samples = len(self.poison_dataframe)
-        self.no_numfeatures = len(
+    @property
+    def no_train_samples(self):
+        return len(self.train_dataframe)
+
+    @property
+    def no_poison_samples(self):
+        return len(self.poison_dataframe)
+
+    @property
+    def no_numfeatures(self):
+        return len(
             get_numerical_feature_column_names(self.train_dataframe)
         )
-        self.no_catfeatures = len(
+
+    @property
+    def no_catfeatures(self):
+        return len(
             get_categorical_feature_column_names(self.train_dataframe)
         )
-        # Create dictionary with number of categories per categorical feature
-        categorical_names = get_categorical_feature_names(self.train_dataframe)
-        self.categories_dict = get_categorical_feature_to_categories(
-            self.train_dataframe
-        )
-        self.no_categories_dict = get_categorical_feature_to_no_categories(
-            self.train_dataframe
-        )
 
-    def regularization_parameter(self):
-        """
-        Sets the value of the regularization parameter of the regression
-        model.
-        """
+    @property
+    def categorical_names(self):
+        return get_categorical_feature_names(self.train_dataframe)
 
-        # Other parameters
-        self.regularization = 0.6612244897959183
+    @property
+    def categories_dict(self):
+        return get_categorical_feature_to_categories(self.train_dataframe)
+
+    @property
+    def no_categories_dict(self):
+        return get_categorical_feature_to_no_categories(self.train_dataframe)
 
     def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
         """

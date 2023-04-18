@@ -2,7 +2,7 @@
 @author: Monse Guedes Ayala
 @project: Poisoning Attacks Paper
 
-Main script for the paper of poisoning attacks of categorical variables. 
+Main script for the paper of poisoning attacks of categorical variables.
 """
 
 # Self-created libraries

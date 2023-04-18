@@ -2,7 +2,7 @@
 @author: Monse Guedes Ayala
 @project: Poisoning Attacks Paper
 
-Auxiliary module of package 'algorithm' with functions to apply solution approaches 
+Auxiliary module of package 'algorithm' with functions to apply solution approaches
 and solve models.
 
 - solving_MINLP
@@ -143,7 +143,6 @@ def solve_benchmark(model_parameters: dict, checking_bilevel=False):
         seed=model_parameters["seed"],
     )
 
-    instance_data.get_num_x_train_dataframe()
     (
         benchmark_model,
         benchmark_instance,
