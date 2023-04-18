@@ -266,12 +266,19 @@ class InstanceData:
     #     # Stack dataframe to get multiindex, indexed by sample and feature
     #     num_x_poison_dataframe = num_x_poison_dataframe.stack().rename_axis(index={None: 'feature'})
     #     num_x_poison_dataframe.name = 'x_poison_num'
+
+    def get_y_train_dataframe(self):
+        return get_targets(df=self.train_dataframe)
+
     #
     def get_num_x_poison_dataframe(self, unstack):
         return get_numerical_features(df=self.poison_dataframe, unstack=unstack)
 
     def get_cat_x_poison_dataframe(self, unstack):
         return get_categorical_features(df=self.poison_dataframe, unstack=unstack)
+
+    def get_y_poison_dataframe(self):
+        return get_targets(df=self.poison_dataframe)
 
     # def get_complete_cat_poison_dataframe(self):
     #     raise NotImplementedError
@@ -337,15 +344,11 @@ class InstanceData:
 
     @property
     def no_numfeatures(self):
-        return len(
-            get_numerical_feature_column_names(self.train_dataframe)
-        )
+        return len(get_numerical_feature_column_names(self.train_dataframe))
 
     @property
     def no_catfeatures(self):
-        return len(
-            get_categorical_feature_column_names(self.train_dataframe)
-        )
+        return len(get_categorical_feature_column_names(self.train_dataframe))
 
     @property
     def categorical_names(self):
@@ -452,7 +455,7 @@ def get_numerical_feature_column_names(df):
 
     Parameters
     ----------
-    df : DataFrame
+    df : pandas.DataFrame
 
     Returns
     -------
@@ -481,7 +484,7 @@ def get_categorical_feature_column_names(df):
 
     Parameters
     ----------
-    df : DataFrame
+    df : pandas.DataFrame
 
     Returns
     -------
@@ -510,7 +513,7 @@ def get_categorical_feature_names(df):
 
     Parameters
     ----------
-    df : DataFrame
+    df : pandas.DataFrame
 
     Returns
     -------
@@ -541,7 +544,7 @@ def get_categorical_feature_to_categories(df):
 
     Parameters
     ----------
-    df : DataFrame
+    df : pandas.DataFrame
 
     Returns
     -------
@@ -575,7 +578,7 @@ def get_categorical_feature_to_no_categories(df):
 
     Parameters
     ----------
-    df : DataFrame
+    df : pandas.DataFrame
 
     Returns
     -------
@@ -612,6 +615,15 @@ def get_numerical_features(df, unstack):
     2       1          2
             2          5
     Name: 0, dtype: int64
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+    unstack : bool
+
+    Returns
+    -------
+    res : pandas.DataFrame
     """
     df = df[get_numerical_feature_column_names(df)]
     if not unstack:
@@ -663,6 +675,13 @@ def get_categorical_features(df, unstack):
     Name: 0, dtype: int64
 
     Parameters
+    ----------
+    df : pandas.DataFrame
+    unstack : bool
+
+    Returns
+    -------
+    res : pandas.DataFrame
     """
     df = df[get_categorical_feature_column_names(df)]
     if not unstack:
@@ -677,3 +696,33 @@ def get_categorical_features(df, unstack):
     df = df.set_index(keys=["sample", "feature", "category"]).iloc[:, 0]
     df = df.sort_index()
     return df
+
+
+def get_targets(df):
+    """Extract targets
+
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ...     "1:1":    [ 1,  0,  1],
+    ...     "1:2":    [ 0,  1,  0],
+    ...     "2:1":    [ 0,  0,  0],
+    ...     "2:2":    [ 0,  1,  0],
+    ...     "2:3":    [ 1,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> get_targets(df)
+    0    6
+    1    7
+    2    8
+    Name: target, dtype: int64
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    res : pandas.Series
+    """
+    return df["target"]
