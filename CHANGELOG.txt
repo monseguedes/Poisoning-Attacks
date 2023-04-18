@@ -23,3 +23,12 @@ Run the following script and setup a virtual environment
 ```
 $ ./setup_python_env.sh
 ```
+
+3. Add black formatter
+
+Add black in the virtual environment. To run black, type the following in the
+top directory of the project
+
+```
+$ black programs/
+```

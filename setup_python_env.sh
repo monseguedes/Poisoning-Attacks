@@ -15,4 +15,4 @@ python3.9 -m venv env
 . ./env/bin/activate
 
 pip install -U pip
-pip install gurobipy matplotlib numpy pandas pyomo scikit-learn seaborn
+pip install black gurobipy matplotlib numpy pandas pyomo scikit-learn seaborn
