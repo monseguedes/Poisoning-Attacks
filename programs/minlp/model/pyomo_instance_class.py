@@ -17,7 +17,8 @@ class InstanceData:
         self, dataset_name: str
     ):  # Right now names are either 'pharm', or 'house'
         """
-        The initialization corresponds to the data for the first iteration. If there are no iterations (single attack strategy).
+        The initialization corresponds to the data for the first iteration.
+        If there are no iterations (single attack strategy).
 
         dataset_name: 'pharm', or 'house'
         """
@@ -32,20 +33,25 @@ class InstanceData:
         seed: int,
     ):
         """
-        Prepares the instance by creating dataframe, dividing it into poisoning samples and
-        standard samples, defining the sizes of the sets involved in the model, and the
-        regularisation parameter. This depends on the poison rate.
+        Prepares the instance by creating dataframe, dividing it into poisoning
+        samples and standard samples, defining the sizes of the sets involved
+        in the model, and the regularisation parameter. This depends on the
+        poison rate.
+
         poison_rate: 4, 8, 12, 16, 20.
         training_samples: no. training samples chosen from the whole data.
         N: number of poisoning subsets.
-        seed: seed for different random splits of training, validation and testing sets.
+        seed: seed for different random splits of training, validation and
+        testing sets.
         """
 
         self.seed = seed
 
         # Poisoning parameters
         self.poison_rate = poison_rate / 100  # 4, 8, 12, 16, or 20
-        self.no_psubsets = no_psubsets  # no. of subsets in which the total poison samples (gotten after applying rate to training data) is divided
+        # no. of subsets in which the total poison samples (gotten after
+        # applying rate to training data) is divided
+        self.no_psubsets = no_psubsets
 
         # Run all necessary methods
         self.create_dataframes(training_samples, self.seed)
@@ -61,10 +67,11 @@ class InstanceData:
 
     def create_dataframes(self, training_samples: int, seed: int):
         """
-        Creates a dataframe with all the data, which has features and traget as columns,
-        and samples as rows. Numerical columns are integers, while categorical columns are
-        of the form '1:1' for 'no.catfeature:no.category'. Response variable is names as
-        'target'. These files are prepared by preprocessing.
+        Creates a dataframe with all the data, which has features and traget as
+        columns, and samples as rows. Numerical columns are integers, while
+        categorical columns are of the form '1:1' for
+        'no.catfeature:no.category'. Response variable is names as 'target'.
+        These files are prepared by preprocessing.
         """
 
         # Whole dataframe with features as columns and target column,
@@ -75,9 +82,10 @@ class InstanceData:
 
         # Pick fixed number of trainig samples.
         # The indexes are not reset, but randomly shuffled
+        # TODO make same format as test
         self.train_dataframe = whole_dataframe.sample(
             frac=None, n=training_samples, random_state=seed
-        )  # TODO make same format as test
+        )
 
         # Set no. of samples variables.
         # self.no_samples = len(self.train_dataframe.index)
@@ -85,7 +93,8 @@ class InstanceData:
             len(self.train_dataframe.columns) - 1
         )  # Remove target column
 
-        # Store rest of samples, which will be further divided into testing and validating sets
+        # Store rest of samples, which will be further divided into testing and
+        # validating sets
         self.test_dataframe = whole_dataframe.drop(self.train_dataframe.index)
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
 
@@ -283,15 +292,17 @@ class InstanceData:
         ].reset_index(drop=True)
         cat_poison_dataframe.index.name = "sample"
         cat_poison_dataframe.index += 1
-        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
+
+        # Stack dataframe to get multiindex, indexed by sample and feature,
+        # useful for pyomo format.
         cat_poison_dataframe = cat_poison_dataframe.stack().rename_axis(
             index={None: "column"}
         )
         cat_poison_dataframe.name = "x_poison_cat"
-        cat_poison_dataframe = (
-            cat_poison_dataframe.reset_index()
-        )  # This resets index so that current index becomes columns
-        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        # This resets index so that current index becomes columns
+        cat_poison_dataframe = cat_poison_dataframe.reset_index()
+        # Split multiindex of the form '1:2' into one index for 1 and another
+        # index for 2
         if len(cat_poison_dataframe) == 0:
             cat_poison_dataframe["feature"] = []
             cat_poison_dataframe["category"] = []
@@ -299,12 +310,12 @@ class InstanceData:
             cat_poison_dataframe[
                 ["feature", "category"]
             ] = cat_poison_dataframe.column.str.split(":", expand=True).astype(int)
-        cat_poison_dataframe = cat_poison_dataframe.drop(
-            columns=["column"]
-        )  # Drops the columns wirth '1:1' names
+        # Drops the columns wirth '1:1' names
+        cat_poison_dataframe = cat_poison_dataframe.drop(columns=["column"])
+        # Sets relevant columns as indices.
         cat_poison_dataframe = cat_poison_dataframe.set_index(
             ["sample", "feature", "category"]
-        )  # Sets relevant columns as indices.
+        )
 
         return cat_poison_dataframe
 
@@ -355,11 +366,13 @@ class InstanceData:
 
     def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
         """
-        Updates instance data in order to incorporate solutions of previous iteration.
+        Updates instance data in order to incorporate solutions of previous
+        iteration.
 
-        The input is a dataframe with new data in the following format: multiindex dataframe with sample and feature as index
-        and solutions of solving model for x_poison_num as column. Here, x_poison_num becomes x_train_num since solutions to previous
-        iterations become datapoints.
+        The input is a dataframe with new data in the following format:
+        multiindex dataframe with sample and feature as index and solutions of
+        solving model for x_poison_num as column. Here, x_poison_num becomes
+        x_train_num since solutions to previous iterations become datapoints.
         """
         if iteration == self.no_psubsets:
             next_iteration = 0
@@ -383,35 +396,34 @@ class InstanceData:
         ].reset_index(drop=True)
         self.cat_poison_dataframe.index.name = "sample"
         self.cat_poison_dataframe.index += 1
-        # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
+        # Stack dataframe to get multiindex, indexed by sample and feature,
+        # useful for pyomo format.
         self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(
             index={None: "column"}
         )
         self.cat_poison_dataframe.name = "x_poison_cat"
-        self.cat_poison_dataframe = (
-            self.cat_poison_dataframe.reset_index()
-        )  # This resets index so that current index becomes columns
-        # Split multiindex of the form '1:2' into one index for 1 and another index for 2
+        # This resets index so that current index becomes columns
+        self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()
+        # Split multiindex of the form '1:2' into one index for 1 and another
+        # index for 2
         self.cat_poison_dataframe[
             ["feature", "category"]
         ] = self.cat_poison_dataframe.column.str.split(":", expand=True).astype(int)
-        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(
-            columns=["column"]
-        )  # Drops the columns wirth '1:1' names
+        # Drops the columns wirth '1:1' names
+        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=["column"])
+        # Sets relevant columns as indices.
         self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(
             ["sample", "feature", "category"]
-        )  # Sets relevant columns as indices.
+        )
 
         ### ATTACK TARGET (y_poison)------------------------------------
+        # Get next poison samples (by slicing whole poison samples in order)
+        # This depends on iteration
         self.y_poison_dataframe = self.complete_y_poison_dataframe[
             next_iteration
-            * self.no_psamples_per_subset : (  # Get next poison samples (by slicing whole poison samples in order)
-                next_iteration + 1
-            )
+            * self.no_psamples_per_subset : (next_iteration + 1)
             * self.no_psamples_per_subset
-        ].reset_index(
-            drop=True
-        )  # Depends on iteration
+        ].reset_index(drop=True)
         self.y_poison_dataframe.index.rename("sample")
         self.y_poison_dataframe.index += 1
 
