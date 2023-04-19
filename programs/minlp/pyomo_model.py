@@ -103,10 +103,6 @@ class PyomoModel(pmo.block):
             self.x_poison_cat = {}
             self.y_poison = {}
 
-            # Status code (POISON_DATA_FIXED/OPTIMIZED/REMOVED)
-            self.poison_data_status = {
-                k: pmo.parameter() for k in range(instance_data.no_poison_samples)
-            }
             # 1 if the corresponding row is removed and 0 otherwise.
             self.poison_data_is_removed = {
                 k: pmo.parameter() for k in range(instance_data.no_poison_samples)
@@ -243,7 +239,8 @@ class PyomoModel(pmo.block):
         (no_poison_samples, no_numfeatures). `cat_feature_flag` must be broadcastable
         to (no_poison_samples, no_catfeatures). The elements of these arrays must be
         either self.POISON_DATA_FIXED, self.POISON_DATA_OPTIMIZED or
-        self.POISON_DATA_REMOVED.
+        self.POISON_DATA_REMOVED. If self.POISON_DATA_REMOVED is used, the corresponding
+        entire row is removed. Otherwise, each variable status is set individually.
 
         Parameters
         ----------
@@ -251,36 +248,31 @@ class PyomoModel(pmo.block):
         num_feature_flag : array of int, broadcastable to (no_poison_samples, no_numfeatures)
         cat_feature_flag : array of int, broadcastable to (no_poison_samples, no_catfeatures)
         """
-        raise NotImplementedError
-        # TODO Broadcast flags to appropriate shapes.
-        # TODO Check consistency of flags (is REMOVED flag used across entire rows?).
-        # TODO Update parameters: poison_data_status, poison_data_is_removed
-        # x_poison_num and x_poison_cat.
+        num_feature_flag = np.broadcast_to(
+            num_feature_flag,
+            (instance_data.no_poison_samples, instance_data.no_numfeatures),
+        )
+        cat_feature_flag = np.broadcast_to(
+            cat_feature_flag,
+            (instance_data.no_poison_samples, instance_data.no_catfeatures),
+        )
+        _poison_data_is_removed = np.any(num_feature_flag == self.POISON_DATA_REMOVED, axis=1)
+        _poison_data_is_removed |= np.any(cat_feature_flag == self.POISON_DATA_REMOVED, axis=1)
+        np.testing.assert_equal(_poison_data_is_removed.shape, (instance_data.no_poison_samples,))
+        for k, v in enumerate(_poison_data_is_removed):
+            self.poison_data_is_removed[k].value = float(v)
 
-    def fix_rows_in_poison_dataframe(self, instance_data, flag):
-        """Fix specified rows in poisoned data
-
-        Parameters
-        ----------
-        instance_data
-        flag : (instance_data.no_poison_samples,) array of int
-            If flag[i] is 1, the corresponding poisoned data is fixed.
-            Otherwise, the poisoned data is optimized.
-        """
-        for k, v in enumerate(flag):
-            self.poison_data_status[k].value = v
-            self.poison_data_is_removed[k].value = int(v == self.POISON_DATA_REMOVED)
-        self.no_poison_samples_in_model.value = np.sum(flag != self.POISON_DATA_REMOVED)
-
-        iter = instance_data.get_num_x_poison_dataframe().items()
-        for k, v in iter:
-            if flag[k[0]] == self.POISON_DATA_OPTIMIZED:
+        for k, v in instance_data.get_num_x_poison_dataframe().items():
+            if num_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_num[k].unfix()
             else:
                 self.x_poison_num[k].fix(v)
 
         for k, v in instance_data.get_cat_x_poison_dataframe().items():
-            self.x_poison_cat[k].fix(v)
+            if cat_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
+                self.x_poison_cat[k].unfix()
+            else:
+                self.x_poison_cat[k].fix(v)
 
     def solve(self):
         self.opt.solve(self, load_solutions=True, tee=self.tee)

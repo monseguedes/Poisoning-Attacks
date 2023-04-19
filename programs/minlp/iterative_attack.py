@@ -92,10 +92,8 @@ def run(config, instance_data):
                 num_feature_flag[
                     breaks[mini_batch_index + 1] :
                 ] = model.POISON_DATA_FIXED
-            model.fix_rows_in_poison_dataframe(instance_data, num_feature_flag)
-            # TODO Implement set_poison_data_status and replace fix_rows_in_poison_dataframe.
-            # model.set_poison_data_status(
-            #     instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED)
+            model.set_poison_data_status(
+                instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED)
             model.solve()
             # TODO Implement a method to update data.
             # model.update_data(instance_data)
