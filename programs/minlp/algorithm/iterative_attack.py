@@ -64,10 +64,6 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     print("ITERATIVE ATTACK STRATEGY")
     print("*" * long_space)
 
-    # Iteration count
-    iteration = 1
-    iterations_solutions = []
-
     model = IterativeAttackModel(instance_data, config["function"])
 
     n_epochs = config["iterative_attack_n_epochs"]
@@ -438,14 +434,12 @@ def mean_squared_error(instance_data, model, function: str):
 
     # Get mean of squared errors
     if function == "MSE":
-        # TODO Use instance_data.no_train_samples
-        mse = 1 / model.no_samples * sum_square_errors
+        mse = 1 / instance_data.no_train_samples * sum_square_errors
     elif function == "SLS":
         mse = sum_square_errors
 
     return mse
 
-# TODO Add flag to specify which terms from poisoned data are included.
 def loss_function_derivative_num_weights(instance_data, model, j, function):
     """
     Finds the derivetive of the loss function (follower's objective) with
@@ -485,8 +479,7 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     )  # Component involving the regularization
 
     if function == "MSE":
-        # TODO Use model.no_poison_samples_in_model
-        final = (2 / (model.no_samples + model.no_psamples)) * (
+        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
 
@@ -537,8 +530,7 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
     )  # Component involving the regularization
 
     if function == "MSE":
-        # TODO Use model.no_poison_data_in_model
-        final = (2 / (model.no_samples + model.no_psamples)) * (
+        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
     elif function == "SLS":
@@ -582,8 +574,7 @@ def loss_function_derivative_bias(instance_data, model, function):
     )
 
     if function == "MSE":
-        # TODO Use model. no_poison_data_in_model
-        final = (2 / (model.no_samples + model.no_psamples)) * (
+        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
             train_samples_component + poison_samples_component
         )
     elif function == "SLS":

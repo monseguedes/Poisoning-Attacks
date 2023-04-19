@@ -25,7 +25,7 @@ config = {
     "poison_rate": 12,
     "training_samples": 30,
     "seed": 3,
-    "function": "SLS",
+    "function": "MSE",
     "no_psubsets": 3,
     "heuristic_subset": 1,
     "datatype": "test",
