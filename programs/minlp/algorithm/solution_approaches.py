@@ -135,9 +135,7 @@ def solve_benchmark(config: dict, checking_bilevel=False):
     print("*" * long_space)
 
     print("Building data class")
-    instance_data = benchmark_data.InstanceData(
-        dataset_name=config["dataset_name"]
-    )
+    instance_data = benchmark_data.InstanceData(dataset_name=config["dataset_name"])
     instance_data.prepare_instance(
         poison_rate=config["poison_rate"],
         training_samples=config["training_samples"],
@@ -149,9 +147,7 @@ def solve_benchmark(config: dict, checking_bilevel=False):
         benchmark_model,
         benchmark_instance,
         benchmark_solution,
-    ) = iterative_attack_strategy(
-        opt=opt, instance_data=instance_data, config=config
-    )
+    ) = iterative_attack_strategy(opt=opt, instance_data=instance_data, config=config)
     print("*" * middle_space)
 
     return benchmark_model, benchmark_instance, benchmark_solution
@@ -203,9 +199,7 @@ def solve_gurobi(config: dict, instance_data):
 
 
 def solve_pyomo(opt, config: dict, instance_data):
-    new_model = BenchmarkPoisonAttackModel(
-        instance_data, function=config["function"]
-    )
+    new_model = BenchmarkPoisonAttackModel(instance_data, function=config["function"])
 
     # Initialise solutions
     for psample, numfeature in itertools.product(
@@ -689,9 +683,7 @@ def benchmark_plus_optimising_heuristic(config: dict):
     print("-" * long_space + "\n" + "-" * long_space)
 
     # Optimise numerical features locally
-    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(
-        config
-    )
+    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(config)
     print("Benchmark has been solved, now adding this solution to data")
 
     # Get poisoning samples as data
@@ -997,9 +989,7 @@ def flipping_heuristic(config: dict, instance, solution):
                 instance.update_cat_poison_dataframe()
 
         opt = pyo.SolverFactory("ipopt")
-        _, instance, solution = iterative_attack_strategy(
-            opt, instance, config
-        )
+        _, instance, solution = iterative_attack_strategy(opt, instance, config)
 
         if original_solution["objective"] > solution["objective"]:
             # The flipping actually made the poisoning attack worse.

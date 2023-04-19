@@ -37,9 +37,7 @@ def run(config):
         benchmark_model,
         benchmark_instance,
         benchmark_solution,
-    ) = iterative_attack_strategy(
-        opt=opt, instance_data=instance_data, config=config
-    )
+    ) = iterative_attack_strategy(opt=opt, instance_data=instance_data, config=config)
     print("*" * middle_space)
 
     return benchmark_model, benchmark_instance, benchmark_solution
@@ -73,7 +71,9 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
 
     if incremental:
         if n_epochs > 1:
-            raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
+            raise ValueError(
+                f"n_epochs should be 1 when incremental but got {n_epochs}"
+            )
 
     no_poison_samples = instance_data.no_poison_samples
 
@@ -95,12 +95,14 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
             # model.fix: 1
             # model.remove: 2
             flag = np.full(instance_data.no_poison_samples, -1)
-            flag[:breaks[mini_batch_index]] = model.POISON_DATA_FIXED
-            flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = model.POISON_DATA_OPTIMIZED
+            flag[: breaks[mini_batch_index]] = model.POISON_DATA_FIXED
+            flag[
+                breaks[mini_batch_index] : breaks[mini_batch_index + 1]
+            ] = model.POISON_DATA_OPTIMIZED
             if incremental:
-                flag[breaks[mini_batch_index + 1]:] = model.POISON_DATA_REMOVED
+                flag[breaks[mini_batch_index + 1] :] = model.POISON_DATA_REMOVED
             else:
-                flag[breaks[mini_batch_index + 1]:] = model.POISON_DATA_FIXED
+                flag[breaks[mini_batch_index + 1] :] = model.POISON_DATA_FIXED
             model.fix_rows_in_poison_dataframe(instance_data, flag)
             opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
@@ -108,11 +110,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
                 print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
-            print(
-                f"{epoch:5d}  "
-                f"{mini_batch_index:5d}  "
-                f"{solution['mse']:9.6f}"
-            )
+            print(f"{epoch:5d}  " f"{mini_batch_index:5d}  " f"{solution['mse']:9.6f}")
 
     # This will break when solution_list is empty, but maybe it's unlikely
     keys = solution_list[0].keys()
@@ -121,9 +119,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     print("mse in each iteration:")
     print(out["mse"])
     print("improvement from the start (%):")
-    print(
-        ((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2)
-    )
+    print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
 
     return model, instance_data, solution
 
@@ -192,7 +188,9 @@ class IterativeAttackModel(pmo.block):
             self.poison_data_is_removed = {
                 k: pmo.parameter() for k in range(instance_data.no_poison_samples)
             }
-            self.no_poison_samples_in_model = pmo.parameter(instance_data.no_poison_samples)
+            self.no_poison_samples_in_model = pmo.parameter(
+                instance_data.no_poison_samples
+            )
 
         for k, v in instance_data.get_num_x_train_dataframe().items():
             self.x_train_num.setdefault(k, pmo.parameter())
@@ -489,12 +487,16 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     )  # Component involving the regularization
 
     n_train_and_poison_samples = (
-        instance_data.no_train_samples + model.no_poison_samples_in_model)
+        instance_data.no_train_samples + model.no_poison_samples_in_model
+    )
 
     if function == "MSE":
-        final = 2 / n_train_and_poison_samples * (
-            train_samples_component + poison_samples_component
-        ) + regularization_component
+        final = (
+            2
+            / n_train_and_poison_samples
+            * (train_samples_component + poison_samples_component)
+            + regularization_component
+        )
 
     elif function == "SLS":
         final = (
@@ -543,7 +545,8 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
     )  # Component involving the regularization
 
     n_train_and_poison_samples = (
-        instance_data.no_train_samples + model.no_poison_samples_in_model)
+        instance_data.no_train_samples + model.no_poison_samples_in_model
+    )
 
     if function == "MSE":
         final = (2 / n_train_and_poison_samples) * (
@@ -590,7 +593,8 @@ def loss_function_derivative_bias(instance_data, model, function):
     )
 
     n_train_and_poison_samples = (
-        instance_data.no_train_samples + model.no_poison_samples_in_model)
+        instance_data.no_train_samples + model.no_poison_samples_in_model
+    )
 
     if function == "MSE":
         final = (2 / n_train_and_poison_samples) * (
