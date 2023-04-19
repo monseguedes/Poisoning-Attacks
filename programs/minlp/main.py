@@ -17,6 +17,8 @@ Main script for the paper of poisoning attacks of categorical variables.
 import iterative_attack
 import ridge_regression
 
+import instance_data_class
+
 import numpy as np
 
 config = {
@@ -38,9 +40,7 @@ config = {
     "iterative_attack_incremental": False,
 }
 
-import pyomo_instance_class
-
-instance_data = pyomo_instance_class.InstanceData(config)
+instance_data = instance_data_class.InstanceData(config)
 
 np.testing.assert_equal(
     instance_data.get_num_x_train_dataframe(wide=False).shape, (150,)

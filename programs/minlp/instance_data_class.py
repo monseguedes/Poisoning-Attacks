@@ -16,9 +16,7 @@ This script creates the class with all the data that is then given to the benckm
 
 # Python imports
 import pandas as pd
-import numpy as np
 from os import path
-from math import floor
 
 
 class InstanceData:

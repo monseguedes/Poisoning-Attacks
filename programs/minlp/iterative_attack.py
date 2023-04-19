@@ -4,7 +4,7 @@
 
 import numpy as np
 import pyomo.environ as pyo
-import pyomo_instance_class
+import instance_data_class
 import pyomo_model
 
 # TODO Refactor and simplify function calls around model building.
@@ -29,7 +29,7 @@ def run(config):
     print("*" * long_space)
 
     print("Building data class")
-    instance_data = pyomo_instance_class.InstanceData(config)
+    instance_data = instance_data_class.InstanceData(config)
 
     (
         benchmark_model,
