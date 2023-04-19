@@ -6,6 +6,9 @@ Main script for the paper of poisoning attacks of categorical variables.
 """
 
 # TODO Implement utitlity to check the results with scikitlearn.
+# Maybe the function take model_parameters, instance_data, and a solution
+# returned from IterativeAttackModel.get_solution, run ridge regression and
+# compare the coefficients.
 
 import sys
 

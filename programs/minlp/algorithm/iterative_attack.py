@@ -120,7 +120,7 @@ class IterativeAttackModel(pmo.block):
         print("*" * long_space)
         print("CONTINUOUS NONLINEAR MODEL")
         print("*" * long_space)
-        self.build_parameters(instance_data)
+        self.update_parameters(instance_data, build=True)
         print("*" * short_space)
         self.build_variables(instance_data)
         print("*" * short_space)
@@ -129,36 +129,30 @@ class IterativeAttackModel(pmo.block):
         self.build_objective(instance_data)
         print("*" * long_space)
 
-    def build_parameters(self, instance_data):
+    def update_parameters(self, instance_data, build=False):
         """
-        PYOMO
-        Parameters of the single level model: sets and no. elements in sets for
-        features, normal samples, and poisoned samples; training features,
-        training target, poison target, and regularization parameter.
+        Build or update parameters in pyomo.
         """
-
-        print("Defining parameters")
-        iter = instance_data.get_num_x_train_dataframe().to_dict().items()
-        self.x_train_num = {k: pmo.parameter(v) for k, v in iter}
-        self.x_train_cat = instance_data.get_cat_x_train_dataframe()
-        self.y_train = instance_data.get_y_train_dataframe()
-        iter = instance_data.get_cat_x_poison_dataframe().to_dict().items()
-        self.x_poison_cat = {k: pmo.parameter(v) for k, v in iter}
-        iter = instance_data.get_y_poison_dataframe().to_dict().items()
-        self.y_poison = {k: pmo.parameter(v) for k, v in iter}
-
-    def update_parameters(self, instance_data):
-        """
-        Update parameters in pyomo.
-        """
-        iter = instance_data.get_num_x_train_dataframe().to_dict().items()
-        for k, v in iter:
+        if build:
+            self.x_train_num = {}
+            self.x_train_cat = {}
+            self.y_train = {}
+            self.x_poison_cat = {}
+            self.y_poison = {}
+        for k, v in instance_data.get_num_x_train_dataframe().items():
+            self.x_train_num.setdefault(k, pmo.parameter())
             self.x_train_num[k].value = v
-        iter = instance_data.get_cat_x_poison_dataframe().to_dict().items()
-        for k, v in iter:
+        for k, v in instance_data.get_cat_x_train_dataframe().items():
+            self.x_train_cat.setdefault(k, pmo.parameter())
+            self.x_train_cat[k].value = v
+        for k, v in instance_data.get_y_train_dataframe().items():
+            self.y_train.setdefault(k, pmo.parameter())
+            self.y_train[k] = v
+        for k, v in instance_data.get_cat_x_poison_dataframe().items():
+            self.x_poison_cat.setdefault(k, pmo.parameter())
             self.x_poison_cat[k].value = v
-        iter = instance_data.get_y_poison_dataframe().to_dict().items()
-        for k, v in iter:
+        for k, v in instance_data.get_y_poison_dataframe().items():
+            self.y_poison.setdefault(k, pmo.parameter())
             self.y_poison[k] = v
 
     def build_variables(self, instance_data):
@@ -258,7 +252,15 @@ class IterativeAttackModel(pmo.block):
         print("Objective has been built")
 
     def fix_rows_in_poison_dataframe(self, instance_data, flag):
-        """ """
+        """Fix specified rows in poisoned data
+
+        Parameters
+        ----------
+        instance_data
+        flag : (instance_data.no_poison_samples,) array of int
+            If flag[i] is 1, the corresponding poisoned data is fixed.
+            Otherwise, the poisoned data is optimized.
+        """
         iter = instance_data.get_num_x_poison_dataframe().to_dict().items()
         for k, v in iter:
             if flag[k[0]]:
@@ -267,7 +269,28 @@ class IterativeAttackModel(pmo.block):
                 self.x_poison_num[k].unfix()
 
     def get_solution(self, wide=False):
-        """Retrieve solutions"""
+        """Retrieve solutions
+
+        This returns a solution as a dict with the following items.
+
+        - x_poison_num: pd.Series or pd.DataFrame
+            Numerical features of poisoned data including fixed ones
+        - optimized_x_poison_num: pd.DataFrame
+            Numerical features of poisoned data excluding fixed ones
+        - weights_num: pd.Series or pd.DataFrame
+        - weights_cat: pd.Series or pd.DataFrame
+        - bias: float
+        - objective: float
+
+        Parameters
+        ----------
+        wide : bool, default False
+            Control the format of the output.
+
+        Returns
+        -------
+        solution : dict
+        """
         if not wide:
             # To make long format dataframes.
             index = pd.MultiIndex(
