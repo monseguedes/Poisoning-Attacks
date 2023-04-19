@@ -69,36 +69,46 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     iterations_solutions = []
 
     model = IterativeAttackModel(instance_data, model_parameters["function"])
-    print(" * " * 20)
-    print("original: ")
-    print(instance_data.get_num_x_poison_dataframe(wide=True))
-    print(" * " * 20)
 
     n_epochs = 4
     mini_batch_size = 0.5
 
     no_poison_samples = instance_data.no_poison_samples
 
-    mini_batch_absolute_size = int(no_poison_samples * mini_batch_size)
+    mini_batch_absolute_size = max(int(no_poison_samples * mini_batch_size), 1)
     breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
     breaks = np.r_[breaks, no_poison_samples]
     n_mini_batches = len(breaks) - 1
+
+    solution_list = []
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
             flag = np.ones(instance_data.no_poison_samples)
             flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = 0
             model.fix_rows_in_poison_dataframe(instance_data, flag)
-            results = opt.solve(model, load_solutions=True, tee=False)
+            opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
+            solution_list.append(solution)
+            if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
+                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'objective':>9s}")
             print(
-                f"{epoch=}  "
-                f"mini_batch={mini_batch_index}  "
-                f"objective={solution['objective']:.6f}"
+                f"{epoch:5d}  "
+                f"{mini_batch_index:5d}  "
+                f"{solution['objective']:9.6f}"
             )
-            print(instance_data.get_num_x_poison_dataframe(wide=True).round(5))
-            print(" * " * 20)
+
+    # This will break when solution_list is empty, but maybe it's unlikely
+    keys = solution_list[0].keys()
+    out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
+
+    print("objective in each iteration:")
+    print(out["objective"])
+    print("improvement from the start (%):")
+    print(
+        ((out["objective"] - out["objective"][0]) / out["objective"][0] * 100).round(2)
+    )
 
     return model, instance_data, solution
 
