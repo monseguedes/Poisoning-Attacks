@@ -3,10 +3,11 @@
 @project: Poisoning Attacks Paper
 """
 
-import pandas as pd
-import re
 import os
+import re
+
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import Lasso
 
 
@@ -163,7 +164,7 @@ class LASSOdataframe:
             [str(column) for column in self.chosen_numerical]
         ]
         new_numerical_cols = [
-            str(i + 1) for i in range(len(numerical_dataframe.columns))
+            str(i) for i in range(len(numerical_dataframe.columns))
         ]
         numerical_dataframe = numerical_dataframe.rename(
             columns=dict(zip(numerical_dataframe.columns, new_numerical_cols))
@@ -178,7 +179,7 @@ class LASSOdataframe:
                 axis=1,
             )
             new_categorical_columns_dict = {
-                str(feature) + ":": str(i + 1) + "_"
+                str(feature) + ":": str(i) + "_"
                 for i, feature in enumerate(self.chosen_categorical)
             }
             columns = list(categorical_dataframe.columns)
@@ -189,6 +190,15 @@ class LASSOdataframe:
                 ) in new_categorical_columns_dict.items():
                     columns[i] = re.sub("^" + old_substring, new_substring, columns[i])
             columns = [x.replace("_", ":") for x in columns]
+            
+            # Currently, the categories are 1-based. We are updating them to be 0-based.
+            # For example, if columns are ["1:1", "1:2", "1:3", "2:1", "2:2"],
+            # it ['1:0', '1:1', '1:2', '2:0', '2:1'].
+            f = lambda x: [x[0], x[1] - 1]
+            g = lambda x: f"{x[0]}:{x[1]}"
+            lm = lambda f, lst: list(map(f, lst))
+            columns = lm(g, lm(f, (lm(int, x.split(":")) for x in columns)))
+
             categorical_dataframe.columns = columns
             whole_dataframe = pd.concat(
                 [
@@ -214,5 +224,5 @@ class LASSOdataframe:
 
 dataframe = create_dataframe("house")
 model = LASSOdataframe(dataframe)
-model.get_features_lists(2, 2)
+model.get_features_lists(5, 5)
 model.save_new_dataframe()

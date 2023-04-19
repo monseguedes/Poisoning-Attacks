@@ -5,10 +5,9 @@
 Auxiliary module of package 'algorithm' with bounding procedure.
 """
 
-from model.model_class import *
 import model.instance_class as data
-
 import numpy as np
+from model.model_class import *
 from scipy.linalg import eigh
 
 

@@ -5,9 +5,10 @@
 Collection of auxiliary functions to define the objective and constraints of the model in model_class.
 """
 
-import numpy as np
 from statistics import mean
+
 import gurobipy as gp
+import numpy as np
 
 
 def objective_function(model, function):

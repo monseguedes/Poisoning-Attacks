@@ -5,18 +5,19 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
-import sys
+# import sys
 
-sys.path.append("./programs/minlp/model")
+# sys.path.append("./programs/minlp")
 
 # Self-created libraries
-import model.model_class as model
-from algorithm.solution_approaches import *
-from solutions_handler.regression_comparison import *
-from algorithm import iterative_attack
-from algorithm import ridge_regression
+# import model.model_class as model
+# from algorithm.solution_approaches import *
+# from solutions_handler.regression_comparison import *
 
+import instance_data_class
+import iterative_attack
 import numpy as np
+import ridge_regression
 
 config = {
     "dataset_name": "5num5cat",
@@ -35,11 +36,11 @@ config = {
     "iterative_attack_n_epochs": 2,
     "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
+    "solver_name": "",
+    "solver_output": False,
 }
 
-from model import pyomo_instance_class
-
-instance_data = pyomo_instance_class.InstanceData(config)
+instance_data = instance_data_class.InstanceData(config)
 
 np.testing.assert_equal(
     instance_data.get_num_x_train_dataframe(wide=False).shape, (150,)
@@ -69,7 +70,9 @@ np.testing.assert_equal(
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', config)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', config)
-benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(config)
+benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
+    config, instance_data
+)
 
 # Run the utitlity to check the results with scikitlearn.
 # Maybe the function take config, instance_data, and a solution

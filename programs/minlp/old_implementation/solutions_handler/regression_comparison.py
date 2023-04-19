@@ -5,22 +5,19 @@
 Functions necessary to evaluate the performance of poisoning attacks. 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import seaborn as sns
-import pandas as pd
-import pyomo.environ as pyo
-
 import os
 
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_error
-
+import matplotlib
+import matplotlib.pyplot as plt
 import model.instance_class
 import model.model_class
 import model.pyomo_instance_class
+import numpy as np
+import pandas as pd
+import pyomo.environ as pyo
+import seaborn as sns
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 sns.set_style("whitegrid")
 

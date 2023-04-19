@@ -7,12 +7,11 @@ TODO:fill
 
 # Self-created imports
 import model.instance_class as data
+import numpy as np
 
 # Python libraries
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import GridSearchCV
-import numpy as np
+from sklearn.model_selection import GridSearchCV, cross_val_score
 
 # Set parameters
 dataset_name = "pharm"

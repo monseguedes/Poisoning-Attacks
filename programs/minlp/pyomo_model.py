@@ -3,134 +3,24 @@
 """Run iterative attack which which poison training data row by row"""
 
 import numpy as np
+import pandas as pd
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
-import pandas as pd
-import pprint
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
-
 
 long_space = 80
 short_space = 60
 middle_space = long_space
 
 
-# TODO Modify this function to take instance_data and pyomo model as arguments.
-def run(config):
-    """Run iterative attack which which poison training data row by row"""
-    from model import pyomo_instance_class
+class PyomoModel(pmo.block):
+    """Pyomo model to formulate poisoning attack
 
-    # Solve benchmark
-    opt = pyo.SolverFactory("ipopt")
-
-    print("" * 2)
-    print("*" * long_space)
-    print("ITERATIVE CONTINUOUS NONLINEAR ALGORITHM")
-    print("*" * long_space)
-
-    print("Building data class")
-    instance_data = pyomo_instance_class.InstanceData(config)
-
-    (
-        benchmark_model,
-        benchmark_instance,
-        benchmark_solution,
-    ) = iterative_attack_strategy(opt=opt, instance_data=instance_data, config=config)
-    print("*" * middle_space)
-
-    return benchmark_model, benchmark_instance, benchmark_solution
-
-
-def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
-    """
-    Algorithm for iterative attack strategy.
-
-    It starts by creating the abstract model, and an initial data object for
-    creating the first instance. After this, while the iteration count is
-    smaller than the number of subsets (there is an iteration per subset), the
-    model instance is created with the intance data object and the model is
-    solved for current instance. After that, solutions are stored in a
-    dataframe, and data object for instance is updated to that current
-    iteration becomes data. Then, we go back to start of while loop and process
-    is repeated for all subsets/iterations.
-    """
-
-    print("" * 2)
-    print("*" * long_space)
-    print("ITERATIVE ATTACK STRATEGY")
-    print("*" * long_space)
-
-    model = IterativeAttackModel(instance_data, config["function"])
-
-    n_epochs = config["iterative_attack_n_epochs"]
-    mini_batch_size = config["iterative_attack_mini_batch_size"]
-
-    incremental = config["iterative_attack_incremental"]
-
-    if incremental:
-        if n_epochs > 1:
-            raise ValueError(
-                f"n_epochs should be 1 when incremental but got {n_epochs}"
-            )
-
-    no_poison_samples = instance_data.no_poison_samples
-
-    if mini_batch_size > 1:
-        mini_batch_absolute_size = mini_batch_size
-    else:
-        # mini batch size is specified as a fraction
-        mini_batch_absolute_size = max(int(no_poison_samples * mini_batch_size), 1)
-    breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
-    breaks = np.r_[breaks, no_poison_samples]
-    n_mini_batches = len(breaks) - 1
-
-    solution_list = []
-
-    for epoch in range(n_epochs):
-        for mini_batch_index in range(n_mini_batches):
-            # Modify flag to specify which one to remove.
-            # model.unfix: 0
-            # model.fix: 1
-            # model.remove: 2
-            flag = np.full(instance_data.no_poison_samples, -1)
-            flag[: breaks[mini_batch_index]] = model.POISON_DATA_FIXED
-            flag[
-                breaks[mini_batch_index] : breaks[mini_batch_index + 1]
-            ] = model.POISON_DATA_OPTIMIZED
-            if incremental:
-                flag[breaks[mini_batch_index + 1] :] = model.POISON_DATA_REMOVED
-            else:
-                flag[breaks[mini_batch_index + 1] :] = model.POISON_DATA_FIXED
-            model.fix_rows_in_poison_dataframe(instance_data, flag)
-            opt.solve(model, load_solutions=True, tee=False)
-            solution = model.get_solution()
-            instance_data.update_numerical_features(solution["optimized_x_poison_num"])
-            solution_list.append(solution)
-            if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
-                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
-            print(f"{epoch:5d}  " f"{mini_batch_index:5d}  " f"{solution['mse']:9.6f}")
-
-    # This will break when solution_list is empty, but maybe it's unlikely
-    keys = solution_list[0].keys()
-    out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
-
-    print("mse in each iteration:")
-    print(out["mse"])
-    print("improvement from the start (%):")
-    print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
-
-    return model, instance_data, solution
-
-
-class IterativeAttackModel(pmo.block):
-    """Pyomo model to run iterative attack
-
-    This is a naive implementation of iterative attack.
-    By default this optimizes all the numerical features in the poison data.
-    One can fix some rows in the poison data and only optimize the remaining
-    by calling `fix_rows_in_poison_dataframe`.
+    This is a naive implementation of poisoning attack.
+    One can fix some variables, such as categorical features, in the poison data and
+    only optimize the remaining by calling `fix_rows_in_poison_dataframe` etc s.
 
     ```
     model = IterativeAttackModel(instance_data, function="MSE")
@@ -148,14 +38,24 @@ class IterativeAttackModel(pmo.block):
     def __init__(
         self,
         instance_data,
-        function,
+        config,
         **kwds,
     ):
         # Gives access to methods in a superclass from the subclass that
         # inherits from it
         super().__init__(**kwds)
         # Initialize the whole abstract model whenever PoisonAttackModel is created:
-        self.function = function
+        self.function = config["function"]
+        self.solver_name = config["solver_name"]
+        self.tee = config["solver_output"]
+        if self.solver_name == "ipopt":
+            self.opt = pyo.SolverFactory("ipopt")
+        else:
+            self.opt = pyo.SolverFactory("gurobi", solver_io="python")
+            self.opt.options["NonConvex"] = 2
+            self.bilinear_term_cache = dict()
+            self.bilinear_term_variable_list = pmo.variable_list()
+            self.bilinear_term_constraint_list = pmo.constraint_list()
         print("" * 2)
         print("*" * long_space)
         print("CONTINUOUS NONLINEAR MODEL")
@@ -169,6 +69,29 @@ class IterativeAttackModel(pmo.block):
         self.build_objective(instance_data)
         print("*" * long_space)
 
+    def prod(self, a, b):
+        """Return the product of two expressions"""
+        if self.solver_name == "ipopt":
+            return self._prod_ipopt(a, b)
+        elif self.solver_name == "gurobi":
+            return self._prod_gurobi(a, b)
+        else:
+            raise ValueError(f"unknown solver name {self.solver_name}")
+
+    def _prod_ipopt(self, a, b):
+        return a * b
+
+    def _prod_gurobi(self, a, b):
+        u, v = (a, b) if id(a) < id(b) else (b, a)
+        key = (id(u), id(v))
+        if key in self.bilinear_term_cache:
+            return self.bilinear_term_cache[key]
+        x = pmo.variable()
+        self.bilinear_term_variable_list.append(x)
+        self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
+        self.bilinear_term_cache[key] = x
+        return x
+
     def update_parameters(self, instance_data, build=False):
         """
         Build or update parameters in pyomo.
@@ -180,10 +103,6 @@ class IterativeAttackModel(pmo.block):
             self.x_poison_cat = {}
             self.y_poison = {}
 
-            # Status code (POISON_DATA_FIXED/OPTIMIZED/REMOVED)
-            self.poison_data_status = {
-                k: pmo.parameter() for k in range(instance_data.no_poison_samples)
-            }
             # 1 if the corresponding row is removed and 0 otherwise.
             self.poison_data_is_removed = {
                 k: pmo.parameter() for k in range(instance_data.no_poison_samples)
@@ -201,9 +120,6 @@ class IterativeAttackModel(pmo.block):
         for k, v in instance_data.get_y_train_dataframe().items():
             self.y_train.setdefault(k, pmo.parameter())
             self.y_train[k] = v
-        for k, v in instance_data.get_cat_x_poison_dataframe().items():
-            self.x_poison_cat.setdefault(k, pmo.parameter())
-            self.x_poison_cat[k].value = v
         for k, v in instance_data.get_y_poison_dataframe().items():
             self.y_poison.setdefault(k, pmo.parameter())
             self.y_poison[k] = v
@@ -223,6 +139,14 @@ class IterativeAttackModel(pmo.block):
             for numfeature in instance_data.numerical_feature_names:
                 self.x_poison_num[psample, numfeature] = pmo.variable(
                     domain=pmo.PercentFraction
+                )
+
+        # Numerical feature vector of poisoned samples
+        self.x_poison_cat = pmo.variable_dict()
+        for psample in range(instance_data.no_poison_samples):
+            for catfeature in instance_data.categorical_feature_category_tuples:
+                self.x_poison_cat[(psample,) + catfeature] = pmo.variable(
+                    domain=pmo.Binary
                 )
 
         # TODO Fix bounds.
@@ -304,27 +228,54 @@ class IterativeAttackModel(pmo.block):
 
         print("Objective has been built")
 
-    def fix_rows_in_poison_dataframe(self, instance_data, flag):
-        """Fix specified rows in poisoned data
+    def set_poison_data_status(self, instance_data, num_feature_flag, cat_feature_flag):
+        """Set status of the variables corresponding to the features in poisoned data
+
+        This sets status of the variables corresponding to the features in poisoned data.
+        One can 1) fix the variables to the ones in instance_data,
+        2) let the optimizer to optimize them or 3) remove them from the model (this
+        is useful when we want to add poisoned data incrementally).
+        `num_feature_flag` must be an array broadcastable to
+        (no_poison_samples, no_numfeatures). `cat_feature_flag` must be broadcastable
+        to (no_poison_samples, no_catfeatures). The elements of these arrays must be
+        either self.POISON_DATA_FIXED, self.POISON_DATA_OPTIMIZED or
+        self.POISON_DATA_REMOVED. If self.POISON_DATA_REMOVED is used, the corresponding
+        entire row is removed. Otherwise, each variable status is set individually.
 
         Parameters
         ----------
-        instance_data
-        flag : (instance_data.no_poison_samples,) array of int
-            If flag[i] is 1, the corresponding poisoned data is fixed.
-            Otherwise, the poisoned data is optimized.
+        instance_data : InstanceData
+        num_feature_flag : array of int, broadcastable to (no_poison_samples, no_numfeatures)
+        cat_feature_flag : array of int, broadcastable to (no_poison_samples, no_catfeatures)
         """
-        for k, v in enumerate(flag):
-            self.poison_data_status[k].value = v
-            self.poison_data_is_removed[k].value = int(v == self.POISON_DATA_REMOVED)
-        self.no_poison_samples_in_model.value = np.sum(flag != self.POISON_DATA_REMOVED)
+        num_feature_flag = np.broadcast_to(
+            num_feature_flag,
+            (instance_data.no_poison_samples, instance_data.no_numfeatures),
+        )
+        cat_feature_flag = np.broadcast_to(
+            cat_feature_flag,
+            (instance_data.no_poison_samples, instance_data.no_catfeatures),
+        )
+        _poison_data_is_removed = np.any(num_feature_flag == self.POISON_DATA_REMOVED, axis=1)
+        _poison_data_is_removed |= np.any(cat_feature_flag == self.POISON_DATA_REMOVED, axis=1)
+        np.testing.assert_equal(_poison_data_is_removed.shape, (instance_data.no_poison_samples,))
+        for k, v in enumerate(_poison_data_is_removed):
+            self.poison_data_is_removed[k].value = float(v)
 
-        iter = instance_data.get_num_x_poison_dataframe().to_dict().items()
-        for k, v in iter:
-            if flag[k[0]] == self.POISON_DATA_OPTIMIZED:
+        for k, v in instance_data.get_num_x_poison_dataframe().items():
+            if num_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_num[k].unfix()
             else:
                 self.x_poison_num[k].fix(v)
+
+        for k, v in instance_data.get_cat_x_poison_dataframe().items():
+            if cat_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
+                self.x_poison_cat[k].unfix()
+            else:
+                self.x_poison_cat[k].fix(v)
+
+    def solve(self):
+        self.opt.solve(self, load_solutions=True, tee=self.tee)
 
     def get_solution(self, wide=False):
         """Retrieve solutions
@@ -354,6 +305,8 @@ class IterativeAttackModel(pmo.block):
         solution : dict
         """
         if not wide:
+            # TODO Simplify the construction of dataframes and series.
+            # TODO Exrract logic to build solutions and reuse from ridge regression.
             # To make long format dataframes.
             index = pd.MultiIndex(
                 levels=[[], []], codes=[[], []], names=["sample", "feature"]
@@ -464,12 +417,12 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     poison_samples_component = sum(
         (
             sum(
-                model.x_poison_num[q, j] * model.weights_num[j]
+                model.prod(model.x_poison_num[q, j], model.weights_num[j])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.weights_cat[j, z] * model.x_poison_cat[q, j, z]
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
@@ -522,12 +475,12 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
     poison_samples_component = sum(
         (
             sum(
-                model.x_poison_num[q, j] * model.weights_num[j]
+                model.prod(model.x_poison_num[q, j], model.weights_num[j])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.weights_cat[j, z] * model.x_poison_cat[q, j, z]
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names

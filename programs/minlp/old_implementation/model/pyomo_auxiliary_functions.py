@@ -5,8 +5,9 @@
 Collection of auxiliary functions defines the objective and constraints of the model.
 """
 
-import numpy as np
 from statistics import mean
+
+import numpy as np
 
 
 def linear_regression_function(model, no_sample):
