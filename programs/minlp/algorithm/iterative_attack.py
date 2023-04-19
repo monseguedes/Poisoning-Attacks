@@ -107,22 +107,22 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
-                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'objective':>9s}")
+                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
             print(
                 f"{epoch:5d}  "
                 f"{mini_batch_index:5d}  "
-                f"{solution['objective']:9.6f}"
+                f"{solution['mse']:9.6f}"
             )
 
     # This will break when solution_list is empty, but maybe it's unlikely
     keys = solution_list[0].keys()
     out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
 
-    print("objective in each iteration:")
-    print(out["objective"])
+    print("mse in each iteration:")
+    print(out["mse"])
     print("improvement from the start (%):")
     print(
-        ((out["objective"] - out["objective"][0]) / out["objective"][0] * 100).round(2)
+        ((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2)
     )
 
     return model, instance_data, solution
@@ -300,7 +300,7 @@ class IterativeAttackModel(pmo.block):
         """
 
         self.objective_function = pmo.objective(
-            expr=mean_squared_error(instance_data, self, self.function),
+            expr=train_error(instance_data, self, self.function),
             sense=pyo.maximize,
         )
 
@@ -341,6 +341,10 @@ class IterativeAttackModel(pmo.block):
         - weights_cat: pd.Series or pd.DataFrame
         - bias: float
         - objective: float
+        - mse : float
+            This is the same as objective if `config['function'] == 'MSE'`.
+            If `config['function'] == 'SLS'`, this is the same as
+            objective / no_train_samples
 
         Parameters
         ----------
@@ -386,13 +390,19 @@ class IterativeAttackModel(pmo.block):
             for k, v in self.weights_cat.items():
                 column = f"{k[0]}:{k[1]}"
                 _weights_cat[column] = [v.value]
+        objective = pyo.value(self.objective_function)
+        if self.function == "SLS":
+            mse = objective / len(self.y_train)
+        else:
+            mse = objective
         return {
             "x_poison_num": _x_poison_num,
             "optimized_x_poison_num": _optimized_x_poison_num,
             "weights_num": _weights_num,
             "weights_cat": _weights_cat,
             "bias": self.bias.value,
-            "objective": pyo.value(self.objective_function),
+            "objective": objective,
+            "mse": mse,
         }
 
 
@@ -419,7 +429,8 @@ def linear_regression_function(instance_data, model, no_sample):
     y_hat = numerical_part + categorical_part + model.bias
     return y_hat
 
-def mean_squared_error(instance_data, model, function: str):
+
+def train_error(instance_data, model, function: str):
     """
     Gets mean squared error, which is the mean of sum of the square of the
     difference between predicted values (regression) and target values for all
@@ -434,11 +445,10 @@ def mean_squared_error(instance_data, model, function: str):
 
     # Get mean of squared errors
     if function == "MSE":
-        mse = 1 / instance_data.no_train_samples * sum_square_errors
+        return 1 / instance_data.no_train_samples * sum_square_errors
     elif function == "SLS":
-        mse = sum_square_errors
+        return sum_square_errors
 
-    return mse
 
 def loss_function_derivative_num_weights(instance_data, model, j, function):
     """
@@ -478,15 +488,18 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
         2 * instance_data.regularization * model.weights_num[j]
     )  # Component involving the regularization
 
+    n_train_and_poison_samples = (
+        instance_data.no_train_samples + model.no_poison_samples_in_model)
+
     if function == "MSE":
-        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
+        final = 2 / n_train_and_poison_samples * (
             train_samples_component + poison_samples_component
         ) + regularization_component
 
-    if function == "SLS":
+    elif function == "SLS":
         final = (
             2 * (train_samples_component + poison_samples_component)
-            + regularization_component
+            + n_train_and_poison_samples * regularization_component
         )
 
     return final
@@ -529,14 +542,17 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
         2 * instance_data.regularization * model.weights_cat[j, w]
     )  # Component involving the regularization
 
+    n_train_and_poison_samples = (
+        instance_data.no_train_samples + model.no_poison_samples_in_model)
+
     if function == "MSE":
-        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
+        final = (2 / n_train_and_poison_samples) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
     elif function == "SLS":
         final = (
             2 * (train_samples_component + poison_samples_component)
-            + regularization_component
+            + n_train_and_poison_samples * regularization_component
         )
 
     return final
@@ -573,8 +589,11 @@ def loss_function_derivative_bias(instance_data, model, function):
         for q in range(instance_data.no_poison_samples)
     )
 
+    n_train_and_poison_samples = (
+        instance_data.no_train_samples + model.no_poison_samples_in_model)
+
     if function == "MSE":
-        final = (2 / (instance_data.no_train_samples + model.no_poison_samples_in_model)) * (
+        final = (2 / n_train_and_poison_samples) * (
             train_samples_component + poison_samples_component
         )
     elif function == "SLS":
