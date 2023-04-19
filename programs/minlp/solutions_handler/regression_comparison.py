@@ -33,7 +33,7 @@ class ComparisonModel:
     This class builds all necessary objects to compare models.
     """
 
-    def __init__(self, model_parameters):
+    def __init__(self, config):
         """
         Given some data class and some model class, build a model to
         then compare to other model.
@@ -43,14 +43,14 @@ class ComparisonModel:
         ridge_model: the nonpoisoned ridge model classs
         """
 
-        self.datatype = model_parameters["datatype"]
+        self.datatype = config["datatype"]
         self.folder = "_".join(
             [
-                model_parameters["dataset_name"],
-                str(model_parameters["poison_rate"]),
-                str(model_parameters["training_samples"]),
-                str(model_parameters["no_psubsets"]),
-                str(model_parameters["seed"]),
+                config["dataset_name"],
+                str(config["poison_rate"]),
+                str(config["training_samples"]),
+                str(config["no_psubsets"]),
+                str(config["seed"]),
             ]
         )
 

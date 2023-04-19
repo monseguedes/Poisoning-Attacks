@@ -56,7 +56,7 @@ def create_matrix(data):
 
 
 # Main Functions to solve model
-def solve_model(model_name: str, model_parameters: dict, checking_bilevel=False):
+def solve_model(model_name: str, config: dict, checking_bilevel=False):
     """
     Function that solves any of the models
     """
@@ -70,35 +70,35 @@ def solve_model(model_name: str, model_parameters: dict, checking_bilevel=False)
         raise ValueError(f"invalid value of {model_name=}")
 
     model_func = model_functions[model_name]
-    model, intance, solution = model_func(model_parameters, checking_bilevel)
+    model, intance, solution = model_func(config, checking_bilevel)
 
     return model, intance, solution
 
 
-def solve_bilevel(model_parameters: dict, checking_bilevel: bool):
+def solve_bilevel(config: dict, checking_bilevel: bool):
     """
     Function to solve and store bilevel results
     """
     # Solve using bilevel model
     bilevel_model, bilevel_instance, bilevel_solution = solving_MINLP(
-        dataset_name=model_parameters["dataset_name"],
-        no_nfeatures=model_parameters["no_nfeatures"],
-        no_cfeatures=model_parameters["no_cfeatures"],
-        poison_rate=model_parameters["poison_rate"],
-        training_samples=model_parameters["training_samples"],
-        time_limit=model_parameters["time_limit"],
-        feasibility=model_parameters["feasibility"],
-        seed=model_parameters["seed"],
-        function=model_parameters["function"],
+        dataset_name=config["dataset_name"],
+        no_nfeatures=config["no_nfeatures"],
+        no_cfeatures=config["no_cfeatures"],
+        poison_rate=config["poison_rate"],
+        training_samples=config["training_samples"],
+        time_limit=config["time_limit"],
+        feasibility=config["feasibility"],
+        seed=config["seed"],
+        function=config["function"],
     )
 
     if checking_bilevel:
         # To check that solutions of lower level are optimal
         pridge_model, pridge_instance, pridge_solution = solve_ridge(
-            dataset_name=model_parameters["dataset_name"],
-            training_samples=model_parameters["training_samples"],
-            seed=model_parameters["seed"],
-            function=model_parameters["function"],
+            dataset_name=config["dataset_name"],
+            training_samples=config["training_samples"],
+            seed=config["seed"],
+            function=config["function"],
             poisoned=True,
             poison_solutions=bilevel_solution,
             bilevel_instance=bilevel_instance,
@@ -107,22 +107,22 @@ def solve_bilevel(model_parameters: dict, checking_bilevel: bool):
     return bilevel_model, bilevel_instance, bilevel_solution
 
 
-def solve_ridge(model_parameters: dict, checking_bilevel: bool):
+def solve_ridge(config: dict, checking_bilevel: bool):
     """
     Function to solve and store ridge results
     """
     # Normal ridge regression
     ridge_model, ridge_instance, ridge_solution = ridge_regression(
-        dataset_name=model_parameters["dataset_name"],
-        training_samples=model_parameters["training_samples"],
-        seed=model_parameters["seed"],
-        function=model_parameters["function"],
+        dataset_name=config["dataset_name"],
+        training_samples=config["training_samples"],
+        seed=config["seed"],
+        function=config["function"],
     )
 
     return ridge_model, ridge_instance, ridge_solution
 
 
-def solve_benchmark(model_parameters: dict, checking_bilevel=False):
+def solve_benchmark(config: dict, checking_bilevel=False):
     """
     Function to solve and store benchmark results
     """
@@ -136,13 +136,13 @@ def solve_benchmark(model_parameters: dict, checking_bilevel=False):
 
     print("Building data class")
     instance_data = benchmark_data.InstanceData(
-        dataset_name=model_parameters["dataset_name"]
+        dataset_name=config["dataset_name"]
     )
     instance_data.prepare_instance(
-        poison_rate=model_parameters["poison_rate"],
-        training_samples=model_parameters["training_samples"],
-        no_psubsets=model_parameters["no_psubsets"],
-        seed=model_parameters["seed"],
+        poison_rate=config["poison_rate"],
+        training_samples=config["training_samples"],
+        no_psubsets=config["no_psubsets"],
+        seed=config["seed"],
     )
 
     (
@@ -150,26 +150,26 @@ def solve_benchmark(model_parameters: dict, checking_bilevel=False):
         benchmark_instance,
         benchmark_solution,
     ) = iterative_attack_strategy(
-        opt=opt, instance_data=instance_data, model_parameters=model_parameters
+        opt=opt, instance_data=instance_data, config=config
     )
     print("*" * middle_space)
 
     return benchmark_model, benchmark_instance, benchmark_solution
 
 
-def solve_gurobi(model_parameters: dict, instance_data):
+def solve_gurobi(config: dict, instance_data):
     # Create model
     print("And start solving them using Gurobi")
     gurobi_model = gp.Model("Poisoning_Attack")
     my_model = PoisonAttackModel(
-        gurobi_model, instance_data, function=model_parameters["function"]
+        gurobi_model, instance_data, function=config["function"]
     )
     m = my_model.model
 
     print("Solving model...")
     m.params.NonConvex = 2
-    m.params.FeasibilityTol = model_parameters["feasibility"]
-    m.params.TimeLimit = model_parameters["time_limit"]
+    m.params.FeasibilityTol = config["feasibility"]
+    m.params.TimeLimit = config["time_limit"]
 
     results = m.optimize()
     print("Model has been solved")
@@ -202,9 +202,9 @@ def solve_gurobi(model_parameters: dict, instance_data):
     return my_model, solutions_dict
 
 
-def solve_pyomo(opt, model_parameters: dict, instance_data):
+def solve_pyomo(opt, config: dict, instance_data):
     new_model = BenchmarkPoisonAttackModel(
-        instance_data, function=model_parameters["function"]
+        instance_data, function=config["function"]
     )
 
     # Initialise solutions
@@ -523,7 +523,7 @@ def single_attack_strategy(
     return model, instance_data, solutions_dict
 
 
-def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_parameters):
+def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     """
     Algorithm for iterative attack strategy.
 
@@ -544,7 +544,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     iteration = 1
     iterations_solutions = []
 
-    model = BenchmarkPoisonAttackModel(instance_data, model_parameters["function"])
+    model = BenchmarkPoisonAttackModel(instance_data, config["function"])
 
     # Initialise variables
     for psample, numfeature in itertools.product(
@@ -670,7 +670,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     return model, instance_data, final_solutions
 
 
-def benchmark_plus_optimising_heuristic(model_parameters: dict):
+def benchmark_plus_optimising_heuristic(config: dict):
     """
     This is the heuristic algorithm we use to get feasible
     solutions. It works as follows. We quickly optimise numerical
@@ -690,7 +690,7 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
 
     # Optimise numerical features locally
     benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(
-        model_parameters
+        config
     )
     print("Benchmark has been solved, now adding this solution to data")
 
@@ -699,34 +699,34 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
     matrix = create_matrix(benchmark_data)
 
     print("We first build a data class for a mixed-integer model")
-    instance_data = data.InstanceData(dataset_name=model_parameters["dataset_name"])
+    instance_data = data.InstanceData(dataset_name=config["dataset_name"])
     instance_data.prepare_instance(
-        poison_rate=model_parameters["poison_rate"],
-        training_samples=model_parameters["training_samples"],
+        poison_rate=config["poison_rate"],
+        training_samples=config["training_samples"],
         no_nfeatures="all",
         no_cfeatures="all",
-        no_poison_subsets=model_parameters["no_psubsets"],
-        seed=model_parameters["seed"],
+        no_poison_subsets=config["no_psubsets"],
+        seed=config["seed"],
     )
     print("And then change old columns for solution from continuous nonlinear model")
     instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
     print("Now select new features to be optimised using Gurobi")
     instance_data.feature_selection(
-        no_nfeatures=model_parameters["no_nfeatures"],
-        no_cfeatures=model_parameters["no_cfeatures"],
+        no_nfeatures=config["no_nfeatures"],
+        no_cfeatures=config["no_cfeatures"],
     )
     instance_data.poison_samples()
 
     chosen_features = instance_data.chosen_categorical
 
-    for i in range(0, len(chosen_features), model_parameters["heuristic_subset"]):
+    for i in range(0, len(chosen_features), config["heuristic_subset"]):
         instance_data.chosen_categorical = chosen_features[
-            i : i + model_parameters["heuristic_subset"]
+            i : i + config["heuristic_subset"]
         ]
         print("Subset of features is", instance_data.chosen_categorical)
 
-        my_model, solutions_dict = solve_gurobi(model_parameters, instance_data)
+        my_model, solutions_dict = solve_gurobi(config, instance_data)
 
         # Update categorical column just solved
         for key, value in solutions_dict["x_poison_cat"].items():
@@ -747,7 +747,7 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
             benchmark_model,
             benchmark_instance,
             solution,
-        ) = iterative_attack_strategy(opt, benchmark_instance, model_parameters)
+        ) = iterative_attack_strategy(opt, benchmark_instance, config)
 
         # # Get poisoning samples as data
         # benchmark_data = solution['x_poison_num']
@@ -773,7 +773,7 @@ def benchmark_plus_optimising_heuristic(model_parameters: dict):
     return my_model, instance_data, solutions_dict
 
 
-def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
+def benchmark_plus_optimising_chopping_heuristic(config: dict):
     """
     This is the heuristic algorithm we use to get feasible
     solutions. It works as follows. We quickly optimise numerical
@@ -794,11 +794,11 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
         benchmark_solution,
     ) = iterative_attack_strategy(
         opt=opt,
-        dataset_name=model_parameters["dataset_name"],
-        poison_rate=model_parameters["poison_rate"],
-        training_samples=model_parameters["training_samples"],
-        no_psubsets=model_parameters["no_psubsets"],
-        seed=model_parameters["seed"],
+        dataset_name=config["dataset_name"],
+        poison_rate=config["poison_rate"],
+        training_samples=config["training_samples"],
+        no_psubsets=config["no_psubsets"],
+        seed=config["seed"],
     )
     print("Benchmark has been solved, now let us add this solution to data")
 
@@ -809,13 +809,13 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
 
     # Optimise now categorical features separately (MINLP)
     print("We now build the original data...")
-    instance_data = data.InstanceData(dataset_name=model_parameters["dataset_name"])
+    instance_data = data.InstanceData(dataset_name=config["dataset_name"])
     instance_data.prepare_instance(
-        poison_rate=model_parameters["poison_rate"],
-        training_samples=model_parameters["training_samples"],
+        poison_rate=config["poison_rate"],
+        training_samples=config["training_samples"],
         no_nfeatures="all",
         no_cfeatures="all",
-        seed=model_parameters["seed"],
+        seed=config["seed"],
     )
     # Change the necessary dataframes to have benchmark as columns in data dataframes (x_poison_dataframe)
     print("And change old columns for benchmark solution")
@@ -823,8 +823,8 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
 
     print("Now select new categorical features to be optimised using Gurobi")
     instance_data.feature_selection(
-        no_nfeatures=model_parameters["no_nfeatures"],
-        no_cfeatures=model_parameters["no_cfeatures"],
+        no_nfeatures=config["no_nfeatures"],
+        no_cfeatures=config["no_cfeatures"],
     )
     instance_data.poison_samples()
 
@@ -846,15 +846,15 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
         # Optimise just these small datasets for all their categorical features
         small_instance = data.InstanceData(dataset_name="subset")
         small_instance.prepare_instance(
-            poison_rate=model_parameters["poison_rate"],
-            training_samples=model_parameters["training_samples"],
-            no_nfeatures=model_parameters["no_nfeatures"],
+            poison_rate=config["poison_rate"],
+            training_samples=config["training_samples"],
+            no_nfeatures=config["no_nfeatures"],
             no_cfeatures=1,
-            seed=model_parameters["seed"],
+            seed=config["seed"],
         )
 
         # Create model
-        small_model, solutions_dict = solve_gurobi(model_parameters, small_instance)
+        small_model, solutions_dict = solve_gurobi(config, small_instance)
         # Substitute these values back into the full dataset
         index = pd.MultiIndex.from_tuples(
             small_model.x_poison_cat.keys(),
@@ -891,7 +891,7 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
 
     # benchmark_instance.cat_poison_dataframe = instance_data.cat_x_poison_dataframe.rename(columns={'x_data_poison_cat': 'x_poison_cat'}) #TODO update master dataframe
 
-    new_model, solutions_dict = solve_pyomo(model_parameters, benchmark_instance)
+    new_model, solutions_dict = solve_pyomo(config, benchmark_instance)
 
     print("Objective value is ", solutions_dict["objective"])
     print("Benchmark objective value is ", benchmark_solution["objective"])
@@ -899,7 +899,7 @@ def benchmark_plus_optimising_chopping_heuristic(model_parameters: dict):
     return new_model, benchmark_data, solutions_dict
 
 
-def flipping_heuristic(model_parameters: dict, instance, solution):
+def flipping_heuristic(config: dict, instance, solution):
     """
      This is the heuristic algorithm we use to get feasible
     solutions. It works as follows. We quickly optimise numerical
@@ -921,20 +921,20 @@ def flipping_heuristic(model_parameters: dict, instance, solution):
     print("-" * long_space)
 
     # # Solve numerical features locally
-    # _, instance, solution = solve_benchmark(model_parameters)
+    # _, instance, solution = solve_benchmark(config)
     # print('Benchmark has been solved, now let us add this solution to data')
 
     benchmark_objective = solution["objective"]
 
     # Flip all categorical features.
-    for i in range(0, instance.no_psamples, model_parameters["heuristic_subset"]):
+    for i in range(0, instance.no_psamples, config["heuristic_subset"]):
         # Save the original data and try flipping. If the flipping does not improve,
         # we restore the data.
         original_instance = copy.deepcopy(instance)
         original_solution = copy.deepcopy(solution)
 
         chosen_samples = list(range(1, instance.no_psamples + 1))[
-            i : i + model_parameters["heuristic_subset"]
+            i : i + config["heuristic_subset"]
         ]
         print("Subset of samples is", chosen_samples)
 
@@ -998,7 +998,7 @@ def flipping_heuristic(model_parameters: dict, instance, solution):
 
         opt = pyo.SolverFactory("ipopt")
         _, instance, solution = iterative_attack_strategy(
-            opt, instance, model_parameters
+            opt, instance, config
         )
 
         if original_solution["objective"] > solution["objective"]:
@@ -1013,5 +1013,5 @@ def flipping_heuristic(model_parameters: dict, instance, solution):
     return instance, solution
 
 
-def IP_heuristic(model_parameters: dict):
+def IP_heuristic(config: dict):
     pass

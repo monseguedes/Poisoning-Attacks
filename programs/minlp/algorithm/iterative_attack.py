@@ -18,7 +18,7 @@ middle_space = long_space
 
 
 # TODO Modify this function to take instance_data and pyomo model as arguments.
-def run(model_parameters, checking_bilevel):
+def run(config, checking_bilevel):
     """Run iterative attack which which poison training data row by row"""
     from model import pyomo_instance_class
 
@@ -31,21 +31,21 @@ def run(model_parameters, checking_bilevel):
     print("*" * long_space)
 
     print("Building data class")
-    instance_data = pyomo_instance_class.InstanceData(model_parameters)
+    instance_data = pyomo_instance_class.InstanceData(config)
 
     (
         benchmark_model,
         benchmark_instance,
         benchmark_solution,
     ) = iterative_attack_strategy(
-        opt=opt, instance_data=instance_data, model_parameters=model_parameters
+        opt=opt, instance_data=instance_data, config=config
     )
     print("*" * middle_space)
 
     return benchmark_model, benchmark_instance, benchmark_solution
 
 
-def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_parameters):
+def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     """
     Algorithm for iterative attack strategy.
 
@@ -68,7 +68,7 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     iteration = 1
     iterations_solutions = []
 
-    model = IterativeAttackModel(instance_data, model_parameters["function"])
+    model = IterativeAttackModel(instance_data, config["function"])
 
     n_epochs = 4
     mini_batch_size = 0.5

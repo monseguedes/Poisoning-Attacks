@@ -18,7 +18,7 @@ from algorithm import ridge_regression
 
 import numpy as np
 
-model_parameters = {
+config = {
     "dataset_name": "5num5cat",
     "no_nfeatures": 0,
     "no_cfeatures": 5,
@@ -36,7 +36,7 @@ model_parameters = {
 
 from model import pyomo_instance_class
 
-instance_data = pyomo_instance_class.InstanceData(model_parameters)
+instance_data = pyomo_instance_class.InstanceData(config)
 
 np.testing.assert_equal(
     instance_data.get_num_x_train_dataframe(wide=False).shape, (150,)
@@ -64,17 +64,17 @@ np.testing.assert_equal(
 )
 
 # # Solve models
-# bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
-# ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
+# bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', config)
+# ridge_model, ridge_instance, ridge_solution = solve_model('ridge', config)
 benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
-    model_parameters, checking_bilevel=False
+    config, checking_bilevel=False
 )
 
 # Run the utitlity to check the results with scikitlearn.
-# Maybe the function take model_parameters, instance_data, and a solution
+# Maybe the function take config, instance_data, and a solution
 # returned from IterativeAttackModel.get_solution, run ridge regression and
 # compare the coefficients.
-ridge_regression_solution = ridge_regression.run(model_parameters, benchmark_instance)
+ridge_regression_solution = ridge_regression.run(config, benchmark_instance)
 
 
 def assert_solutions_are_close(sol1, sol2):
@@ -102,16 +102,16 @@ raise SystemExit
     bilevel_model,
     bilevel_instance,
     bilevel_solution,
-) = benchmark_plus_optimising_heuristic(model_parameters)
+) = benchmark_plus_optimising_heuristic(config)
 print(bilevel_solution)
 
-# benchmark_plus_optimising_subset_heuristic(model_parameters)
+# benchmark_plus_optimising_subset_heuristic(config)
 # objectives = []
-# _, instance, solution = solve_benchmark(model_parameters)
+# _, instance, solution = solve_benchmark(config)
 # # objectives.append(solution['objective'])
-# instance, solution = flipping_heuristic(model_parameters, instance, solution)
+# instance, solution = flipping_heuristic(config, instance, solution)
 # objectives.append(solution['objective'])
-# instance, solution = flipping_heuristic(model_parameters, instance, solution)
+# instance, solution = flipping_heuristic(config, instance, solution)
 # objectives.append(solution['objective'])
 
 # objectives = np.array(objectives)
@@ -121,7 +121,7 @@ print(bilevel_solution)
 # print((objectives[1:] - objectives[0]) / objectives[0] * 100)
 
 # Compare models
-# comparison = ComparisonModel(model_parameters)
+# comparison = ComparisonModel(config)
 # comparison.compare_everything(bilevel_instance=bilevel_instance, bilevel_model=bilevel_model,
 #                               ridge_instance=ridge_instance,ridge_model=ridge_model,
 #                               benchmark_instance=benchmark_instance, benchmark_model=benchmark_model)

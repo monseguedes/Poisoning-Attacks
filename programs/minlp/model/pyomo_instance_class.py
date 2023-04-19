@@ -22,18 +22,18 @@ from math import floor
 
 
 class InstanceData:
-    def __init__(self, model_parameters):
+    def __init__(self, config):
         """
         The initialization corresponds to the data for the first iteration.
         If there are no iterations (single attack strategy).
 
         dataset_name: 'pharm', or 'house'
         """
-        self.regularization = model_parameters["regularization"]
+        self.regularization = config["regularization"]
 
         # Whole dataframe with features as columns and target column,
         # as in file (1,2,3..,1:1,1:2,...,target).
-        dataset_directory = path.join("data", model_parameters["dataset_name"])
+        dataset_directory = path.join("data", config["dataset_name"])
         whole_dataframe = pd.read_csv(
             path.join(dataset_directory, "data-binary.csv"), index_col=[0]
         )
@@ -42,8 +42,8 @@ class InstanceData:
 
         # Pick fixed number of trainig samples.
         # The indexes are not reset, but randomly shuffled
-        training_samples = model_parameters["training_samples"]
-        seed = model_parameters["seed"]
+        training_samples = config["training_samples"]
+        seed = config["seed"]
         self.train_dataframe = whole_dataframe.sample(
             frac=None, n=training_samples, random_state=seed
         )
@@ -55,7 +55,7 @@ class InstanceData:
 
         self.train_dataframe.reset_index(drop=True, inplace=True)
 
-        poison_rate = model_parameters["poison_rate"] / 100
+        poison_rate = config["poison_rate"] / 100
         self.poison_dataframe = self.train_dataframe.sample(
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)

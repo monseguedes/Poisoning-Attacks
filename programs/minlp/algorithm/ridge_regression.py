@@ -6,7 +6,7 @@ from sklearn.linear_model import Ridge
 import pandas as pd
 
 
-def run(model_parameters, instance_data, wide=False):
+def run(config, instance_data, wide=False):
     """Run ridge regression without poisoning"""
     num_dataframe = pd.concat(
         [
@@ -26,7 +26,7 @@ def run(model_parameters, instance_data, wide=False):
         [instance_data.get_y_train_dataframe(), instance_data.get_y_poison_dataframe()]
     )
     y = y_df.to_numpy()
-    model = Ridge(alpha=model_parameters["regularization"], fit_intercept=True)
+    model = Ridge(alpha=config["regularization"], fit_intercept=True)
     model.fit(X, y)
 
     weights_num = model.coef_[: instance_data.no_numfeatures]
