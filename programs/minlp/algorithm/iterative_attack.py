@@ -94,19 +94,20 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
-            # TODO Modify flag to specify which one to remove.
+            # Modify flag to specify which one to remove.
             # model.unfix: 0
             # model.fix: 1
             # model.remove: 2
-            flag = np.full(instance_data.no_poison_samples, model.POISON_DATA_REMOVED)
+            flag = np.full(instance_data.no_poison_samples, -1)
             flag[:breaks[mini_batch_index]] = model.POISON_DATA_FIXED
             flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = model.POISON_DATA_OPTIMIZED
+            if incremental:
+                flag[breaks[mini_batch_index + 1]:] = model.POISON_DATA_REMOVED
+            else:
+                flag[breaks[mini_batch_index + 1]:] = model.POISON_DATA_FIXED
             model.fix_rows_in_poison_dataframe(instance_data, flag)
             opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
-            for k, v in solution.items():
-                print(k)
-                print(v)
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:

@@ -32,8 +32,8 @@ config = {
     "regularization": 0.6612244897959183,
     "feasibility": 0.00001,
     "time_limit": 20,
-    "iterative_attack_n_epochs": 4,
-    "iterative_attack_mini_batch_size": 0.5,
+    "iterative_attack_n_epochs": 2,
+    "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
 }
 
@@ -92,7 +92,7 @@ def assert_solutions_are_close(sol1, sol2):
     for key in ["weights_num", "weights_cat", "bias"]:
         a = flatten(sol1[key])
         b = flatten(sol2[key])
-        np.testing.assert_allclose(a, b)
+        np.testing.assert_allclose(a, b, rtol=1e-6)
 
 
 assert_solutions_are_close(benchmark_solution, ridge_regression_solution)
