@@ -232,6 +232,31 @@ class PyomoModel(pmo.block):
 
         print("Objective has been built")
 
+    def set_poison_data_status(self, instance_data, num_feature_flag, cat_feature_flag):
+        """Set status of the variables corresponding to the features in poisoned data
+
+        This sets status of the variables corresponding to the features in poisoned data.
+        One can 1) fix the variables to the ones in instance_data,
+        2) let the optimizer to optimize them or 3) remove them from the model (this
+        is useful when we want to add poisoned data incrementally).
+        `num_feature_flag` must be an array broadcastable to 
+        (no_poison_samples, no_numfeatures). `cat_feature_flag` must be broadcastable
+        to (no_poison_samples, no_catfeatures). The elements of these arrays must be
+        either self.POISON_DATA_FIXED, self.POISON_DATA_OPTIMIZED or 
+        self.POISON_DATA_REMOVED.
+
+        Parameters
+        ----------
+        instance_data : InstanceData
+        num_feature_flag : array of int, broadcastable to (no_poison_samples, no_numfeatures)
+        cat_feature_flag : array of int, broadcastable to (no_poison_samples, no_catfeatures)
+        """
+        raise NotImplementedError
+        # TODO Broadcast flags to appropriate shapes.
+        # TODO Check consistency of flags (is REMOVED flag used across entire rows?).
+        # TODO Update parameters: poison_data_status, poison_data_is_removed
+        # x_poison_num and x_poison_cat.
+
     def fix_rows_in_poison_dataframe(self, instance_data, flag):
         """Fix specified rows in poisoned data
 

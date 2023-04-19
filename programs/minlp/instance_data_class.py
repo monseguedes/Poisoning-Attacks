@@ -161,6 +161,10 @@ class InstanceData:
             for index, row in iter:
                 self.poison_dataframe[index] = row
 
+    def update_categorical_features(self, df):
+        raise NotImplementedError
+
+
 
 def get_numerical_feature_column_names(df):
     """Extract the column names of numerical features
