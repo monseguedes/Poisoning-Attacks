@@ -74,15 +74,29 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     print(instance_data.get_num_x_poison_dataframe(wide=True))
     print(" * " * 20)
 
-    for epoch in range(4):
-        for mini_batch in range(2):
+    n_epochs = 4
+    mini_batch_size = 0.5
+
+    no_poison_samples = instance_data.no_poison_samples
+
+    mini_batch_absolute_size = int(no_poison_samples * mini_batch_size)
+    breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
+    breaks = np.r_[breaks, no_poison_samples]
+    n_mini_batches = len(breaks) - 1
+
+    for epoch in range(n_epochs):
+        for mini_batch_index in range(n_mini_batches):
             flag = np.ones(instance_data.no_poison_samples)
-            flag[2 * mini_batch : 2 * (mini_batch + 1)] = 0
+            flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = 0
             model.fix_rows_in_poison_dataframe(instance_data, flag)
             results = opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
-            print(f"{epoch=}  {mini_batch=}  objective={solution['objective']:.6f}")
+            print(
+                f"{epoch=}  "
+                f"mini_batch={mini_batch_index}  "
+                f"objective={solution['objective']:.6f}"
+            )
             print(instance_data.get_num_x_poison_dataframe(wide=True).round(5))
             print(" * " * 20)
 

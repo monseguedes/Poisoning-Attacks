@@ -66,6 +66,22 @@ np.testing.assert_equal(
     instance_data.get_cat_x_poison_dataframe(wide=True).shape, (4, 24)
 )
 
+model_parameters = {
+    "dataset_name": "5num5cat",
+    "no_nfeatures": 0,
+    "no_cfeatures": 5,
+    "poison_rate": 20,
+    "training_samples": 30,
+    "seed": 3,
+    "function": "SLS",
+    "no_psubsets": 3,
+    "heuristic_subset": 1,
+    "datatype": "test",
+    "feasibility": 0.00001,
+    "time_limit": 20,
+}
+instance_data = pyomo_instance_class.InstanceData(model_parameters)
+
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
