@@ -38,7 +38,6 @@ def run(config, instance_data):
     instance_data = instance_data.copy()
 
     # Solve benchmark
-    opt = pyo.SolverFactory("ipopt")
 
     print("" * 2)
     print("*" * long_space)
