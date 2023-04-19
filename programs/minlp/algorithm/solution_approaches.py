@@ -66,9 +66,11 @@ def solve_model(model_name: str, model_parameters: dict, checking_bilevel=False)
         "benchmark": solve_benchmark,
     }
 
-    if model_name in model_functions:
-        model_func = model_functions[model_name]
-        model, intance, solution = model_func(model_parameters, checking_bilevel)
+    if model_name not in model_functions:
+        raise ValueError(f"invalid value of {model_name=}")
+
+    model_func = model_functions[model_name]
+    model, intance, solution = model_func(model_parameters, checking_bilevel)
 
     return model, intance, solution
 
