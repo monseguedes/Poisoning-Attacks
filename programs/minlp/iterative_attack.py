@@ -45,7 +45,9 @@ def run(config, instance_data):
     print("ITERATIVE ATTACK STRATEGY")
     print("*" * long_space)
 
-    model = pyomo_model.PyomoModel(instance_data, config["function"])
+    if not config.get("solver_name"):
+        config["solver_name"] = "ipopt"
+    model = pyomo_model.PyomoModel(instance_data, config)
 
     n_epochs = config["iterative_attack_n_epochs"]
     mini_batch_size = config["iterative_attack_mini_batch_size"]
@@ -87,7 +89,9 @@ def run(config, instance_data):
             else:
                 flag[breaks[mini_batch_index + 1] :] = model.POISON_DATA_FIXED
             model.fix_rows_in_poison_dataframe(instance_data, flag)
-            opt.solve(model, load_solutions=True, tee=False)
+            model.solve()
+            # TODO Implement a method to update data.
+            # model.update_data(instance_data)
             solution = model.get_solution()
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
             solution_list.append(solution)

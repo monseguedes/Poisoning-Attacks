@@ -18,10 +18,9 @@ middle_space = long_space
 class PyomoModel(pmo.block):
     """Pyomo model to formulate poisoning attack
 
-    This is a naive implementation of poisoning attach.
-    By default this optimizes all the numerical features in the poison data.
-    One can fix some rows in the poison data and only optimize the remaining
-    by calling `fix_rows_in_poison_dataframe`.
+    This is a naive implementation of poisoning attack.
+    One can fix some variables, such as categorical features, in the poison data and 
+    only optimize the remaining by calling `fix_rows_in_poison_dataframe` etc s.
 
     ```
     model = IterativeAttackModel(instance_data, function="MSE")
@@ -39,14 +38,24 @@ class PyomoModel(pmo.block):
     def __init__(
         self,
         instance_data,
-        function,
+        config,
         **kwds,
     ):
         # Gives access to methods in a superclass from the subclass that
         # inherits from it
         super().__init__(**kwds)
         # Initialize the whole abstract model whenever PoisonAttackModel is created:
-        self.function = function
+        self.function = config["function"]
+        self.solver_name = config["solver_name"]
+        self.tee = config["solver_output"]
+        if self.solver_name == "ipopt":
+            self.opt = pyo.SolverFactory("ipopt")
+        else:
+            self.opt = pyo.SolverFactory("gurobi", solver_io="python")
+            self.opt.options["NonConvex"] = 2
+            self.bilinear_term_cache = dict()
+            self.bilinear_term_variable_list = pmo.variable_list()
+            self.bilinear_term_constraint_list = pmo.constraint_list()
         print("" * 2)
         print("*" * long_space)
         print("CONTINUOUS NONLINEAR MODEL")
@@ -59,6 +68,29 @@ class PyomoModel(pmo.block):
         print("*" * long_space)
         self.build_objective(instance_data)
         print("*" * long_space)
+
+    def prod(self, a, b):
+        """Return the product of two expressions"""
+        if self.solver_name == "ipopt":
+            return self._prod_ipopt(a, b)
+        elif self.solver_name == "gurobi":
+            return self._prod_gurobi(a, b)
+        else:
+            raise ValueError(f"unknown solver name {self.solver_name}")
+    
+    def _prod_ipopt(self, a, b):
+        return a * b
+
+    def _prod_gurobi(self, a, b):
+        u, v = (a, b) if id(a) < id(b) else (b, a)
+        key = (id(u), id(v))
+        if key in self.bilinear_term_cache:
+            return self.bilinear_term_cache[key]
+        x = pmo.variable()
+        self.bilinear_term_variable_list.append(x)
+        self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
+        self.bilinear_term_cache[key] = x
+        return x
 
     def update_parameters(self, instance_data, build=False):
         """
@@ -225,6 +257,9 @@ class PyomoModel(pmo.block):
         for k, v in instance_data.get_cat_x_poison_dataframe().items():
             self.x_poison_cat[k].fix(v)
 
+    def solve(self):
+        self.opt.solve(self, load_solutions=True, tee=self.tee)
+
     def get_solution(self, wide=False):
         """Retrieve solutions
 
@@ -365,12 +400,12 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     poison_samples_component = sum(
         (
             sum(
-                model.x_poison_num[q, j] * model.weights_num[j]
+                model.prod(model.x_poison_num[q, j], model.weights_num[j])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.weights_cat[j, z] * model.x_poison_cat[q, j, z]
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
@@ -423,12 +458,12 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
     poison_samples_component = sum(
         (
             sum(
-                model.x_poison_num[q, j] * model.weights_num[j]
+                model.prod(model.x_poison_num[q, j], model.weights_num[j])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.weights_cat[j, z] * model.x_poison_cat[q, j, z]
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names

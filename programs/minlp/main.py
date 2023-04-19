@@ -36,6 +36,8 @@ config = {
     "iterative_attack_n_epochs": 2,
     "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
+    "solver_name": "",
+    "solver_output": False,
 }
 
 instance_data = instance_data_class.InstanceData(config)
