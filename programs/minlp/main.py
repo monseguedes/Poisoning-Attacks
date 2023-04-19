@@ -5,6 +5,8 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
+# TODO Implement utitlity to check the results with scikitlearn.
+
 import sys
 
 sys.path.append("./programs/minlp/model")

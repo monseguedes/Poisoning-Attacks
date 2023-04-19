@@ -8,6 +8,8 @@ import pyomo.kernel as pmo
 import pandas as pd
 import pprint
 
+# TODO Refactor.
+
 
 long_space = 80
 short_space = 60
@@ -126,9 +128,6 @@ class IterativeAttackModel(pmo.block):
         print("*" * long_space)
         self.build_objective(instance_data)
         print("*" * long_space)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
 
     def build_parameters(self, instance_data):
         """
@@ -267,32 +266,48 @@ class IterativeAttackModel(pmo.block):
             else:
                 self.x_poison_num[k].unfix()
 
-    def get_solution(self, stack=True):
+    def get_solution(self, wide=False):
         """Retrieve solutions"""
-        if stack:
+        if not wide:
             # To make long format dataframes.
             index = pd.MultiIndex(
                 levels=[[], []], codes=[[], []], names=["sample", "feature"]
             )
-            poison_solution = pd.Series(index=index)
-            optimized_poison_solution = pd.Series(index=index)
+            _x_poison_num = pd.Series(index=index)
+            _optimized_x_poison_num = pd.Series(index=index)
             for k, v in self.x_poison_num.items():
-                poison_solution.loc[k] = v.value
+                _x_poison_num.loc[k] = v.value
                 if not v.is_fixed():
-                    optimized_poison_solution.loc[k] = v.value
+                    _optimized_x_poison_num.loc[k] = v.value
+            _weights_num = pd.Series()
+            for k, v in self.weights_num.items():
+                _weights_num[k] = v.value
+            index = pd.MultiIndex(
+                levels=[[], []], codes=[[], []], names=["feature", "category"]
+            )
+            _weights_cat = pd.Series(index=index)
+            for k, v in self.weights_cat.items():
+                _weights_cat.loc[k] = v.value
         else:
             # To make wide fromat dataframes.
-            poison_solution = pd.DataFrame()
-            optimized_poison_solution = pd.DataFrame()
+            _x_poison_num = pd.DataFrame()
+            _optimized_x_poison_num = pd.DataFrame()
             for k, v in self.x_poison_num.items():
-                poison_solution.loc[k] = v.value
+                _x_poison_num.loc[k] = v.value
                 if not v.is_fixed():
-                    optimized_poison_solution.loc[k] = v.value
+                    _optimized_x_poison_num.loc[k] = v.value
+            _weights_num = pd.DataFrame()
+            for k, v in self.weights_num.items():
+                _weights_num[k] = [v.value]
+            _weights_cat = pd.DataFrame()
+            for k, v in self.weights_cat.items():
+                column = f"{k[0]}:{k[1]}"
+                _weights_cat[column] = [v.value]
         return {
-            "x_poison_num": poison_solution,
-            "optimized_x_poison_num": optimized_poison_solution,
-            "weights_num": {k: v.value for k, v in self.weights_num.items()},
-            "weights_cat": {k: v.value for k, v in self.weights_cat.items()},
+            "x_poison_num": _x_poison_num,
+            "optimized_x_poison_num": _optimized_x_poison_num,
+            "weights_num": _weights_num,
+            "weights_cat": _weights_cat,
             "bias": self.bias.value,
             "objective": pyo.value(self.objective_function),
         }
