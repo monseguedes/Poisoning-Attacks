@@ -123,6 +123,10 @@ class InstanceData:
         return get_numerical_feature_column_names(self.train_dataframe)
 
     @property
+    def categorical_feature_category_tuples(self):
+        return get_categorical_feature_category_tuples(self.train_dataframe)
+
+    @property
     def categorical_feature_names(self):
         return get_categorical_feature_names(self.train_dataframe)
 
@@ -209,6 +213,37 @@ def get_categorical_feature_column_names(df):
     names : list[str]
     """
     return [x for x in df.columns if ":" in str(x)]
+
+
+def get_categorical_feature_category_tuples(df):
+    """Extract the column names of categorical features as tuple of ints
+
+    Examples
+    --------
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ...     "1:1":    [ 1,  0,  0],
+    ...     "1:2":    [ 0,  1,  0],
+    ...     "2:1":    [ 0,  0,  1],
+    ...     "2:2":    [ 0,  1,  0],
+    ...     "2:3":    [ 0,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> get_categorical_feature_category_tuples(df)
+    [(1, 1), (1, 2), (2, 1), (2, 2), (2, 3)]
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    names : list[str]
+    """
+    return [
+        tuple(map(int, x.split(":"))) for x in get_categorical_feature_column_names(df)
+    ]
 
 
 def get_categorical_feature_names(df):

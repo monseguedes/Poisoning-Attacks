@@ -65,6 +65,8 @@ np.testing.assert_equal(
 
 instance_data = pyomo_instance_class.InstanceData(model_parameters)
 
+# ridge_regression_solution = ridge_regression.run(model_parameters, instance_data)
+
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
@@ -72,11 +74,33 @@ benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
     model_parameters, checking_bilevel=False
 )
 
-# TODO Implement utitlity to check the results with scikitlearn.
+# Run the utitlity to check the results with scikitlearn.
 # Maybe the function take model_parameters, instance_data, and a solution
 # returned from IterativeAttackModel.get_solution, run ridge regression and
 # compare the coefficients.
-ridge_regression.run(model_parameters, benchmark_instance, benchmark_solution)
+ridge_regression_solution = ridge_regression.run(model_parameters, benchmark_instance)
+
+
+def assert_solutions_are_close(sol1, sol2):
+    def flatten(x):
+        try:
+            x = x.to_numpy()
+        except AttributeError:
+            pass
+        try:
+            return x.ravel()
+        except AttributeError:
+            return x
+
+    for key in ["weights_num", "weights_cat", "bias"]:
+        a = flatten(sol1[key])
+        b = flatten(sol2[key])
+        np.testing.assert_allclose(a, b)
+
+
+assert_solutions_are_close(benchmark_solution, ridge_regression_solution)
+print("test passed")
+
 raise SystemExit
 (
     bilevel_model,
