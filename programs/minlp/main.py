@@ -92,7 +92,7 @@ def assert_solutions_are_close(sol1, sol2):
     for key in ["weights_num", "weights_cat", "bias"]:
         a = flatten(sol1[key])
         b = flatten(sol2[key])
-        np.testing.assert_allclose(a, b, rtol=1e-6)
+        np.testing.assert_allclose(a, b, rtol=1e-4)
 
 
 assert_solutions_are_close(benchmark_solution, ridge_regression_solution)

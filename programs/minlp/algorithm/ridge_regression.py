@@ -26,7 +26,7 @@ def run(config, instance_data, wide=False):
         [instance_data.get_y_train_dataframe(), instance_data.get_y_poison_dataframe()]
     )
     y = y_df.to_numpy()
-    model = Ridge(alpha=config["regularization"], fit_intercept=True)
+    model = Ridge(alpha=len(X) * config["regularization"], fit_intercept=True)
     model.fit(X, y)
 
     weights_num = model.coef_[: instance_data.no_numfeatures]
