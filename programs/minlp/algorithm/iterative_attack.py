@@ -98,11 +98,15 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
             # model.unfix: 0
             # model.fix: 1
             # model.remove: 2
-            flag = np.ones(instance_data.no_poison_samples)
-            flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = 0
+            flag = np.full(instance_data.no_poison_samples, model.POISON_DATA_REMOVED)
+            flag[:breaks[mini_batch_index]] = model.POISON_DATA_FIXED
+            flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = model.POISON_DATA_OPTIMIZED
             model.fix_rows_in_poison_dataframe(instance_data, flag)
             opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
+            for k, v in solution.items():
+                print(k)
+                print(v)
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
@@ -144,6 +148,10 @@ class IterativeAttackModel(pmo.block):
     ```
     """
 
+    POISON_DATA_FIXED = 0
+    POISON_DATA_OPTIMIZED = 1
+    POISON_DATA_REMOVED = 2
+
     def __init__(
         self,
         instance_data,
@@ -178,6 +186,17 @@ class IterativeAttackModel(pmo.block):
             self.y_train = {}
             self.x_poison_cat = {}
             self.y_poison = {}
+
+            # Status code (POISON_DATA_FIXED/OPTIMIZED/REMOVED)
+            self.poison_data_status = {
+                k: pmo.parameter() for k in range(instance_data.no_poison_samples)
+            }
+            # 1 if the corresponding row is removed and 0 otherwise.
+            self.poison_data_is_removed = {
+                k: pmo.parameter() for k in range(instance_data.no_poison_samples)
+            }
+            self.no_poison_samples_in_model = pmo.parameter(instance_data.no_poison_samples)
+
         for k, v in instance_data.get_num_x_train_dataframe().items():
             self.x_train_num.setdefault(k, pmo.parameter())
             self.x_train_num[k].value = v
@@ -300,12 +319,17 @@ class IterativeAttackModel(pmo.block):
             If flag[i] is 1, the corresponding poisoned data is fixed.
             Otherwise, the poisoned data is optimized.
         """
+        for k, v in enumerate(flag):
+            self.poison_data_status[k].value = v
+            self.poison_data_is_removed[k].value = int(v == self.POISON_DATA_REMOVED)
+        self.no_poison_samples_in_model.value = np.sum(flag != self.POISON_DATA_REMOVED)
+
         iter = instance_data.get_num_x_poison_dataframe().to_dict().items()
         for k, v in iter:
-            if flag[k[0]]:
-                self.x_poison_num[k].fix(v)
-            else:
+            if flag[k[0]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_num[k].unfix()
+            else:
+                self.x_poison_num[k].fix(v)
 
     def get_solution(self, wide=False):
         """Retrieve solutions
@@ -398,7 +422,6 @@ def linear_regression_function(instance_data, model, no_sample):
     y_hat = numerical_part + categorical_part + model.bias
     return y_hat
 
-# TODO Compute the number of poisoned data based on the flag.
 def mean_squared_error(instance_data, model, function: str):
     """
     Gets mean squared error, which is the mean of sum of the square of the
@@ -414,6 +437,7 @@ def mean_squared_error(instance_data, model, function: str):
 
     # Get mean of squared errors
     if function == "MSE":
+        # TODO Use instance_data.no_train_samples
         mse = 1 / model.no_samples * sum_square_errors
     elif function == "SLS":
         mse = sum_square_errors
@@ -451,6 +475,7 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
             - model.y_poison[q]
         )
         * model.x_poison_num[q, j]
+        * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )
 
@@ -459,6 +484,7 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     )  # Component involving the regularization
 
     if function == "MSE":
+        # TODO Use model.no_poison_samples_in_model
         final = (2 / (model.no_samples + model.no_psamples)) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
@@ -501,6 +527,7 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
             - model.y_poison[q]
         )
         * model.x_poison_cat[q, j, w]
+        * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )  # Component involving the sum of poison samples errors
 
@@ -509,6 +536,7 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
     )  # Component involving the regularization
 
     if function == "MSE":
+        # TODO Use model.no_poison_data_in_model
         final = (2 / (model.no_samples + model.no_psamples)) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
@@ -548,10 +576,12 @@ def loss_function_derivative_bias(instance_data, model, function):
             + model.bias
             - model.y_poison[q]
         )
+        * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )
 
     if function == "MSE":
+        # TODO Use model. no_poison_data_in_model
         final = (2 / (model.no_samples + model.no_psamples)) * (
             train_samples_component + poison_samples_component
         )
