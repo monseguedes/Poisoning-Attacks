@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+
+"""Ridge regression without poisoning"""
+
+from sklearn.linear_model import Ridge
+import pandas as pd
+
+
+def run(model_parameters, instance_data, wide=False):
+    """Run ridge regression without poisoning"""
+    num_dataframe = pd.concat(
+        [
+            instance_data.get_num_x_train_dataframe(wide=True),
+            instance_data.get_num_x_poison_dataframe(wide=True),
+        ]
+    )
+    cat_dataframe = pd.concat(
+        [
+            instance_data.get_cat_x_train_dataframe(wide=True),
+            instance_data.get_cat_x_poison_dataframe(wide=True),
+        ]
+    )
+    X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
+    X = X_df.to_numpy()
+    y_df = pd.concat(
+        [instance_data.get_y_train_dataframe(), instance_data.get_y_poison_dataframe()]
+    )
+    y = y_df.to_numpy()
+    model = Ridge(alpha=model_parameters["regularization"], fit_intercept=True)
+    model.fit(X, y)
+
+    weights_num = model.coef_[: instance_data.no_numfeatures]
+    weights_cat = model.coef_[instance_data.no_numfeatures :]
+    bias = model.intercept_
+
+    if not wide:
+        # To make long format dataframes.
+        _weights_num = pd.Series()
+        for k, v in zip(instance_data.numerical_feature_names, weights_num):
+            _weights_num[k] = v
+        index = pd.MultiIndex(
+            levels=[[], []], codes=[[], []], names=["feature", "category"]
+        )
+        _weights_cat = pd.Series(index=index)
+        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        for k, v in iter:
+            _weights_cat.loc[k] = v
+    else:
+        # To make wide fromat dataframes.
+        _weights_num = pd.DataFrame()
+        for k, v in zip(instance_data.numerical_feature_names, weights_num):
+            _weights_num[k] = [v]
+        _weights_cat = pd.DataFrame()
+        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        for k, v in iter:
+            column = f"{k[0]}:{k[1]}"
+            _weights_cat[column] = [v]
+
+    return {
+        "weights_num": _weights_num,
+        "weights_cat": _weights_cat,
+        "bias": bias,
+    }
