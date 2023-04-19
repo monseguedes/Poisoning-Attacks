@@ -362,6 +362,8 @@ class IterativeAttackModel(pmo.block):
         solution : dict
         """
         if not wide:
+            # TODO Simplify the construction of dataframes and series.
+            # TODO Exrract logic to build solutions and reuse from ridge regression.
             # To make long format dataframes.
             index = pd.MultiIndex(
                 levels=[[], []], codes=[[], []], names=["sample", "feature"]
