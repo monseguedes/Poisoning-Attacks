@@ -5,10 +5,15 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
+import sys
+
+sys.path.append("./programs/minlp/model")
+
 # Self-created libraries
 import model.model_class as model
 from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import *
+from algorithm import iterative_attack
 
 import numpy as np
 
@@ -27,9 +32,9 @@ model_parameters = {
     "time_limit": 20,
 }
 
-import model.pyomo_instance_class as benchmark_data
+from model import pyomo_instance_class
 
-instance_data = benchmark_data.InstanceData(model_parameters)
+instance_data = pyomo_instance_class.InstanceData(model_parameters)
 
 np.testing.assert_equal(
     instance_data.get_num_x_train_dataframe(unstack=True).shape, (150,)
@@ -55,13 +60,12 @@ np.testing.assert_equal(
 np.testing.assert_equal(
     instance_data.get_cat_x_poison_dataframe(unstack=False).shape, (4, 24)
 )
-raise SystemExit
 
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
-benchmark_model, benchmark_instance, benchmark_solution = solve_model(
-    "benchmark", model_parameters
+benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
+    model_parameters, checking_bilevel=False
 )
 raise SystemExit
 (

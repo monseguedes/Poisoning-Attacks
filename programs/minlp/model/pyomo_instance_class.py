@@ -329,77 +329,13 @@ class InstanceData:
         )
         return self.no_categories_in_categorical_feature
 
-    def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
-        """
-        Updates instance data in order to incorporate solutions of previous
-        iteration.
-
-        The input is a dataframe with new data in the following format:
-        multiindex dataframe with sample and feature as index and solutions of
-        solving model for x_poison_num as column. Here, x_poison_num becomes
-        x_train_num since solutions to previous iterations become datapoints.
-        """
-        raise NotImplementedError
-        if iteration == self.no_psubsets:
-            next_iteration = 0
+    def update_numerical_features(self, df):
+        if isinstance(df, pd.Series):
+            for index, row in df.items():
+                self.poison_dataframe.loc[index] = row
         else:
-            next_iteration = iteration
-
-        ### NUMERICAL POISON (x_poison_num_data)-------------------------------
-        self.num_x_poison_dataframe.to_numpy()[
-            (iteration - 1)
-            * self.no_numfeatures
-            * self.no_psamples_per_subset : iteration
-            * self.no_numfeatures
-            * self.no_psamples_per_subset
-        ] = new_x_poison_num.to_numpy()
-
-        ### ATTACK CATEGORICAL FEATURES (x_poison_cat)
-        self.cat_poison_dataframe = self.complete_cat_poison_dataframe.iloc[
-            next_iteration
-            * self.no_psamples_per_subset : (next_iteration + 1)
-            * self.no_psamples_per_subset
-        ].reset_index(drop=True)
-        self.cat_poison_dataframe.index.name = "sample"
-        self.cat_poison_dataframe.index += 1
-        # Stack dataframe to get multiindex, indexed by sample and feature,
-        # useful for pyomo format.
-        self.cat_poison_dataframe = self.cat_poison_dataframe.stack().rename_axis(
-            index={None: "column"}
-        )
-        self.cat_poison_dataframe.name = "x_poison_cat"
-        # This resets index so that current index becomes columns
-        self.cat_poison_dataframe = self.cat_poison_dataframe.reset_index()
-        # Split multiindex of the form '1:2' into one index for 1 and another
-        # index for 2
-        self.cat_poison_dataframe[
-            ["feature", "category"]
-        ] = self.cat_poison_dataframe.column.str.split(":", expand=True).astype(int)
-        # Drops the columns wirth '1:1' names
-        self.cat_poison_dataframe = self.cat_poison_dataframe.drop(columns=["column"])
-        # Sets relevant columns as indices.
-        self.cat_poison_dataframe = self.cat_poison_dataframe.set_index(
-            ["sample", "feature", "category"]
-        )
-
-        ### ATTACK TARGET (y_poison)------------------------------------
-        # Get next poison samples (by slicing whole poison samples in order)
-        # This depends on iteration
-        self.y_poison_dataframe = self.complete_y_poison_dataframe[
-            next_iteration
-            * self.no_psamples_per_subset : (next_iteration + 1)
-            * self.no_psamples_per_subset
-        ].reset_index(drop=True)
-        self.y_poison_dataframe.index.rename("sample")
-        self.y_poison_dataframe.index += 1
-
-        ### UPDATE FLAG
-        self.flag_array = np.ones(self.no_psamples_per_subset)
-        self.flag_array[
-            next_iteration
-            * self.no_psamples_per_subset : (next_iteration + 1)
-            * self.no_psamples_per_subset
-        ] = 0
+            for index, row in iter:
+                self.poison_dataframe[index] = row
 
 
 def get_numerical_feature_column_names(df):
