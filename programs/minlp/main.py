@@ -63,10 +63,6 @@ np.testing.assert_equal(
     instance_data.get_cat_x_poison_dataframe(wide=True).shape, (4, 24)
 )
 
-instance_data = pyomo_instance_class.InstanceData(model_parameters)
-
-# ridge_regression_solution = ridge_regression.run(model_parameters, instance_data)
-
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', model_parameters)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', model_parameters)
