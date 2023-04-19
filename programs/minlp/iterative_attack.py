@@ -5,18 +5,13 @@
 import copy
 
 import numpy as np
-import pyomo.environ as pyo
 import pyomo_model
-
-# TODO Refactor and simplify function calls around model building.
-# TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
 
 long_space = 80
 short_space = 60
 middle_space = long_space
 
 
-# TODO Modify this function to take instance_data and pyomo model as arguments.
 def run(config, instance_data):
     """Run iterative attack which which poison training data row by row
 
@@ -53,19 +48,19 @@ def run(config, instance_data):
 
     incremental = config["iterative_attack_incremental"]
 
-    if incremental:
-        if n_epochs > 1:
-            raise ValueError(
-                f"n_epochs should be 1 when incremental but got {n_epochs}"
-            )
+    if incremental and (n_epochs > 1):
+        raise ValueError(
+            f"n_epochs should be 1 when incremental but got {n_epochs}"
+        )
 
     no_poison_samples = instance_data.no_poison_samples
 
-    if mini_batch_size > 1:
+    if isinstance(mini_batch_size, int):
         mini_batch_absolute_size = mini_batch_size
     else:
         # mini batch size is specified as a fraction
-        mini_batch_absolute_size = max(int(no_poison_samples * mini_batch_size), 1)
+        mini_batch_absolute_size = int(no_poison_samples * mini_batch_size)
+    mini_batch_absolute_size = max(mini_batch_absolute_size, 1)
     breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
     breaks = np.r_[breaks, no_poison_samples]
     n_mini_batches = len(breaks) - 1
