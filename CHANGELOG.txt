@@ -74,5 +74,5 @@ documentation which examples. We can actually run the examples
 and test if the outputs of the functions are as expected or not:
 
 ```
-$ python -m doctest programs/minlp/model/pyomo_instance_class.py
+$ python -m doctest programs/minlp/model/pyomo_instance_class.py -o NORMALIZE_WHITESPACE
 ```

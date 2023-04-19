@@ -5,6 +5,10 @@
 This script creates the class with all the data that is then given to the benckmark model.
 """
 
+# TODO Improve consistency of naming.
+# TODO Implement utitlity to convert wide <-> long format.
+# TODO Implement update of categorical features.
+
 # Python imports
 import pandas as pd
 import numpy as np
@@ -578,10 +582,11 @@ def get_categorical_features(df, wide=False):
     Name: 0, dtype: int64
 
     >>> get_categorical_features(df, wide=True)
-       1:1  1:2  2:1  2:2  2:3
-    0    1    0    0    0    1
-    1    0    1    0    1    0
-    2    1    0    0    0    1
+            1:1  1:2  2:1  2:2  2:3
+    sample
+    0         1    0    0    0    1
+    1         0    1    0    1    0
+    2         1    0    0    0    1
 
     Parameters
     ----------
