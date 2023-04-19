@@ -15,7 +15,7 @@ short_space = 60
 middle_space = long_space
 
 
-class IterativeAttackModel(pmo.block):
+class PyomoModel(pmo.block):
     """Pyomo model to run iterative attack
 
     This is a naive implementation of iterative attack.

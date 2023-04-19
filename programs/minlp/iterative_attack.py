@@ -45,7 +45,7 @@ def run(config, instance_data):
     print("ITERATIVE ATTACK STRATEGY")
     print("*" * long_space)
 
-    model = pyomo_model.IterativeAttackModel(instance_data, config["function"])
+    model = pyomo_model.PyomoModel(instance_data, config["function"])
 
     n_epochs = config["iterative_attack_n_epochs"]
     mini_batch_size = config["iterative_attack_mini_batch_size"]
