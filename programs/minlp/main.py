@@ -32,6 +32,7 @@ config = {
     "regularization": 0.6612244897959183,
     "feasibility": 0.00001,
     "time_limit": 20,
+    "incremental_iterative_attack": False,
 }
 
 from model import pyomo_instance_class
@@ -66,9 +67,7 @@ np.testing.assert_equal(
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', config)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', config)
-benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
-    config, checking_bilevel=False
-)
+benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(config)
 
 # Run the utitlity to check the results with scikitlearn.
 # Maybe the function take config, instance_data, and a solution

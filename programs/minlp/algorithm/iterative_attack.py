@@ -18,7 +18,7 @@ middle_space = long_space
 
 
 # TODO Modify this function to take instance_data and pyomo model as arguments.
-def run(config, checking_bilevel):
+def run(config):
     """Run iterative attack which which poison training data row by row"""
     from model import pyomo_instance_class
 
