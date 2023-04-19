@@ -8,7 +8,8 @@ import pyomo.kernel as pmo
 import pandas as pd
 import pprint
 
-# TODO Refactor.
+# TODO Refactor and simplify function calls around model building.
+# TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
 
 
 long_space = 80
