@@ -5,16 +5,17 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
-import sys
+# import sys
 
-sys.path.append("./programs/minlp/model")
+# sys.path.append("./programs/minlp")
 
 # Self-created libraries
-import model.model_class as model
-from algorithm.solution_approaches import *
-from solutions_handler.regression_comparison import *
-from algorithm import iterative_attack
-from algorithm import ridge_regression
+# import model.model_class as model
+# from algorithm.solution_approaches import *
+# from solutions_handler.regression_comparison import *
+
+import iterative_attack
+import ridge_regression
 
 import numpy as np
 
@@ -37,7 +38,7 @@ config = {
     "iterative_attack_incremental": False,
 }
 
-from model import pyomo_instance_class
+import pyomo_instance_class
 
 instance_data = pyomo_instance_class.InstanceData(config)
 

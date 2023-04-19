@@ -6,11 +6,10 @@ import numpy as np
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
 import pandas as pd
-import pprint
+import pyomo_instance_class
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
-
 
 long_space = 80
 short_space = 60
@@ -20,7 +19,7 @@ middle_space = long_space
 # TODO Modify this function to take instance_data and pyomo model as arguments.
 def run(config):
     """Run iterative attack which which poison training data row by row"""
-    from model import pyomo_instance_class
+
 
     # Solve benchmark
     opt = pyo.SolverFactory("ipopt")
