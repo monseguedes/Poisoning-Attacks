@@ -16,9 +16,9 @@ middle_space = long_space
 
 
 class PyomoModel(pmo.block):
-    """Pyomo model to run iterative attack
+    """Pyomo model to formulate poisoning attack
 
-    This is a naive implementation of iterative attack.
+    This is a naive implementation of poisoning attach.
     By default this optimizes all the numerical features in the poison data.
     One can fix some rows in the poison data and only optimize the remaining
     by calling `fix_rows_in_poison_dataframe`.
