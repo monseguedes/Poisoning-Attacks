@@ -70,12 +70,22 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
 
     model = IterativeAttackModel(instance_data, config["function"])
 
-    n_epochs = 4
-    mini_batch_size = 0.5
+    n_epochs = config["iterative_attack_n_epochs"]
+    mini_batch_size = config["iterative_attack_mini_batch_size"]
+
+    incremental = config["iterative_attack_incremental"]
+
+    if incremental:
+        if n_epochs > 1:
+            raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
 
     no_poison_samples = instance_data.no_poison_samples
 
-    mini_batch_absolute_size = max(int(no_poison_samples * mini_batch_size), 1)
+    if mini_batch_size > 1:
+        mini_batch_absolute_size = mini_batch_size
+    else:
+        # mini batch size is specified as a fraction
+        mini_batch_absolute_size = max(int(no_poison_samples * mini_batch_size), 1)
     breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
     breaks = np.r_[breaks, no_poison_samples]
     n_mini_batches = len(breaks) - 1
@@ -84,6 +94,10 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
+            # TODO Modify flag to specify which one to remove.
+            # model.unfix: 0
+            # model.fix: 1
+            # model.remove: 2
             flag = np.ones(instance_data.no_poison_samples)
             flag[breaks[mini_batch_index] : breaks[mini_batch_index + 1]] = 0
             model.fix_rows_in_poison_dataframe(instance_data, flag)
@@ -384,7 +398,7 @@ def linear_regression_function(instance_data, model, no_sample):
     y_hat = numerical_part + categorical_part + model.bias
     return y_hat
 
-
+# TODO Compute the number of poisoned data based on the flag.
 def mean_squared_error(instance_data, model, function: str):
     """
     Gets mean squared error, which is the mean of sum of the square of the
@@ -406,7 +420,7 @@ def mean_squared_error(instance_data, model, function: str):
 
     return mse
 
-
+# TODO Add flag to specify which terms from poisoned data are included.
 def loss_function_derivative_num_weights(instance_data, model, j, function):
     """
     Finds the derivetive of the loss function (follower's objective) with
