@@ -33,6 +33,7 @@ model_parameters = {
     "no_psubsets": 3,
     "heuristic_subset": 1,
     "datatype": "test",
+    "regularization": 0.6612244897959183,
     "feasibility": 0.00001,
     "time_limit": 20,
 }
@@ -66,20 +67,6 @@ np.testing.assert_equal(
     instance_data.get_cat_x_poison_dataframe(wide=True).shape, (4, 24)
 )
 
-model_parameters = {
-    "dataset_name": "5num5cat",
-    "no_nfeatures": 0,
-    "no_cfeatures": 5,
-    "poison_rate": 20,
-    "training_samples": 30,
-    "seed": 3,
-    "function": "SLS",
-    "no_psubsets": 3,
-    "heuristic_subset": 1,
-    "datatype": "test",
-    "feasibility": 0.00001,
-    "time_limit": 20,
-}
 instance_data = pyomo_instance_class.InstanceData(model_parameters)
 
 # # Solve models

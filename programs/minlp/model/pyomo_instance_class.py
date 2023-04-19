@@ -29,7 +29,7 @@ class InstanceData:
 
         dataset_name: 'pharm', or 'house'
         """
-        self.regularization = 0.6612244897959183
+        self.regularization = model_parameters["regularization"]
 
         # Whole dataframe with features as columns and target column,
         # as in file (1,2,3..,1:1,1:2,...,target).
