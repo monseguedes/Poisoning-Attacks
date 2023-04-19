@@ -3,9 +3,9 @@
 """Run iterative attack which which poison training data row by row"""
 
 import numpy as np
+import pandas as pd
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
-import pandas as pd
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.

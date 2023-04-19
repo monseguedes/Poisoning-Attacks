@@ -2,9 +2,10 @@
 
 """Run iterative attack which which poison training data row by row"""
 
+import copy
+
 import numpy as np
 import pyomo.environ as pyo
-import instance_data_class
 import pyomo_model
 
 # TODO Refactor and simplify function calls around model building.
@@ -16,44 +17,28 @@ middle_space = long_space
 
 
 # TODO Modify this function to take instance_data and pyomo model as arguments.
-def run(config):
-    """Run iterative attack which which poison training data row by row"""
+def run(config, instance_data):
+    """Run iterative attack which which poison training data row by row
 
+    This is a hueristic to optimize numerical features row by row using IPOPT.
+    The given data is not modified but a copy will be returned.
+
+    Parameters
+    ----------
+    config : dict
+    instance_data : InstanceData
+
+    Returns
+    -------
+    model : pyomo.block
+    modified_data : InstanceData
+    solution : dict[str, pd.DataFrame]
+    """
+    config = copy.deepcopy(config)
+    instance_data = instance_data.copy()
 
     # Solve benchmark
     opt = pyo.SolverFactory("ipopt")
-
-    print("" * 2)
-    print("*" * long_space)
-    print("ITERATIVE CONTINUOUS NONLINEAR ALGORITHM")
-    print("*" * long_space)
-
-    print("Building data class")
-    instance_data = instance_data_class.InstanceData(config)
-
-    (
-        benchmark_model,
-        benchmark_instance,
-        benchmark_solution,
-    ) = iterative_attack_strategy(opt=opt, instance_data=instance_data, config=config)
-    print("*" * middle_space)
-
-    return benchmark_model, benchmark_instance, benchmark_solution
-
-
-def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
-    """
-    Algorithm for iterative attack strategy.
-
-    It starts by creating the abstract model, and an initial data object for
-    creating the first instance. After this, while the iteration count is
-    smaller than the number of subsets (there is an iteration per subset), the
-    model instance is created with the intance data object and the model is
-    solved for current instance. After that, solutions are stored in a
-    dataframe, and data object for instance is updated to that current
-    iteration becomes data. Then, we go back to start of while loop and process
-    is repeated for all subsets/iterations.
-    """
 
     print("" * 2)
     print("*" * long_space)

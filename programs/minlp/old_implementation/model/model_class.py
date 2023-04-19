@@ -21,20 +21,22 @@ is given to the model as an input class.
 
 """
 
+import itertools
+
 # Python Libraries
 from os import path
+
+import algorithm.bounding_procedure as bnd
 import gurobipy as gp
-from gurobipy import GRB
-import itertools
-import pyomo.environ as pyo
-import pyomo.kernel as pmo
 
 # Self-created modules
 import model.auxiliary_functions as aux
-import model.pyomo_auxiliary_functions as paux
 import model.instance_class
+import model.pyomo_auxiliary_functions as paux
 import model.pyomo_instance_class
-import algorithm.bounding_procedure as bnd
+import pyomo.environ as pyo
+import pyomo.kernel as pmo
+from gurobipy import GRB
 
 long_space = 70
 short_space = 60

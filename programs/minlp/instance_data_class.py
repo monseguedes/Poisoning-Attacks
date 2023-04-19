@@ -14,9 +14,10 @@ This script creates the class with all the data that is then given to the benckm
 # performance becomes an issue, we can leave as it is. But when necesarry
 # we can think about how to improve it.
 
-# Python imports
-import pandas as pd
+import copy
 from os import path
+
+import pandas as pd
 
 
 class InstanceData:
@@ -61,8 +62,16 @@ class InstanceData:
         # TODO Define attributes related to column information, and remove corresponding property.
         # You dont have to remove ones related to rows, such as number of training data, since
         # we may updage dataframe later.
-        self.no_numfeatures = len(get_numerical_feature_column_names(self.train_dataframe))
-        self.no_catfeatures = len(get_categorical_feature_column_names(self.train_dataframe))
+        self.no_numfeatures = len(
+            get_numerical_feature_column_names(self.train_dataframe)
+        )
+        self.no_catfeatures = len(
+            get_categorical_feature_column_names(self.train_dataframe)
+        )
+
+    def copy(self):
+        """Return a deepcopy of self"""
+        return copy.deepcopy(self)
 
     def get_numerical_columns(self):
         return [
@@ -469,9 +478,10 @@ def get_targets(df):
     """
     return df["target"]
 
+
 def make_vertical_numerical_dataframe(df):
     """Make dataframe vertical
-    
+
     >>> df = pd.DataFrame({
     ...     "1":      [ 0,  1,  2],
     ...     "2":      [ 3,  4,  5],
@@ -504,9 +514,10 @@ def make_vertical_numerical_dataframe(df):
     df = df.sort_index()
     return df
 
+
 def make_horizontal_numerical_dataframe(df):
     """Make dataframe horizontal
-    
+
     >>> df = pd.DataFrame({
     ...     "1":      [ 0,  1,  2],
     ...     "2":      [ 3,  4,  5],
@@ -537,9 +548,10 @@ def make_horizontal_numerical_dataframe(df):
     """
     raise NotImplementedError
 
+
 def make_vertical_categorical_dataframe(df):
     """Make dataframe vertical
-    
+
     >>> df = pd.DataFrame({
     ...     "1:1":    [ 1,  0,  1],
     ...     "1:2":    [ 0,  1,  0],

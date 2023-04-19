@@ -2,8 +2,8 @@
 
 """Ridge regression without poisoning"""
 
-from sklearn.linear_model import Ridge
 import pandas as pd
+from sklearn.linear_model import Ridge
 
 
 def run(config, instance_data, wide=False):

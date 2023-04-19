@@ -6,15 +6,17 @@ This script creates the class with all the data that is then given to either the
 model or the ridge regression model.
 """
 
-# Python imports
-import pandas as pd
-import numpy as np
-from os import path
-from math import floor
 import itertools
 
 # Add path to be able to use module from other folder
 import sys
+from math import floor
+from os import path
+
+import numpy as np
+
+# Python imports
+import pandas as pd
 
 sys.path.append("./programs/minlp/algorithm")
 import choosing_features as choose

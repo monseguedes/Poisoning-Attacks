@@ -14,12 +14,10 @@ Main script for the paper of poisoning attacks of categorical variables.
 # from algorithm.solution_approaches import *
 # from solutions_handler.regression_comparison import *
 
-import iterative_attack
-import ridge_regression
-
 import instance_data_class
-
+import iterative_attack
 import numpy as np
+import ridge_regression
 
 config = {
     "dataset_name": "5num5cat",
@@ -70,7 +68,9 @@ np.testing.assert_equal(
 # # Solve models
 # bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', config)
 # ridge_model, ridge_instance, ridge_solution = solve_model('ridge', config)
-benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(config)
+benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
+    config, instance_data
+)
 
 # Run the utitlity to check the results with scikitlearn.
 # Maybe the function take config, instance_data, and a solution

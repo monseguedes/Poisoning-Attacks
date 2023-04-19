@@ -12,23 +12,23 @@ and solve models.
 
 """
 
-# Self-created modules
-from model.model_class import *
-import model.instance_class as data
-import model.pyomo_instance_class as benchmark_data
-
-
 # Python Libraries
 import copy
-from os import path
-import pandas as pd
-import numpy as np
-import os
-import gurobipy as gp
-import time
 import csv
+import os
+import time
+from os import path
+
+import gurobipy as gp
 import matplotlib.pyplot as plt
+import model.instance_class as data
+import model.pyomo_instance_class as benchmark_data
+import numpy as np
+import pandas as pd
 import pyomo.environ as pyo
+
+# Self-created modules
+from model.model_class import *
 
 middle_space = long_space
 long_space = 80
