@@ -201,9 +201,6 @@ class IterativeAttackModel(pmo.block):
         for k, v in instance_data.get_y_train_dataframe().items():
             self.y_train.setdefault(k, pmo.parameter())
             self.y_train[k] = v
-        for k, v in instance_data.get_cat_x_poison_dataframe().items():
-            self.x_poison_cat.setdefault(k, pmo.parameter())
-            self.x_poison_cat[k].value = v
         for k, v in instance_data.get_y_poison_dataframe().items():
             self.y_poison.setdefault(k, pmo.parameter())
             self.y_poison[k] = v
@@ -223,6 +220,14 @@ class IterativeAttackModel(pmo.block):
             for numfeature in instance_data.numerical_feature_names:
                 self.x_poison_num[psample, numfeature] = pmo.variable(
                     domain=pmo.PercentFraction
+                )
+
+        # Numerical feature vector of poisoned samples
+        self.x_poison_cat = pmo.variable_dict()
+        for psample in range(instance_data.no_poison_samples):
+            for catfeature in instance_data.categorical_feature_category_tuples:
+                self.x_poison_cat[(psample,) + catfeature] = pmo.variable(
+                    domain=pmo.Binary
                 )
 
         # TODO Fix bounds.
@@ -325,6 +330,9 @@ class IterativeAttackModel(pmo.block):
                 self.x_poison_num[k].unfix()
             else:
                 self.x_poison_num[k].fix(v)
+
+        for k, v in instance_data.get_cat_x_poison_dataframe().items():
+            self.x_poison_cat[k].fix(v)
 
     def get_solution(self, wide=False):
         """Retrieve solutions
