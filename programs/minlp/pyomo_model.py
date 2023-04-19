@@ -19,7 +19,7 @@ class PyomoModel(pmo.block):
     """Pyomo model to formulate poisoning attack
 
     This is a naive implementation of poisoning attack.
-    One can fix some variables, such as categorical features, in the poison data and 
+    One can fix some variables, such as categorical features, in the poison data and
     only optimize the remaining by calling `fix_rows_in_poison_dataframe` etc s.
 
     ```
@@ -77,7 +77,7 @@ class PyomoModel(pmo.block):
             return self._prod_gurobi(a, b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
-    
+
     def _prod_ipopt(self, a, b):
         return a * b
 
@@ -239,10 +239,10 @@ class PyomoModel(pmo.block):
         One can 1) fix the variables to the ones in instance_data,
         2) let the optimizer to optimize them or 3) remove them from the model (this
         is useful when we want to add poisoned data incrementally).
-        `num_feature_flag` must be an array broadcastable to 
+        `num_feature_flag` must be an array broadcastable to
         (no_poison_samples, no_numfeatures). `cat_feature_flag` must be broadcastable
         to (no_poison_samples, no_catfeatures). The elements of these arrays must be
-        either self.POISON_DATA_FIXED, self.POISON_DATA_OPTIMIZED or 
+        either self.POISON_DATA_FIXED, self.POISON_DATA_OPTIMIZED or
         self.POISON_DATA_REMOVED.
 
         Parameters

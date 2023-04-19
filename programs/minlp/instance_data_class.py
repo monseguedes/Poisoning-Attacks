@@ -165,7 +165,6 @@ class InstanceData:
         raise NotImplementedError
 
 
-
 def get_numerical_feature_column_names(df):
     """Extract the column names of numerical features
 
