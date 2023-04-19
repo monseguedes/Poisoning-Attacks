@@ -32,6 +32,8 @@ config = {
     "regularization": 0.6612244897959183,
     "feasibility": 0.00001,
     "time_limit": 20,
+    "iterative_attack_n_epochs": 4,
+    "iterative_attack_mini_batch_size": 0.5,
     "incremental_iterative_attack": False,
 }
 
