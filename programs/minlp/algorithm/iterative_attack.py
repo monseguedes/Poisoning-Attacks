@@ -66,24 +66,22 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, model_param
     iterations_solutions = []
 
     model = IterativeAttackModel(instance_data, model_parameters["function"])
-    print(' * ' * 20)
-    print('original: ')
-    print(instance_data.get_num_x_poison_dataframe(unstack=False))
-    print(' * ' * 20)
+    print(" * " * 20)
+    print("original: ")
+    print(instance_data.get_num_x_poison_dataframe(wide=True))
+    print(" * " * 20)
 
-    for j in range(2):
-        for i in range(2):
+    for epoch in range(4):
+        for mini_batch in range(2):
             flag = np.ones(instance_data.no_poison_samples)
-            flag[2*i:2*(i + 1)] = 0
+            flag[2 * mini_batch : 2 * (mini_batch + 1)] = 0
             model.fix_rows_in_poison_dataframe(instance_data, flag)
             results = opt.solve(model, load_solutions=True, tee=False)
             solution = model.get_solution()
-            print(' * ' * 20)
-            print(solution["x_poison_num"].unstack().round(5))
-            print(solution["objective"])
-            print(' - ' * 20)
             instance_data.update_numerical_features(solution["optimized_x_poison_num"])
-            print(instance_data.get_num_x_poison_dataframe(unstack=False).round(5))
+            print(f"{epoch=}  {mini_batch=}  objective={solution['objective']:.6f}")
+            print(instance_data.get_num_x_poison_dataframe(wide=True).round(5))
+            print(" * " * 20)
 
     return model, instance_data, solution
 
@@ -141,11 +139,11 @@ class IterativeAttackModel(pmo.block):
         """
 
         print("Defining parameters")
-        iter = instance_data.get_num_x_train_dataframe(unstack=True).to_dict().items()
+        iter = instance_data.get_num_x_train_dataframe().to_dict().items()
         self.x_train_num = {k: pmo.parameter(v) for k, v in iter}
-        self.x_train_cat = instance_data.get_cat_x_train_dataframe(unstack=True)
+        self.x_train_cat = instance_data.get_cat_x_train_dataframe()
         self.y_train = instance_data.get_y_train_dataframe()
-        iter = instance_data.get_cat_x_poison_dataframe(unstack=True).to_dict().items()
+        iter = instance_data.get_cat_x_poison_dataframe().to_dict().items()
         self.x_poison_cat = {k: pmo.parameter(v) for k, v in iter}
         iter = instance_data.get_y_poison_dataframe().to_dict().items()
         self.y_poison = {k: pmo.parameter(v) for k, v in iter}
@@ -154,10 +152,10 @@ class IterativeAttackModel(pmo.block):
         """
         Update parameters in pyomo.
         """
-        iter = instance_data.get_num_x_train_dataframe(unstack=True).to_dict().items()
+        iter = instance_data.get_num_x_train_dataframe().to_dict().items()
         for k, v in iter:
             self.x_train_num[k].value = v
-        iter = instance_data.get_cat_x_poison_dataframe(unstack=True).to_dict().items()
+        iter = instance_data.get_cat_x_poison_dataframe().to_dict().items()
         for k, v in iter:
             self.x_poison_cat[k].value = v
         iter = instance_data.get_y_poison_dataframe().to_dict().items()
@@ -262,7 +260,7 @@ class IterativeAttackModel(pmo.block):
 
     def fix_rows_in_poison_dataframe(self, instance_data, flag):
         """ """
-        iter = instance_data.get_num_x_poison_dataframe(unstack=True).to_dict().items()
+        iter = instance_data.get_num_x_poison_dataframe().to_dict().items()
         for k, v in iter:
             if flag[k[0]]:
                 self.x_poison_num[k].fix(v)
@@ -273,7 +271,9 @@ class IterativeAttackModel(pmo.block):
         """Retrieve solutions"""
         if stack:
             # To make long format dataframes.
-            index = pd.MultiIndex(levels=[[], []], codes=[[], []], names=['sample', 'feature'])
+            index = pd.MultiIndex(
+                levels=[[], []], codes=[[], []], names=["sample", "feature"]
+            )
             poison_solution = pd.Series(index=index)
             optimized_poison_solution = pd.Series(index=index)
             for k, v in self.x_poison_num.items():

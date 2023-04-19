@@ -37,28 +37,28 @@ from model import pyomo_instance_class
 instance_data = pyomo_instance_class.InstanceData(model_parameters)
 
 np.testing.assert_equal(
-    instance_data.get_num_x_train_dataframe(unstack=True).shape, (150,)
+    instance_data.get_num_x_train_dataframe(wide=False).shape, (150,)
 )
 np.testing.assert_equal(
-    instance_data.get_num_x_train_dataframe(unstack=False).shape, (30, 5)
+    instance_data.get_num_x_train_dataframe(wide=True).shape, (30, 5)
 )
 np.testing.assert_equal(
-    instance_data.get_cat_x_train_dataframe(unstack=True).shape, (720,)
+    instance_data.get_cat_x_train_dataframe(wide=False).shape, (720,)
 )
 np.testing.assert_equal(
-    instance_data.get_cat_x_train_dataframe(unstack=False).shape, (30, 24)
+    instance_data.get_cat_x_train_dataframe(wide=True).shape, (30, 24)
 )
 np.testing.assert_equal(
-    instance_data.get_num_x_poison_dataframe(unstack=True).shape, (20,)
+    instance_data.get_num_x_poison_dataframe(wide=False).shape, (20,)
 )
 np.testing.assert_equal(
-    instance_data.get_num_x_poison_dataframe(unstack=False).shape, (4, 5)
+    instance_data.get_num_x_poison_dataframe(wide=True).shape, (4, 5)
 )
 np.testing.assert_equal(
-    instance_data.get_cat_x_poison_dataframe(unstack=True).shape, (96,)
+    instance_data.get_cat_x_poison_dataframe(wide=False).shape, (96,)
 )
 np.testing.assert_equal(
-    instance_data.get_cat_x_poison_dataframe(unstack=False).shape, (4, 24)
+    instance_data.get_cat_x_poison_dataframe(wide=True).shape, (4, 24)
 )
 
 # # Solve models

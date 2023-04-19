@@ -184,8 +184,8 @@ class InstanceData:
     #     # num_x_train_dataframe.name = 'x_train_num'
     #     return num_x_train_dataframe
     #
-    def get_num_x_train_dataframe(self, unstack):
-        return get_numerical_features(df=self.train_dataframe, unstack=unstack)
+    def get_num_x_train_dataframe(self, wide=False):
+        return get_numerical_features(df=self.train_dataframe, wide=wide)
 
     # def get_cat_x_train_dataframe(self, stack):
     #     categorical_columns = self.get_categorical_columns()
@@ -208,8 +208,8 @@ class InstanceData:
     #     cat_x_train_dataframe = cat_x_train_dataframe.sort_index()
     #     return cat_x_train_dataframe
 
-    def get_cat_x_train_dataframe(self, unstack):
-        return get_categorical_features(df=self.train_dataframe, unstack=unstack)
+    def get_cat_x_train_dataframe(self, wide=False):
+        return get_categorical_features(df=self.train_dataframe, wide=wide)
 
     # def get_num_x_poison_dataframe(self):
     #     numerical_columns = self.get_numerical_columns()
@@ -224,11 +224,11 @@ class InstanceData:
         return get_targets(df=self.train_dataframe)
 
     #
-    def get_num_x_poison_dataframe(self, unstack):
-        return get_numerical_features(df=self.poison_dataframe, unstack=unstack)
+    def get_num_x_poison_dataframe(self, wide=False):
+        return get_numerical_features(df=self.poison_dataframe, wide=wide)
 
-    def get_cat_x_poison_dataframe(self, unstack):
-        return get_categorical_features(df=self.poison_dataframe, unstack=unstack)
+    def get_cat_x_poison_dataframe(self, wide=False):
+        return get_categorical_features(df=self.poison_dataframe, wide=wide)
 
     def get_y_poison_dataframe(self):
         return get_targets(df=self.poison_dataframe)
@@ -494,7 +494,7 @@ def get_categorical_feature_to_no_categories(df):
     return {k: len(v) for k, v in dct.items()}
 
 
-def get_numerical_features(df, unstack):
+def get_numerical_features(df, wide=False):
     """Extract numerical features
 
     >>> df = pd.DataFrame({
@@ -507,12 +507,7 @@ def get_numerical_features(df, unstack):
     ...     "2:3":    [ 0,  0,  1],
     ...     "target": [ 6,  7,  8],
     ... })
-    >>> get_numerical_features(df, unstack=False)
-       1  2
-    0  0  3
-    1  1  4
-    2  2  5
-    >>> get_numerical_features(df, unstack=True)
+    >>> get_numerical_features(df)
     sample  feature
     0       1          0
             2          3
@@ -521,11 +516,16 @@ def get_numerical_features(df, unstack):
     2       1          2
             2          5
     Name: 0, dtype: int64
+    >>> get_numerical_features(df, wide=True)
+       1  2
+    0  0  3
+    1  1  4
+    2  2  5
 
     Parameters
     ----------
     df : pandas.DataFrame
-    unstack : bool
+    wide : bool, default False
 
     Returns
     -------
@@ -533,7 +533,7 @@ def get_numerical_features(df, unstack):
     """
     df = _cast_column_names_to_int(df)
     df = df[get_numerical_feature_column_names(df)]
-    if not unstack:
+    if wide:
         return df
     df = df.unstack()
     df = df.reset_index()
@@ -545,7 +545,7 @@ def get_numerical_features(df, unstack):
     return df
 
 
-def get_categorical_features(df, unstack):
+def get_categorical_features(df, wide=False):
     """Extract categorical features
 
     >>> df = pd.DataFrame({
@@ -558,13 +558,7 @@ def get_categorical_features(df, unstack):
     ...     "2:3":    [ 1,  0,  1],
     ...     "target": [ 6,  7,  8],
     ... })
-    >>> get_categorical_features(df, unstack=False)
-       1:1  1:2  2:1  2:2  2:3
-    0    1    0    0    0    1
-    1    0    1    0    1    0
-    2    1    0    0    0    1
-
-    >>> get_categorical_features(df, unstack=True)
+    >>> get_categorical_features(df)
     sample  feature  category
     0       1        1           1
                      2           0
@@ -583,22 +577,27 @@ def get_categorical_features(df, unstack):
                      3           1
     Name: 0, dtype: int64
 
+    >>> get_categorical_features(df, wide=True)
+       1:1  1:2  2:1  2:2  2:3
+    0    1    0    0    0    1
+    1    0    1    0    1    0
+    2    1    0    0    0    1
+
     Parameters
     ----------
     df : pandas.DataFrame
-    unstack : bool
+    wide : bool, default False
 
     Returns
     -------
     res : pandas.DataFrame
     """
     df = df[get_categorical_feature_column_names(df)]
-    if not unstack:
+    if wide:
         return df
     # The first index makes le
     df.index.name = "sample"
     df = df.unstack()
-    # df.name = "value"
     df = df.reset_index()
     df[["feature", "category"]] = df.iloc[:, 0].str.split(":", expand=True).astype(int)
     df["sample"] = df["sample"].astype(int)
