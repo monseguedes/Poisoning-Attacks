@@ -8,7 +8,11 @@ This script creates the class with all the data that is then given to the benckm
 # TODO Improve consistency of naming.
 # TODO Implement utitlity to convert wide <-> long format.
 # TODO Implement update of categorical features.
-# TODO Improve efficiency of the getter functions.
+# TODO Improve efficiency of the getter/setter functions.
+# In particular, conversion between str <-> integer is very slow
+# (e.g. creating string '1:2' from feature=1, category=2). Until the
+# performance becomes an issue, we can leave as it is. But when necesarry
+# we can think about how to improve it.
 
 # Python imports
 import pandas as pd
