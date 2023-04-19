@@ -13,79 +13,31 @@ from math import floor
 
 
 class InstanceData:
-    def __init__(self, dataset_name: str):
+    def __init__(self, model_parameters):
         """
         The initialization corresponds to the data for the first iteration.
         If there are no iterations (single attack strategy).
 
         dataset_name: 'pharm', or 'house'
         """
-        # e.g., data/pharm
-        self.dataset_directory = "".join(["data/", dataset_name])
-
-    def prepare_instance(
-        self,
-        poison_rate: int,
-        training_samples: int,
-        no_psubsets: int,
-        seed: int,
-    ):
-        """
-        Prepares the instance by creating dataframe, dividing it into poisoning
-        samples and standard samples, defining the sizes of the sets involved
-        in the model, and the regularisation parameter. This depends on the
-        poison rate.
-
-        poison_rate: 4, 8, 12, 16, 20.
-        training_samples: no. training samples chosen from the whole data.
-        N: number of poisoning subsets.
-        seed: seed for different random splits of training, validation and
-        testing sets.
-        """
-
-        self.seed = seed
-
-        # Poisoning parameters
-        self.poison_rate = poison_rate / 100  # 4, 8, 12, 16, or 20
-        # no. of subsets in which the total poison samples (gotten after
-        # applying rate to training data) is divided
-        self.no_psubsets = no_psubsets
         self.regularization = 0.6612244897959183
-
-        # Run all necessary methods
-        self.create_dataframes(training_samples, self.seed)
-        # print('Splitting daframe')
-        # self.split_dataframe()
-        # print('Numerical and categorical split')
-        # self.num_cat_split()
-        # print('Splitting poisoning data')
-        # self.poison_samples()
-        # print("Defining sets")
-
-    def create_dataframes(self, training_samples: int, seed: int):
-        """
-        Creates a dataframe with all the data, which has features and traget as
-        columns, and samples as rows. Numerical columns are integers, while
-        categorical columns are of the form '1:1' for
-        'no.catfeature:no.category'. Response variable is names as 'target'.
-        These files are prepared by preprocessing.
-        """
 
         # Whole dataframe with features as columns and target column,
         # as in file (1,2,3..,1:1,1:2,...,target).
+        dataset_directory = path.join("data", model_parameters["dataset_name"])
         whole_dataframe = pd.read_csv(
-            path.join(self.dataset_directory, "data-binary.csv"), index_col=[0]
+            path.join(dataset_directory, "data-binary.csv"), index_col=[0]
         )
+
+        _cast_column_names_to_int(whole_dataframe, inplace=True)
 
         # Pick fixed number of trainig samples.
         # The indexes are not reset, but randomly shuffled
-        # TODO make same format as test
+        training_samples = model_parameters["training_samples"]
+        seed = model_parameters["seed"]
         self.train_dataframe = whole_dataframe.sample(
             frac=None, n=training_samples, random_state=seed
         )
-
-        # Remove target column
-        self.no_total_features = len(self.train_dataframe.columns) - 1
 
         # Store rest of samples, which will be further divided into testing and
         # validating sets
@@ -94,8 +46,9 @@ class InstanceData:
 
         self.train_dataframe.reset_index(drop=True, inplace=True)
 
+        poison_rate = model_parameters["poison_rate"] / 100
         self.poison_dataframe = self.train_dataframe.sample(
-            frac=self.poison_rate, random_state=self.seed
+            frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
 
     # def split_dataframe(self):
@@ -351,16 +304,30 @@ class InstanceData:
         return len(get_categorical_feature_column_names(self.train_dataframe))
 
     @property
-    def categorical_names(self):
+    def numerical_feature_names(self):
+        return get_numerical_feature_column_names(self.train_dataframe)
+
+    @property
+    def categorical_feature_names(self):
         return get_categorical_feature_names(self.train_dataframe)
 
     @property
-    def categories_dict(self):
+    def categories_in_categorical_feature(self):
         return get_categorical_feature_to_categories(self.train_dataframe)
 
     @property
-    def no_categories_dict(self):
+    def no_categories_in_categorical_feature(self):
         return get_categorical_feature_to_no_categories(self.train_dataframe)
+
+    @property
+    def no_categories_dict(self):
+        import warnings
+
+        warnings.warn(
+            "no_categories_dict is deprecated. Use no_categories_in_categorical_feature",
+            stacklevel=2,
+        )
+        return self.no_categories_in_categorical_feature
 
     def update_data(self, iteration: int, new_x_poison_num: pd.DataFrame):
         """
@@ -451,7 +418,7 @@ def get_numerical_feature_column_names(df):
     ...     "target": [ 6,  7,  8],
     ... })
     >>> get_numerical_feature_column_names(df)
-    ['1', '2']
+    [1, 2]
 
     Parameters
     ----------
@@ -459,9 +426,9 @@ def get_numerical_feature_column_names(df):
 
     Returns
     -------
-    names : list
+    names : list[int]
     """
-    return [x for x in df.columns if ":" not in x and x != "target"]
+    return [int(x) for x in df.columns if ":" not in str(x) and x != "target"]
 
 
 def get_categorical_feature_column_names(df):
@@ -488,9 +455,9 @@ def get_categorical_feature_column_names(df):
 
     Returns
     -------
-    names : list
+    names : list[str]
     """
-    return [x for x in df.columns if ":" in x]
+    return [x for x in df.columns if ":" in str(x)]
 
 
 def get_categorical_feature_names(df):
@@ -509,7 +476,7 @@ def get_categorical_feature_names(df):
     ...     "target": [ 6,  7,  8],
     ... })
     >>> get_categorical_feature_names(df)
-    ['1', '2']
+    [1, 2]
 
     Parameters
     ----------
@@ -517,10 +484,11 @@ def get_categorical_feature_names(df):
 
     Returns
     -------
-    names : list
+    names : list[int]
     """
+    df = _cast_column_names_to_int(df)
     return sorted(
-        set([x.split(":")[0] for x in get_categorical_feature_column_names(df)])
+        set([int(x.split(":")[0]) for x in get_categorical_feature_column_names(df)])
     )
 
 
@@ -548,8 +516,9 @@ def get_categorical_feature_to_categories(df):
 
     Returns
     -------
-    names : list
+    names : dict[int, list[int]]
     """
+    df = _cast_column_names_to_int(df)
     out = dict()
     for column_name in get_categorical_feature_column_names(df):
         feature, category = map(int, column_name.split(":"))
@@ -582,8 +551,9 @@ def get_categorical_feature_to_no_categories(df):
 
     Returns
     -------
-    names : list
+    names : dict[int, int]
     """
+    df = _cast_column_names_to_int(df)
     dct = get_categorical_feature_to_categories(df)
     return {k: len(v) for k, v in dct.items()}
 
@@ -625,12 +595,15 @@ def get_numerical_features(df, unstack):
     -------
     res : pandas.DataFrame
     """
+    df = _cast_column_names_to_int(df)
     df = df[get_numerical_feature_column_names(df)]
     if not unstack:
         return df
     df = df.unstack()
     df = df.reset_index()
     df = df.rename(columns={"level_0": "feature", "level_1": "sample"})
+    df["feature"] = df["feature"].astype(int)
+    df["sample"] = df["sample"].astype(int)
     df = df.set_index(["sample", "feature"])[0]
     df = df.sort_index()
     return df
@@ -692,6 +665,9 @@ def get_categorical_features(df, unstack):
     # df.name = "value"
     df = df.reset_index()
     df[["feature", "category"]] = df.iloc[:, 0].str.split(":", expand=True).astype(int)
+    df["sample"] = df["sample"].astype(int)
+    df["feature"] = df["feature"].astype(int)
+    df["category"] = df["category"].astype(int)
     df = df.drop(columns=df.columns[0])
     df = df.set_index(keys=["sample", "feature", "category"]).iloc[:, 0]
     df = df.sort_index()
@@ -726,3 +702,19 @@ def get_targets(df):
     res : pandas.Series
     """
     return df["target"]
+
+
+def _cast_column_names_to_int(df, inplace=False):
+    if inplace:
+        out = df
+    else:
+        out = df.copy()
+    out.columns = map(_cast_to_int_if_possible, out.columns)
+    return out
+
+
+def _cast_to_int_if_possible(x):
+    try:
+        return int(x)
+    except ValueError:
+        return x

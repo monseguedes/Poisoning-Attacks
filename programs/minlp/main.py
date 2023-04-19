@@ -29,15 +29,7 @@ model_parameters = {
 
 import model.pyomo_instance_class as benchmark_data
 
-instance_data = benchmark_data.InstanceData(
-    dataset_name=model_parameters["dataset_name"]
-)
-instance_data.prepare_instance(
-    poison_rate=model_parameters["poison_rate"],
-    training_samples=model_parameters["training_samples"],
-    no_psubsets=model_parameters["no_psubsets"],
-    seed=model_parameters["seed"],
-)
+instance_data = benchmark_data.InstanceData(model_parameters)
 
 np.testing.assert_equal(
     instance_data.get_num_x_train_dataframe(unstack=True).shape, (150,)
