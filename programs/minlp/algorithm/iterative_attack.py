@@ -324,7 +324,7 @@ class IterativeAttackModel(pmo.block):
             self.poison_data_is_removed[k].value = int(v == self.POISON_DATA_REMOVED)
         self.no_poison_samples_in_model.value = np.sum(flag != self.POISON_DATA_REMOVED)
 
-        iter = instance_data.get_num_x_poison_dataframe().to_dict().items()
+        iter = instance_data.get_num_x_poison_dataframe().items()
         for k, v in iter:
             if flag[k[0]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_num[k].unfix()

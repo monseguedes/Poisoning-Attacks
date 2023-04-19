@@ -60,6 +60,12 @@ class InstanceData:
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
 
+        # TODO Define attributes related to column information, and remove corresponding property.
+        # You dont have to remove ones related to rows, such as number of training data, since
+        # we may updage dataframe later.
+        self.no_numfeatures = len(get_numerical_feature_column_names(self.train_dataframe))
+        self.no_catfeatures = len(get_categorical_feature_column_names(self.train_dataframe))
+
     def get_numerical_columns(self):
         return [
             name
@@ -109,14 +115,6 @@ class InstanceData:
     @property
     def no_poison_samples(self):
         return len(self.poison_dataframe)
-
-    @property
-    def no_numfeatures(self):
-        return len(get_numerical_feature_column_names(self.train_dataframe))
-
-    @property
-    def no_catfeatures(self):
-        return len(get_categorical_feature_column_names(self.train_dataframe))
 
     @property
     def numerical_feature_names(self):
@@ -385,13 +383,7 @@ def get_numerical_features(df, wide=False):
     df = df[get_numerical_feature_column_names(df)]
     if wide:
         return df
-    df = df.unstack()
-    df = df.reset_index()
-    df = df.rename(columns={"level_0": "feature", "level_1": "sample"})
-    df["feature"] = df["feature"].astype(int)
-    df["sample"] = df["sample"].astype(int)
-    df = df.set_index(["sample", "feature"])[0]
-    df = df.sort_index()
+    df = make_vertical_numerical_dataframe(df)
     return df
 
 
@@ -446,17 +438,7 @@ def get_categorical_features(df, wide=False):
     df = df[get_categorical_feature_column_names(df)]
     if wide:
         return df
-    # The first index makes le
-    df.index.name = "sample"
-    df = df.unstack()
-    df = df.reset_index()
-    df[["feature", "category"]] = df.iloc[:, 0].str.split(":", expand=True).astype(int)
-    df["sample"] = df["sample"].astype(int)
-    df["feature"] = df["feature"].astype(int)
-    df["category"] = df["category"].astype(int)
-    df = df.drop(columns=df.columns[0])
-    df = df.set_index(keys=["sample", "feature", "category"]).iloc[:, 0]
-    df = df.sort_index()
+    df = make_vertical_categorical_dataframe(df)
     return df
 
 
@@ -488,6 +470,126 @@ def get_targets(df):
     res : pandas.Series
     """
     return df["target"]
+
+def make_vertical_numerical_dataframe(df):
+    """Make dataframe vertical
+    
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ... })
+
+    >>> make_vertical_numerical_dataframe(df)
+    sample  feature
+    0       1          0
+            2          3
+    1       1          1
+            2          4
+    2       1          2
+            2          5
+    Name: 0, dtype: int64
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    res : pandas.DataFrame
+    """
+    df = df.unstack()
+    df = df.reset_index()
+    df = df.rename(columns={"level_0": "feature", "level_1": "sample"})
+    df["feature"] = df["feature"].astype(int)
+    df["sample"] = df["sample"].astype(int)
+    df = df.set_index(["sample", "feature"])[0]
+    df = df.sort_index()
+    return df
+
+def make_horizontal_numerical_dataframe(df):
+    """Make dataframe horizontal
+    
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ... })
+
+    >>> pd.DataFrame({
+    ...     "feature": [1, 2, 1, 2, 1, 2],
+    ...     "sample": ["0", "0", "1", "1", "2", "2"],
+    ... })
+
+    >>> make_vertical_numerical_dataframe(df)
+    sample  feature
+    0       1          0
+            2          3
+    1       1          1
+            2          4
+    2       1          2
+            2          5
+    Name: 0, dtype: int64
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    res : pandas.DataFrame
+    """
+    raise NotImplementedError
+
+def make_vertical_categorical_dataframe(df):
+    """Make dataframe vertical
+    
+    >>> df = pd.DataFrame({
+    ...     "1:1":    [ 1,  0,  1],
+    ...     "1:2":    [ 0,  1,  0],
+    ...     "2:1":    [ 0,  0,  0],
+    ...     "2:2":    [ 0,  1,  0],
+    ...     "2:3":    [ 1,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+
+    >>> get_categorical_features(df)
+    sample  feature  category
+    0       1        1           1
+                     2           0
+            2        1           0
+                     2           0
+                     3           1
+    1       1        1           0
+                     2           1
+            2        1           0
+                     2           1
+                     3           0
+    2       1        1           1
+                     2           0
+            2        1           0
+                     2           0
+                     3           1
+    Name: 0, dtype: int64
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    res : pandas.DataFrame
+    """
+    # The first index makes le
+    df.index.name = "sample"
+    df = df.unstack()
+    df = df.reset_index()
+    df[["feature", "category"]] = df.iloc[:, 0].str.split(":", expand=True).astype(int)
+    df["sample"] = df["sample"].astype(int)
+    df["feature"] = df["feature"].astype(int)
+    df["category"] = df["category"].astype(int)
+    df = df.drop(columns=df.columns[0])
+    df = df.set_index(keys=["sample", "feature", "category"]).iloc[:, 0]
+    df = df.sort_index()
+    return df
 
 
 def _cast_column_names_to_int(df, inplace=False):
