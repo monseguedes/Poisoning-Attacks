@@ -5,11 +5,6 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
-# TODO Implement utitlity to check the results with scikitlearn.
-# Maybe the function take model_parameters, instance_data, and a solution
-# returned from IterativeAttackModel.get_solution, run ridge regression and
-# compare the coefficients.
-
 import sys
 
 sys.path.append("./programs/minlp/model")
@@ -19,6 +14,7 @@ import model.model_class as model
 from algorithm.solution_approaches import *
 from solutions_handler.regression_comparison import *
 from algorithm import iterative_attack
+from algorithm import ridge_regression
 
 import numpy as np
 
@@ -75,6 +71,12 @@ instance_data = pyomo_instance_class.InstanceData(model_parameters)
 benchmark_model, benchmark_instance, benchmark_solution = iterative_attack.run(
     model_parameters, checking_bilevel=False
 )
+
+# TODO Implement utitlity to check the results with scikitlearn.
+# Maybe the function take model_parameters, instance_data, and a solution
+# returned from IterativeAttackModel.get_solution, run ridge regression and
+# compare the coefficients.
+ridge_regression.run(model_parameters, benchmark_instance, benchmark_solution)
 raise SystemExit
 (
     bilevel_model,
