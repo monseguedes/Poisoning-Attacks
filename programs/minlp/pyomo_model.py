@@ -340,6 +340,17 @@ class PyomoModel(pmo.block):
                 _x_poison_num.loc[k] = v.value
                 if not v.is_fixed():
                     _optimized_x_poison_num.loc[k] = v.value
+            index = pd.MultiIndex(
+                levels=[[], [], []],
+                codes=[[], [], []],
+                names=["sample", "feature", "category"],
+            )
+            _x_poison_cat = pd.Series(index=index)
+            _optimized_x_poison_cat = pd.Series(index=index)
+            for k, v in self.x_poison_cat.items():
+                _x_poison_cat.loc[k] = v.value
+                if not v.is_fixed():
+                    _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.Series()
             for k, v in self.weights_num.items():
                 _weights_num[k] = v.value
@@ -357,6 +368,13 @@ class PyomoModel(pmo.block):
                 _x_poison_num.loc[k] = v.value
                 if not v.is_fixed():
                     _optimized_x_poison_num.loc[k] = v.value
+            _x_poison_cat = pd.DataFrame()
+            _optimized_x_poison_cat = pd.DataFrame()
+            for k, v in self.x_poison_cat.items():
+                # TODO
+                _x_poison_cat.loc[k] = v.value
+                if not v.is_fixed():
+                    _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.DataFrame()
             for k, v in self.weights_num.items():
                 _weights_num[k] = [v.value]
@@ -372,6 +390,8 @@ class PyomoModel(pmo.block):
         return {
             "x_poison_num": _x_poison_num,
             "optimized_x_poison_num": _optimized_x_poison_num,
+            "x_poison_cat": _x_poison_cat,
+            "optimized_x_poison_cat": _optimized_x_poison_cat,
             "weights_num": _weights_num,
             "weights_cat": _weights_cat,
             "bias": self.bias.value,
