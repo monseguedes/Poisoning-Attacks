@@ -158,11 +158,15 @@ class InstanceData:
             for index, row in df.items():
                 self.poison_dataframe.loc[index] = row
         else:
-            for index, row in iter:
-                self.poison_dataframe[index] = row
+            raise NotImplementedError
 
     def update_categorical_features(self, df):
-        raise NotImplementedError
+        if isinstance(df, pd.Series):
+            for index, row in df.items():
+                # TODO Avoid making string as a column name.
+                self.poison_dataframe.loc[index[0], f"{index[1]}:{index[2]}"] = row
+        else:
+            raise NotImplementedError
 
 
 def get_numerical_feature_column_names(df):
