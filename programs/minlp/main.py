@@ -13,28 +13,28 @@ import ridge_regression
 import iterative_attack
 
 config = {
-    # Dataset 
+    # Dataset
     "dataset_name": "5num5cat",
     "training_samples": 30,
-    "poison_rate": 12,  
+    "poison_rate": 12,
     "seed": 3,
-    # Problem 
+    # Problem
     "function": "MSE",
     "regularization": 0.6612244897959183,
     "solver_name": "",
-    #Solvers
+    # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
     "time_limit": 20,
     # Numerical attack
-    "no_psubsets": 3,
-    "iterative_attack_n_epochs": 1,
+    "numerical_attack_n_epochs": 1,
     "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
-    # Gurobi attack
-    "categorical_subset_size": 1,
-    "no_nfeatures": 0,
-    "no_cfeatures": 5,
+    # Categorical attack
+    "categorical_attack_n_epochs": 1,
+    "categorical_attack_mini_batch_size": 0.1,
+    "categorical_attack_no_nfeatures": 0,
+    "categorical_attack_no_cfeatures": 5,
     # Solutions
     "datatype": "test",
 }
@@ -55,17 +55,24 @@ instance_data = instance_data_class.InstanceData(config)
 
 numerical_model = None
 
-_, instance_data, regression_parameters = iterative_attack.run(config, instance_data, numerical_model)
+_, instance_data, regression_parameters = iterative_attack.run(
+    config, instance_data, numerical_model
+)
 
-# Only optimize numerical and categorical.
-numerical_model, instance_data, regression_parameters = numerical_attack.run(config, instance_data, numerical_model)
-# Optimize numerical and categorical.
-categorical_model = None
-categorical_model, instance_data, regression_parameters = categorical_attack.run(config, instance_data, categorical_model)
+# # Only optimize numerical and categorical.
+# numerical_model, instance_data, regression_parameters = numerical_attack.run(
+#     config, instance_data, numerical_model
+# )
+# # Optimize numerical and categorical.
+# categorical_model = None
+# categorical_model, instance_data, regression_parameters = categorical_attack.run(
+#     config, instance_data, categorical_model
+# )
 
 
 # Run the utitlity to check the results with scikitlearn.
 scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
+
 
 def assert_solutions_are_close(sol1, sol2):
     def flatten(x):

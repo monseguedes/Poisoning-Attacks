@@ -12,7 +12,7 @@ short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model = None):
+def run(config, instance_data, model=None):
     """Run iterative attack which which poison training data row by row
 
     This is a hueristic to optimize numerical features row by row using IPOPT.
@@ -47,7 +47,7 @@ def run(config, instance_data, model = None):
     else:
         model.update_parameters(instance_data)
 
-    n_epochs = config["iterative_attack_n_epochs"]
+    n_epochs = config["numerical_attack_n_epochs"]
     mini_batch_size = config["iterative_attack_mini_batch_size"]
 
     incremental = config["iterative_attack_incremental"]

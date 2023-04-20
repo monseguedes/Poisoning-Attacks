@@ -172,7 +172,7 @@ class PyomoModel(pmo.block):
         model
         """
         print("Building SOS contraints")
-        if self.solver_name != 'ipopt':
+        if self.solver_name != "ipopt":
             self.sos_constraints = pmo.constraint_dict()
             for psample in range(instance_data.no_poison_samples):
                 for cat_feature in instance_data.categorical_feature_names:
@@ -322,7 +322,10 @@ class PyomoModel(pmo.block):
         -------
         solution : dict
         """
-        return {**self.get_regression_model_parameters(wide=wide), **self.get_poison_data(wide=wide)}
+        return {
+            **self.get_regression_model_parameters(wide=wide),
+            **self.get_poison_data(wide=wide),
+        }
 
     def get_poison_data(self, wide=False, only_optimized=False):
         """Retrieve solutions

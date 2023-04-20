@@ -16,6 +16,7 @@ This script creates the class with all the data that is then given to the benckm
 
 import copy
 from os import path
+import choosing_features
 
 import pandas as pd
 
@@ -68,6 +69,9 @@ class InstanceData:
         self.no_catfeatures = len(
             get_categorical_feature_column_names(self.train_dataframe)
         )
+        self.no_chosen_numerical_features = config["categorical_attack_no_nfeatures"]  
+        self.no_chosen_categorical_features = config["categorical_attack_no_cfeatures"]
+        
 
     def copy(self):
         """Return a deepcopy of self"""
@@ -142,6 +146,14 @@ class InstanceData:
     @property
     def no_categories_in_categorical_feature(self):
         return get_categorical_feature_to_no_categories(self.train_dataframe)
+    
+    @property
+    def chosen_numerical_feature_names(self):
+        return get_chosen_numerical_feature_names(self.train_dataframe, self.no_chosen_numerical_features) # TODO how do I add config here
+    
+    @property
+    def chosen_categorical_feature_names(self):
+        return get_chosen_categorical_feature_names(self.train_dataframe, self.no_chosen_categorical_features) # TODO how do I add config here
 
     @property
     def no_categories_dict(self):
@@ -607,6 +619,71 @@ def make_vertical_categorical_dataframe(df):
     df = df.set_index(keys=["sample", "feature", "category"]).iloc[:, 0]
     df = df.sort_index()
     return df
+
+
+def get_chosen_numerical_feature_names(df, no_chosen_numerical_features):
+    """Extract the column names of chosen numerical features
+
+    Examples #TODO how do I add more input
+    --------
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ...     "1:1":    [ 1,  0,  0],
+    ...     "1:2":    [ 0,  1,  0],
+    ...     "2:1":    [ 0,  0,  1],
+    ...     "2:2":    [ 0,  1,  0],
+    ...     "2:3":    [ 0,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> get_numerical_feature_column_names(df)
+    [1, 2]
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    names : list[int]
+    """
+    chosen_numerical = choosing_features.LASSOdataframe(df).get_features_lists(
+        no_chosen_numerical_features, 0
+    )[0]
+
+    return chosen_numerical
+
+def get_chosen_categorical_feature_names(df, no_chosen_categorical_features):
+    """Extract the column names of chosen numerical features
+
+    Examples #TODO how do I add more input
+    --------
+    >>> df = pd.DataFrame({
+    ...     "1":      [ 0,  1,  2],
+    ...     "2":      [ 3,  4,  5],
+    ...     "1:1":    [ 1,  0,  0],
+    ...     "1:2":    [ 0,  1,  0],
+    ...     "2:1":    [ 0,  0,  1],
+    ...     "2:2":    [ 0,  1,  0],
+    ...     "2:3":    [ 0,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> get_numerical_feature_column_names(df)
+    [1, 2]
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+
+    Returns
+    -------
+    names : list[int]
+    """
+    chosen_categorical = choosing_features.LASSOdataframe(df).get_features_lists(
+        0, no_chosen_categorical_features
+    )[1]
+
+    return chosen_categorical
 
 
 def _cast_column_names_to_int(df, inplace=False):

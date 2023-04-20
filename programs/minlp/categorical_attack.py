@@ -32,7 +32,7 @@ def run(config, instance_data, model=None):
     config = copy.deepcopy(config)
     instance_data = instance_data.copy()
 
-    print('\n' + "*" * long_space)
+    print("\n" + "*" * long_space)
     print("CATEGORICAL ATTACK STRATEGY")
     print("*" * long_space)
 
@@ -45,11 +45,11 @@ def run(config, instance_data, model=None):
     else:
         model.update_parameters(instance_data)
 
-    n_epochs = config["iterative_attack_n_epochs"]
+    n_epochs = config["categorical_attack_n_epochs"]
 
     no_poison_samples = instance_data.no_poison_samples
 
-    objective_list = []
+    objective_list = []  # TODO where used?
 
     counter = 0
 
@@ -59,9 +59,17 @@ def run(config, instance_data, model=None):
     O = model.POISON_DATA_OPTIMIZED
     R = model.POISON_DATA_REMOVED
 
+    # We want to solve for a subset of numerical features given by config['categorical_attack_no_nfeatures'],
+    # and a subset of categorical ones, given by config['categorical_attack_no_cfeatures']. But for categorical
+    # ones we want to iterate over a subset of batches.
+
     for epoch in range(n_epochs):
         for poison_sample_index in range(no_poison_samples):
-            for categorical_feature_name in instance_data.categorical_feature_names:
+            for (
+                categorical_feature_name
+            ) in (
+                instance_data.chosen_categorical_feature_names
+            ):  # TODO change this for selection
                 num_feature_flag = F
                 shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
                 cat_feature_flag = np.full(shape, F)

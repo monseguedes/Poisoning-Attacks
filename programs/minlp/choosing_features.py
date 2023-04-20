@@ -21,15 +21,26 @@ def create_dataframe(name: str):
 
     dataframe = pd.read_csv(path, index_col=0)
 
-    categorical_columns = [name for name in dataframe.columns if ':' in name]   # Names of categorical columns
-    categorical_names = set([name.split(':')[0] for name in categorical_columns])   # Names of unique categorical features
-    categories_dict = {cat_name : [category.split(':')[1] for category in categorical_columns if category.startswith(cat_name + ':')] for cat_name in categorical_names}
+    categorical_columns = [
+        name for name in dataframe.columns if ":" in name
+    ]  # Names of categorical columns
+    categorical_names = set(
+        [name.split(":")[0] for name in categorical_columns]
+    )  # Names of unique categorical features
+    categories_dict = {
+        cat_name: [
+            category.split(":")[1]
+            for category in categorical_columns
+            if category.startswith(cat_name + ":")
+        ]
+        for cat_name in categorical_names
+    }
 
     # Check that all have at least one 1.
     check = []
     for catfeature, categories in categories_dict.items():
         df = dataframe
-        df_columns = [catfeature + ':' + category for category in categories]
+        df_columns = [catfeature + ":" + category for category in categories]
         has_one = df[df_columns].eq(1).any(axis=1).all()
         check.append(has_one)
     print(np.all(check))
@@ -154,7 +165,7 @@ class LASSOdataframe:
                 categorical_features = {
                     key: abs(value)
                     for key, value in self.coeffs_used_features.items()
-                    if ":" in key
+                    if isinstance(key, str) and ":" in key
                 }
                 for key, value in categorical_features.items():
                     key_type = int(key.split(":")[0])
@@ -233,7 +244,7 @@ class LASSOdataframe:
         whole_dataframe.to_csv(os.path.join(directory, "data-binary.csv"))
 
 
-dataframe = create_dataframe("house")
-model = LASSOdataframe(dataframe)
-model.get_features_lists(5, 5)
-model.save_new_dataframe()
+# dataframe = create_dataframe("house")
+# model = LASSOdataframe(dataframe)
+# model.get_features_lists(5, 5)
+# model.save_new_dataframe()

@@ -36,7 +36,7 @@ def run(config, instance_data, model=None):
     config = copy.deepcopy(config)
     instance_data = instance_data.copy()
 
-    print('\n' + "*" * long_space)
+    print("\n" + "*" * long_space)
     print("ITERATIVE ATTACK HEURISTIC")
     print("*" * long_space)
 
@@ -52,12 +52,16 @@ def run(config, instance_data, model=None):
 
     config["solver_name"] = "ipopt"
     numerical_model = None
-    numerical_model, instance_data, regression_parameters = numerical_attack.run(config, instance_data, numerical_model)
+    numerical_model, instance_data, regression_parameters = numerical_attack.run(
+        config, instance_data, numerical_model
+    )
 
     # Run categorical attack TODO improve categorical attack
     config["solver_name"] = "gurobi"
     categorical_model = None
-    categorical_model, instance_data, regression_parameters = categorical_attack.run(config, instance_data, categorical_model)
+    categorical_model, instance_data, regression_parameters = categorical_attack.run(
+        config, instance_data, categorical_model
+    )
 
     # TODO printing of solutions
 
