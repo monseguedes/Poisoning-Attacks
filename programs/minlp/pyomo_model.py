@@ -314,19 +314,72 @@ class PyomoModel(pmo.block):
             mse = objective
         return mse
 
-    def get_solution(self, wide=False, only_optimized=False):
+    def get_poison_data(self, wide=False, only_optimized=False):
         """Retrieve solutions
 
         This returns a solution as a dict with the following items.
 
         - x_poison_num: pd.Series or pd.DataFrame
-            Numerical features of poisoned data including fixed ones
-        - optimized_x_poison_num: pd.DataFrame, optional
-            Numerical features of poisoned data excluding fixed ones
+            Numerical features of poisoned data. If `only_optimized` is
+            True, this excludes fixed nor moreved ones. Otherwise, this
+            contains fixed ones.
         - x_poison_cat: pd.Series or pd.DataFrame
-            Categorical features of poisoned data including fixed ones
-        - optimized_x_poison_cat: pd.DataFrame, optional
-            Categorical features of poisoned data excluding fixed ones
+            Categorical features of poisoned data. If `only_optimized` is
+            True, this excludes fixed nor moreved ones. Otherwise, this
+            contains fixed ones.
+
+        Parameters
+        ----------
+        wide : bool, default False
+            Control the format of the output.
+        only_optimized : bool, default False
+
+        Returns
+        -------
+        solution : dict
+        """
+        if not wide:
+            # TODO Simplify the construction of dataframes and series.
+            # TODO Exrract logic to build solutions and reuse from ridge regression.
+            # To make long format dataframes.
+            index = pd.MultiIndex(
+                levels=[[], []], codes=[[], []], names=["sample", "feature"]
+            )
+            _x_poison_num = pd.Series(index=index)
+            for k, v in self.x_poison_num.items():
+                if (not only_optimized) or (not v.is_fixed()):
+                    _x_poison_num.loc[k] = v.value
+            index = pd.MultiIndex(
+                levels=[[], [], []],
+                codes=[[], [], []],
+                names=["sample", "feature", "category"],
+            )
+            _x_poison_cat = pd.Series(index=index)
+            for k, v in self.x_poison_cat.items():
+                if (not only_optimized) or (not v.is_fixed()):
+                    _x_poison_cat.loc[k] = v.value
+        else:
+            # To make wide fromat dataframes.
+            _x_poison_num = pd.DataFrame()
+            for k, v in self.x_poison_num.items():
+                if (not only_optimized) or (not v.is_fixed()):
+                    _x_poison_num.loc[k] = v.value
+            _x_poison_cat = pd.DataFrame()
+            for k, v in self.x_poison_cat.items():
+                # TODO
+                if (not only_optimized) or (not v.is_fixed()):
+                    _x_poison_cat.loc[k] = v.value
+        out = {
+            "x_poison_num": _x_poison_num,
+            "x_poison_cat": _x_poison_cat,
+        }
+        return out
+
+    def get_solution(self, wide=False):
+        """Retrieve solutions
+
+        This returns a solution as a dict with the following items.
+
         - weights_num: pd.Series or pd.DataFrame
         - weights_cat: pd.Series or pd.DataFrame
         - bias: float
@@ -352,23 +405,6 @@ class PyomoModel(pmo.block):
             index = pd.MultiIndex(
                 levels=[[], []], codes=[[], []], names=["sample", "feature"]
             )
-            _x_poison_num = pd.Series(index=index)
-            _optimized_x_poison_num = pd.Series(index=index)
-            for k, v in self.x_poison_num.items():
-                _x_poison_num.loc[k] = v.value
-                if only_optimized and not v.is_fixed():
-                    _optimized_x_poison_num.loc[k] = v.value
-            index = pd.MultiIndex(
-                levels=[[], [], []],
-                codes=[[], [], []],
-                names=["sample", "feature", "category"],
-            )
-            _x_poison_cat = pd.Series(index=index)
-            _optimized_x_poison_cat = pd.Series(index=index)
-            for k, v in self.x_poison_cat.items():
-                _x_poison_cat.loc[k] = v.value
-                if only_optimized and not v.is_fixed():
-                    _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.Series()
             for k, v in self.weights_num.items():
                 _weights_num[k] = v.value
@@ -380,19 +416,6 @@ class PyomoModel(pmo.block):
                 _weights_cat.loc[k] = v.value
         else:
             # To make wide fromat dataframes.
-            _x_poison_num = pd.DataFrame()
-            _optimized_x_poison_num = pd.DataFrame()
-            for k, v in self.x_poison_num.items():
-                _x_poison_num.loc[k] = v.value
-                if only_optimized and not v.is_fixed():
-                    _optimized_x_poison_num.loc[k] = v.value
-            _x_poison_cat = pd.DataFrame()
-            _optimized_x_poison_cat = pd.DataFrame()
-            for k, v in self.x_poison_cat.items():
-                # TODO
-                _x_poison_cat.loc[k] = v.value
-                if only_optimized and not v.is_fixed():
-                    _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.DataFrame()
             for k, v in self.weights_num.items():
                 _weights_num[k] = [v.value]
@@ -406,17 +429,12 @@ class PyomoModel(pmo.block):
         else:
             mse = objective
         out = {
-            "x_poison_num": _x_poison_num,
-            "x_poison_cat": _x_poison_cat,
             "weights_num": _weights_num,
             "weights_cat": _weights_cat,
             "bias": self.bias.value,
             "objective": objective,
             "mse": mse,
         }
-        if only_optimized:
-            out["optimized_x_poison_num"] = _optimized_x_poison_num
-            out["optimized_x_poison_cat"] = _optimized_x_poison_cat
         return out
 
     def update_data(self, *args, **kwargs):
@@ -427,20 +445,18 @@ class PyomoModel(pmo.block):
         """Create a new data_instance updated with current solution"""
         return self._update_data(*args, **kwargs, inplace=False)
 
-    def _update_data(self, instance_data, numerical=True, categorical=True, inplace=False):
+    def _update_data(
+        self, instance_data, numerical=True, categorical=True, inplace=False
+    ):
         if inplace:
             out = instance_data
         else:
             out = instance_data.copy()
-        solution = self.get_solution(only_optimized=True)
+        solution = self.get_poison_data(only_optimized=True)
         if numerical:
-            out.update_numerical_features(
-                solution["optimized_x_poison_num"]
-            )
+            out.update_numerical_features(solution["x_poison_num"])
         if categorical:
-            out.update_categorical_features(
-                solution["optimized_x_poison_cat"]
-            )
+            out.update_categorical_features(solution["x_poison_cat"])
         return out
 
 
