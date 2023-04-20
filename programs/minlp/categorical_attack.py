@@ -12,7 +12,7 @@ short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data):
+def run(config, instance_data, model=None):
     """Run categorical attack which poison categorical data
 
     This is a hueristic to poison categorical features using gurobi.
@@ -40,7 +40,11 @@ def run(config, instance_data):
     if not config.get("solver_name"):
         config["solver_name"] = "gurobi"
     np.testing.assert_equal(config["solver_name"], "gurobi")
-    model = pyomo_model.PyomoModel(instance_data, config)
+
+    if model is None:
+        model = pyomo_model.PyomoModel(instance_data, config)
+    else:
+        model.update_parameters(instance_data)
 
     n_epochs = config["iterative_attack_n_epochs"]
 

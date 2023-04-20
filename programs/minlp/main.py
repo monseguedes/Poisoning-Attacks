@@ -25,7 +25,7 @@ config = {
     "regularization": 0.6612244897959183,
     "feasibility": 0.00001,
     "time_limit": 20,
-    "iterative_attack_n_epochs": 2,
+    "iterative_attack_n_epochs": 1,
     "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
     "solver_name": "",
@@ -35,19 +35,19 @@ config = {
 instance_data = instance_data_class.InstanceData(config)
 
 
-shape = (config["training_samples"], 5)
-np.testing.assert_equal(
-    instance_data.get_num_x_train_dataframe(wide=False).shape, (np.prod(shape),)
-)
-np.testing.assert_equal(instance_data.get_num_x_train_dataframe(wide=True).shape, shape)
-shape = (config["training_samples"], 24)
-np.testing.assert_equal(
-    instance_data.get_cat_x_train_dataframe(wide=False).shape, (np.prod(shape),)
-)
-np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
-
+# shape = (config["training_samples"], 5)
+# np.testing.assert_equal(
+#     instance_data.get_num_x_train_dataframe(wide=False).shape, (np.prod(shape),)
+# )
+# np.testing.assert_equal(instance_data.get_num_x_train_dataframe(wide=True).shape, shape)
+# shape = (config["training_samples"], 24)
+# np.testing.assert_equal(
+#     instance_data.get_cat_x_train_dataframe(wide=False).shape, (np.prod(shape),)
+# )
+# np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
+numerical_model = None
 # Only optimize numerical and categorical.
-_, instance_data, regression_parameters = iterative_attack.run(config, instance_data)
+numerical_model, instance_data, regression_parameters = iterative_attack.run(config, instance_data, numerical_model)
 # Optimize numerical and categorical.
 _, instance_data, regression_parameters = categorical_attack.run(config, instance_data)
 

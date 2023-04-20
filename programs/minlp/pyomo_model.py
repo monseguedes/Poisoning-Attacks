@@ -172,21 +172,22 @@ class PyomoModel(pmo.block):
         model
         """
         print("Building SOS contraints")
-        self.sos_constraints = pmo.constraint_dict()
-        for psample in range(instance_data.no_poison_samples):
-            for cat_feature in instance_data.categorical_feature_names:
-                # TODO Check why there are categorical features without any ones.
-                # Once it is fixed, change <= to ==.
-                constraint = pmo.constraint(
-                    sum(
-                        self.x_poison_cat[psample, cat_feature, category]
-                        for category in instance_data.categories_in_categorical_feature[
-                            cat_feature
-                        ]
+        if self.solver_name != 'ipopt':
+            self.sos_constraints = pmo.constraint_dict()
+            for psample in range(instance_data.no_poison_samples):
+                for cat_feature in instance_data.categorical_feature_names:
+                    # TODO Check why there are categorical features without any ones.
+                    # Once it is fixed, change <= to ==.
+                    constraint = pmo.constraint(
+                        sum(
+                            self.x_poison_cat[psample, cat_feature, category]
+                            for category in instance_data.categories_in_categorical_feature[
+                                cat_feature
+                            ]
+                        )
+                        == 1
                     )
-                    <= 1
-                )
-                self.sos_constraints[psample, cat_feature] = constraint
+                    self.sos_constraints[psample, cat_feature] = constraint
 
         print("Building num weights contraints")
         # There is one constraint per feature

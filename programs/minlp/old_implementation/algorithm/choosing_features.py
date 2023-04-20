@@ -21,6 +21,19 @@ def create_dataframe(name: str):
 
     dataframe = pd.read_csv(path, index_col=0)
 
+    categorical_columns = [name for name in dataframe.columns if ':' in name]   # Names of categorical columns
+    categorical_names = set([name.split(':')[0] for name in categorical_columns])   # Names of unique categorical features
+    categories_dict = {cat_name : [category.split(':')[1] for category in categorical_columns if category.startswith(cat_name + ':')] for cat_name in categorical_names}
+
+    # Check that all have at least one 1.
+    check = []
+    for catfeature, categories in categories_dict.items():
+        df = dataframe
+        df_columns = [catfeature + ':' + category for category in categories]
+        has_one = df[df_columns].eq(1).any(axis=1).all()
+        check.append(has_one)
+    print(np.all(check))
+
     return dataframe
 
 
