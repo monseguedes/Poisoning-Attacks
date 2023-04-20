@@ -179,34 +179,51 @@ class PyomoModel(pmo.block):
         conditions for lower-level variables: weights and bias of regression
         model
         """
+        print("Building SOS contraints")
+        self.sos_constraints = pmo.constraint_dict()
+        for psample in range(instance_data.no_poison_samples):
+            for cat_feature in instance_data.categorical_feature_names:
+                # TODO Check why there are categorical features without any ones.
+                # Once it is fixed, change <= to ==.
+                constraint = pmo.constraint(
+                    sum(
+                        self.x_poison_cat[psample, cat_feature, category]
+                        for category in instance_data.categories_in_categorical_feature[
+                            cat_feature
+                        ]
+                    )
+                    <= 1
+                )
+                self.sos_constraints[psample, cat_feature] = constraint
 
         print("Building num weights contraints")
-        self.cons_first_order_optimality_conditions_num_weights = (
-            pmo.constraint_dict()
-        )  # There is one constraint per feature
+        # There is one constraint per feature
+        self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()
         for numfeature in instance_data.numerical_feature_names:
-            self.cons_first_order_optimality_conditions_num_weights[
-                numfeature
-            ] = pmo.constraint(
+            constraint = pmo.constraint(
                 body=loss_function_derivative_num_weights(
                     instance_data, self, numfeature, self.function
                 ),
                 rhs=0,
             )
+            self.cons_first_order_optimality_conditions_num_weights[
+                numfeature
+            ] = constraint
         print("Building cat weights contraints")
         self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
         for cat_feature in instance_data.categorical_feature_names:
             for category in instance_data.categories_in_categorical_feature[
                 cat_feature
             ]:
-                self.cons_first_order_optimality_conditions_cat_weights[
-                    cat_feature, category
-                ] = pmo.constraint(
+                constraint = pmo.constraint(
                     body=loss_function_derivative_cat_weights(
                         instance_data, self, cat_feature, category, self.function
                     ),
                     rhs=0,
                 )
+                self.cons_first_order_optimality_conditions_cat_weights[
+                    cat_feature, category
+                ] = constraint
 
         print("Building bias constraints")
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(
@@ -256,9 +273,15 @@ class PyomoModel(pmo.block):
             cat_feature_flag,
             (instance_data.no_poison_samples, instance_data.no_catfeatures),
         )
-        _poison_data_is_removed = np.any(num_feature_flag == self.POISON_DATA_REMOVED, axis=1)
-        _poison_data_is_removed |= np.any(cat_feature_flag == self.POISON_DATA_REMOVED, axis=1)
-        np.testing.assert_equal(_poison_data_is_removed.shape, (instance_data.no_poison_samples,))
+        _poison_data_is_removed = np.any(
+            num_feature_flag == self.POISON_DATA_REMOVED, axis=1
+        )
+        _poison_data_is_removed |= np.any(
+            cat_feature_flag == self.POISON_DATA_REMOVED, axis=1
+        )
+        np.testing.assert_equal(
+            _poison_data_is_removed.shape, (instance_data.no_poison_samples,)
+        )
         for k, v in enumerate(_poison_data_is_removed):
             self.poison_data_is_removed[k].value = float(v)
 
