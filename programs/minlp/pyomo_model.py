@@ -56,7 +56,7 @@ class PyomoModel(pmo.block):
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
-        self.opt.options["timelimit"] = config["time_limit"]
+            self.opt.options["timelimit"] = config["time_limit"]
         print("" * 2)
         print("*" * long_space)
         print("CONTINUOUS NONLINEAR MODEL")

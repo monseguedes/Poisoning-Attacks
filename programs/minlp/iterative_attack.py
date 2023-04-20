@@ -67,7 +67,8 @@ def run(config, instance_data):
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
-            # Modify num_feature_flag to specify which one to remove.
+            # Modify num_feature_flag to specify which features are to be
+            # optimized, fixed and removed.
             # model.unfix: 0
             # model.fix: 1
             # model.remove: 2
