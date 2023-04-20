@@ -300,15 +300,33 @@ class PyomoModel(pmo.block):
     def solve(self):
         self.opt.solve(self, load_solutions=True, tee=self.tee)
 
-    def get_solution(self, wide=False):
+    def get_mse(self):
+        """Get the MSE on the training data after poisoning
+
+        Returns
+        -------
+        mse : float
+        """
+        objective = pyo.value(self.objective_function)
+        if self.function == "SLS":
+            mse = objective / len(self.y_train)
+        else:
+            mse = objective
+        return mse
+
+    def get_solution(self, wide=False, only_optimized=False):
         """Retrieve solutions
 
         This returns a solution as a dict with the following items.
 
         - x_poison_num: pd.Series or pd.DataFrame
             Numerical features of poisoned data including fixed ones
-        - optimized_x_poison_num: pd.DataFrame
+        - optimized_x_poison_num: pd.DataFrame, optional
             Numerical features of poisoned data excluding fixed ones
+        - x_poison_cat: pd.Series or pd.DataFrame
+            Categorical features of poisoned data including fixed ones
+        - optimized_x_poison_cat: pd.DataFrame, optional
+            Categorical features of poisoned data excluding fixed ones
         - weights_num: pd.Series or pd.DataFrame
         - weights_cat: pd.Series or pd.DataFrame
         - bias: float
@@ -338,7 +356,7 @@ class PyomoModel(pmo.block):
             _optimized_x_poison_num = pd.Series(index=index)
             for k, v in self.x_poison_num.items():
                 _x_poison_num.loc[k] = v.value
-                if not v.is_fixed():
+                if only_optimized and not v.is_fixed():
                     _optimized_x_poison_num.loc[k] = v.value
             index = pd.MultiIndex(
                 levels=[[], [], []],
@@ -349,7 +367,7 @@ class PyomoModel(pmo.block):
             _optimized_x_poison_cat = pd.Series(index=index)
             for k, v in self.x_poison_cat.items():
                 _x_poison_cat.loc[k] = v.value
-                if not v.is_fixed():
+                if only_optimized and not v.is_fixed():
                     _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.Series()
             for k, v in self.weights_num.items():
@@ -366,14 +384,14 @@ class PyomoModel(pmo.block):
             _optimized_x_poison_num = pd.DataFrame()
             for k, v in self.x_poison_num.items():
                 _x_poison_num.loc[k] = v.value
-                if not v.is_fixed():
+                if only_optimized and not v.is_fixed():
                     _optimized_x_poison_num.loc[k] = v.value
             _x_poison_cat = pd.DataFrame()
             _optimized_x_poison_cat = pd.DataFrame()
             for k, v in self.x_poison_cat.items():
                 # TODO
                 _x_poison_cat.loc[k] = v.value
-                if not v.is_fixed():
+                if only_optimized and not v.is_fixed():
                     _optimized_x_poison_cat.loc[k] = v.value
             _weights_num = pd.DataFrame()
             for k, v in self.weights_num.items():
@@ -387,17 +405,43 @@ class PyomoModel(pmo.block):
             mse = objective / len(self.y_train)
         else:
             mse = objective
-        return {
+        out = {
             "x_poison_num": _x_poison_num,
-            "optimized_x_poison_num": _optimized_x_poison_num,
             "x_poison_cat": _x_poison_cat,
-            "optimized_x_poison_cat": _optimized_x_poison_cat,
             "weights_num": _weights_num,
             "weights_cat": _weights_cat,
             "bias": self.bias.value,
             "objective": objective,
             "mse": mse,
         }
+        if only_optimized:
+            out["optimized_x_poison_num"] = _optimized_x_poison_num
+            out["optimized_x_poison_cat"] = _optimized_x_poison_cat
+        return out
+
+    def update_data(self, *args, **kwargs):
+        """Update instance_data using current solution"""
+        return self._update_data(*args, **kwargs, inplace=True)
+
+    def updated_data(self, *args, **kwargs):
+        """Create a new data_instance updated with current solution"""
+        return self._update_data(*args, **kwargs, inplace=False)
+
+    def _update_data(self, instance_data, numerical=True, categorical=True, inplace=False):
+        if inplace:
+            out = instance_data
+        else:
+            out = instance_data.copy()
+        solution = self.get_solution(only_optimized=True)
+        if numerical:
+            out.update_numerical_features(
+                solution["optimized_x_poison_num"]
+            )
+        if categorical:
+            out.update_categorical_features(
+                solution["optimized_x_poison_cat"]
+            )
+        return out
 
 
 def linear_regression_function(instance_data, model, no_sample):

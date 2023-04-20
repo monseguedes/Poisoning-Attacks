@@ -50,6 +50,8 @@ def run(config, instance_data):
 
     counter = 0
 
+    solution_list = []
+
     F = model.POISON_DATA_FIXED
     O = model.POISON_DATA_OPTIMIZED
     R = model.POISON_DATA_REMOVED
@@ -65,21 +67,18 @@ def run(config, instance_data):
                     instance_data, num_feature_flag, cat_feature_flag
                 )
                 model.solve()
+                model.update_data(instance_data)
                 solution = model.get_solution()
-                instance_data.update_numerical_features(
-                    solution["optimized_x_poison_num"]
-                )
-                instance_data.update_categorical_features(
-                    solution["optimized_x_poison_cat"]
-                )
-                objective_list.append(solution["mse"])
+                solution_list.append(solution)
             if (counter) % 20 == 0:
                 print(f"{'epoch':>5s}  {'row':>5s}  {'mse':>9s}")
             print(f"{epoch:5d}  {poison_sample_index:5d}  {solution['mse']:9.6f}")
             counter += 1
 
     # This will break when objective_list is empty, but maybe it's unlikely
-    out = {"mse": np.array(objective_list)}
+    # This will break when solution_list is empty, but maybe it's unlikely
+    keys = solution_list[0].keys()
+    out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
 
     print("mse in each iteration:")
     print(out["mse"])

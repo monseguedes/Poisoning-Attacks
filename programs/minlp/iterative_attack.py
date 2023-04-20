@@ -88,10 +88,8 @@ def run(config, instance_data):
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
             model.solve()
-            # TODO Implement a method to update data.
-            # model.update_data(instance_data)
+            model.update_data(instance_data)
             solution = model.get_solution()
-            instance_data.update_numerical_features(solution["optimized_x_poison_num"])
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
                 print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
