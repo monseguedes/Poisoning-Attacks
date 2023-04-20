@@ -20,15 +20,7 @@ class PyomoModel(pmo.block):
 
     This is a naive implementation of poisoning attack.
     One can fix some variables, such as categorical features, in the poison data and
-    only optimize the remaining by calling `fix_rows_in_poison_dataframe` etc s.
-
-    ```
-    model = IterativeAttackModel(instance_data, function="MSE")
-    fixed = np.ones(instance_data.no_poison_samples)
-    fixed[0, 1] = 0  # Only optimize the first two rows in the poison data.
-    model.fix_rows_in_poison_dataframe(instance_data, fixed)
-    model.get_solution()['x_poison_num']
-    ```
+    only optimize the remaining by calling `set_poison_data_status`.
     """
 
     POISON_DATA_FIXED = 0
@@ -314,6 +306,23 @@ class PyomoModel(pmo.block):
             mse = objective
         return mse
 
+    def get_solution(self, wide=False):
+        """Retrieve solutions
+
+        This returns all the solution. More precisely, this combines the data
+        returned by get_poison_data and get_regression_model_parameters.
+
+        Parameters
+        ----------
+        wide : bool, default False
+            Control the format of the output.
+
+        Returns
+        -------
+        solution : dict
+        """
+        return {**self.get_regression_model_parameters(wide=wide), **self.get_poison_data(wide=wide)}
+
     def get_poison_data(self, wide=False, only_optimized=False):
         """Retrieve solutions
 
@@ -375,7 +384,7 @@ class PyomoModel(pmo.block):
         }
         return out
 
-    def get_solution(self, wide=False):
+    def get_regression_model_parameters(self, wide=False):
         """Retrieve solutions
 
         This returns a solution as a dict with the following items.

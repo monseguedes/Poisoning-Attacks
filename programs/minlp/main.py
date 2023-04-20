@@ -45,28 +45,14 @@ np.testing.assert_equal(
     instance_data.get_cat_x_train_dataframe(wide=False).shape, (np.prod(shape),)
 )
 np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
-shape = (int(np.ceil(config["training_samples"] * config["poison_rate"] / 100)), 5)
-# np.testing.assert_equal(
-#     instance_data.get_num_x_poison_dataframe(wide=False).shape, (np.prod(shape),)
-# )
-np.testing.assert_equal(
-    instance_data.get_num_x_poison_dataframe(wide=True).shape, shape
-)
-
-# # Solve models
-# bilevel_model, bilevel_instance, bilevel_solution = solve_model('bilevel', config)
-# ridge_model, ridge_instance, ridge_solution = solve_model('ridge', config)
 
 # Only optimize numerical and categorical.
-_, instance_data, solution = iterative_attack.run(config, instance_data)
+_, instance_data, regression_parameters = iterative_attack.run(config, instance_data)
 # Optimize numerical and categorical.
-_, instance_data, solution = categorical_attack.run(config, instance_data)
+_, instance_data, regression_parameters = categorical_attack.run(config, instance_data)
 
 # Run the utitlity to check the results with scikitlearn.
-# Maybe the function take config, instance_data, and a solution
-# returned from IterativeAttackModel.get_solution, run ridge regression and
-# compare the coefficients.
-ridge_regression_solution = ridge_regression.run(config, instance_data)
+scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
 
 def assert_solutions_are_close(sol1, sol2):
@@ -86,5 +72,5 @@ def assert_solutions_are_close(sol1, sol2):
         np.testing.assert_allclose(a, b, rtol=1e-4)
 
 
-assert_solutions_are_close(solution, ridge_regression_solution)
+assert_solutions_are_close(regression_parameters, scikit_learn_regression_parameters)
 print("test passed")
