@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 
-"""Run iterative attack which which poison training data row by row"""
+"""Iterative heuristic attack which poisons both numerical and categorical data"""
 
 import copy
 
 import numpy as np
 import pyomo_model
+import numerical_attack
+import categorical_attack
 
 long_space = 80
 short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model = None):
-    """Run iterative attack which which poison training data row by row
+def run(config, instance_data, model=None):
+    """Run categorical attack which poison categorical data
 
-    This is a hueristic to optimize numerical features row by row using IPOPT.
+    This is a hueristic to poison features using a combunation of
+    locally optimising numerical features using ipots and 'optimising'
+    categorical ones using gurobi.
     The given data is not modified but a copy will be returned.
 
     Parameters
@@ -32,82 +36,34 @@ def run(config, instance_data, model = None):
     config = copy.deepcopy(config)
     instance_data = instance_data.copy()
 
-    # Solve benchmark
-
-    print("" * 2)
-    print("*" * long_space)
-    print("ITERATIVE ATTACK STRATEGY")
+    print('\n' + "*" * long_space)
+    print("ITERATIVE ATTACK HEURISTIC")
     print("*" * long_space)
 
+    # TODO we use both solvers. but ipopts first.
     if not config.get("solver_name"):
         config["solver_name"] = "ipopt"
+    np.testing.assert_equal(config["solver_name"], "ipopt")
 
     if model is None:
         model = pyomo_model.PyomoModel(instance_data, config)
     else:
         model.update_parameters(instance_data)
 
-    n_epochs = config["iterative_attack_n_epochs"]
-    mini_batch_size = config["iterative_attack_mini_batch_size"]
+    config["solver_name"] = "ipopt"
+    numerical_model = None
+    numerical_model, instance_data, regression_parameters = numerical_attack.run(config, instance_data, numerical_model)
 
-    incremental = config["iterative_attack_incremental"]
+    # Run categorical attack TODO improve categorical attack
+    config["solver_name"] = "gurobi"
+    categorical_model = None
+    categorical_model, instance_data, regression_parameters = categorical_attack.run(config, instance_data, categorical_model)
 
-    if incremental and (n_epochs > 1):
-        raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
+    # TODO printing of solutions
 
-    no_poison_samples = instance_data.no_poison_samples
+    solution = categorical_model.get_solution()
 
-    if isinstance(mini_batch_size, int):
-        mini_batch_absolute_size = mini_batch_size
-    else:
-        # mini batch size is specified as a fraction
-        mini_batch_absolute_size = int(no_poison_samples * mini_batch_size)
-    mini_batch_absolute_size = max(mini_batch_absolute_size, 1)
-    breaks = np.arange(0, no_poison_samples, mini_batch_absolute_size)
-    breaks = np.r_[breaks, no_poison_samples]
-    n_mini_batches = len(breaks) - 1
-
-    solution_list = []
-
-    F = model.POISON_DATA_FIXED
-    O = model.POISON_DATA_OPTIMIZED
-    R = model.POISON_DATA_REMOVED
-
-    for epoch in range(n_epochs):
-        for mini_batch_index in range(n_mini_batches):
-            # Modify num_feature_flag to specify which features are to be
-            # optimized, fixed and removed.
-            # model.unfix: 0
-            # model.fix: 1
-            # model.remove: 2
-            num_feature_flag = np.full(instance_data.no_poison_samples, -1)
-            start, stop = breaks[mini_batch_index], breaks[mini_batch_index + 1]
-            num_feature_flag[:start] = F
-            num_feature_flag[start:stop] = O
-            if incremental:
-                num_feature_flag[stop:] = R
-            else:
-                num_feature_flag[stop:] = F
-            model.set_poison_data_status(
-                instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
-            )
-            model.solve()
-            model.update_data(instance_data)
-            solution = model.get_solution()
-            solution_list.append(solution)
-            if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
-                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
-            print(f"{epoch:5d}  " f"{mini_batch_index:5d}  " f"{solution['mse']:9.6f}")
-
-    # This will break when solution_list is empty, but maybe it's unlikely
-    keys = solution_list[0].keys()
-    out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
-
-    print("mse in each iteration:")
-    print(out["mse"])
-    print("improvement from the start (%):")
-    print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
-
+    # TODO what do we do with model
     return model, instance_data, solution
 
 

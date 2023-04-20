@@ -7,29 +7,36 @@ Main script for the paper of poisoning attacks of categorical variables.
 
 import categorical_attack
 import instance_data_class
-import iterative_attack
+import numerical_attack
 import numpy as np
 import ridge_regression
+import iterative_attack
 
 config = {
+    # Dataset 
     "dataset_name": "5num5cat",
-    "no_nfeatures": 0,
-    "no_cfeatures": 5,
-    "poison_rate": 12,
     "training_samples": 30,
+    "poison_rate": 12,  
     "seed": 3,
+    # Problem 
     "function": "MSE",
-    "no_psubsets": 3,
-    "heuristic_subset": 1,
-    "datatype": "test",
     "regularization": 0.6612244897959183,
+    "solver_name": "",
+    #Solvers
+    "solver_output": False,
     "feasibility": 0.00001,
     "time_limit": 20,
+    # Numerical attack
+    "no_psubsets": 3,
     "iterative_attack_n_epochs": 1,
     "iterative_attack_mini_batch_size": 0.1,
     "iterative_attack_incremental": False,
-    "solver_name": "",
-    "solver_output": False,
+    # Gurobi attack
+    "categorical_subset_size": 1,
+    "no_nfeatures": 0,
+    "no_cfeatures": 5,
+    # Solutions
+    "datatype": "test",
 }
 
 instance_data = instance_data_class.InstanceData(config)
@@ -45,15 +52,20 @@ instance_data = instance_data_class.InstanceData(config)
 #     instance_data.get_cat_x_train_dataframe(wide=False).shape, (np.prod(shape),)
 # )
 # np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
+
 numerical_model = None
+
+_, instance_data, regression_parameters = iterative_attack.run(config, instance_data, numerical_model)
+
 # Only optimize numerical and categorical.
-numerical_model, instance_data, regression_parameters = iterative_attack.run(config, instance_data, numerical_model)
+numerical_model, instance_data, regression_parameters = numerical_attack.run(config, instance_data, numerical_model)
 # Optimize numerical and categorical.
-_, instance_data, regression_parameters = categorical_attack.run(config, instance_data)
+categorical_model = None
+categorical_model, instance_data, regression_parameters = categorical_attack.run(config, instance_data, categorical_model)
+
 
 # Run the utitlity to check the results with scikitlearn.
 scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
-
 
 def assert_solutions_are_close(sol1, sol2):
     def flatten(x):

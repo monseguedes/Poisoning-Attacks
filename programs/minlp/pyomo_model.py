@@ -10,8 +10,8 @@ import pyomo.kernel as pmo
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
 
-long_space = 80
-short_space = 60
+long_space = 70
+short_space = 50
 middle_space = long_space
 
 
@@ -50,17 +50,17 @@ class PyomoModel(pmo.block):
             self.bilinear_term_constraint_list = pmo.constraint_list()
             self.opt.options["timelimit"] = config["time_limit"]
         print("" * 2)
-        print("*" * long_space)
-        print("CONTINUOUS NONLINEAR MODEL")
-        print("*" * long_space)
+        print("-" * long_space)
+        print("Building model...")
+        print("-" * long_space)
         self.update_parameters(instance_data, build=True)
         print("*" * short_space)
         self.build_variables(instance_data)
         print("*" * short_space)
         self.build_constraints(instance_data)
-        print("*" * long_space)
+        print("*" * short_space)
         self.build_objective(instance_data)
-        print("*" * long_space)
+        print("*" * short_space)
 
     def prod(self, a, b):
         """Return the product of two expressions"""

@@ -32,8 +32,7 @@ def run(config, instance_data, model=None):
     config = copy.deepcopy(config)
     instance_data = instance_data.copy()
 
-    print("" * 2)
-    print("*" * long_space)
+    print('\n' + "*" * long_space)
     print("CATEGORICAL ATTACK STRATEGY")
     print("*" * long_space)
 
