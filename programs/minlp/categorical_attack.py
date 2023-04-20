@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+
+"""Run iterative attack which poison categorical data"""
+
+import copy
+
+import numpy as np
+import pyomo_model
+
+long_space = 80
+short_space = 60
+middle_space = long_space
+
+
+def run(config, instance_data):
+    """Run categorical attack which poison categorical data
+
+    This is a hueristic to poison categorical features using gurobi.
+    The given data is not modified but a copy will be returned.
+
+    Parameters
+    ----------
+    config : dict
+    instance_data : InstanceData
+
+    Returns
+    -------
+    model : pyomo.block
+    modified_data : InstanceData
+    solution : dict[str, pd.DataFrame]
+    """
+    config = copy.deepcopy(config)
+    instance_data = instance_data.copy()
+
+    print("" * 2)
+    print("*" * long_space)
+    print("CATEGORICAL ATTACK STRATEGY")
+    print("*" * long_space)
+
+    if not config.get("solver_name"):
+        config["solver_name"] = "gurobi"
+    np.testing.assert_equal(config["solver_name"], "gurobi")
+    model = pyomo_model.PyomoModel(instance_data, config)
+
+    n_epochs = config["iterative_attack_n_epochs"]
+
+    no_poison_samples = instance_data.no_poison_samples
+
+    objective_list = []
+
+    counter = 0
+
+    F = model.POISON_DATA_FIXED
+    O = model.POISON_DATA_OPTIMIZED
+    R = model.POISON_DATA_REMOVED
+
+    for epoch in range(n_epochs):
+        for poison_sample_index in range(no_poison_samples):
+            for categorical_feature_name in instance_data.categorical_feature_names:
+                num_feature_flag = F
+                shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
+                cat_feature_flag = np.full(shape, F)
+                cat_feature_flag[poison_sample_index, categorical_feature_name] = O
+                model.set_poison_data_status(
+                    instance_data, num_feature_flag, cat_feature_flag
+                )
+                model.solve()
+                solution = model.get_solution()
+                instance_data.update_numerical_features(
+                    solution["optimized_x_poison_num"]
+                )
+                instance_data.update_categorical_features(
+                    solution["optimized_x_poison_cat"]
+                )
+                objective_list.append(solution["mse"])
+            if (counter) % 20 == 0:
+                print(f"{'epoch':>5s}  {'row':>5s}  {'mse':>9s}")
+            print(f"{epoch:5d}  {poison_sample_index:5d}  {solution['mse']:9.6f}")
+            counter += 1
+
+    # This will break when objective_list is empty, but maybe it's unlikely
+    out = {"mse": np.array(objective_list)}
+
+    print("mse in each iteration:")
+    print(out["mse"])
+    print("improvement from the start (%):")
+    print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
+
+    return model, instance_data, solution
+
+
+if __name__ == "__main__":
+    import doctest
+
+    n_fails, _ = doctest.testmod()
+    if n_fails > 0:
+        raise SystemExit(1)
+
+# vimquickrun: python % && ./vimquickrun.sh
