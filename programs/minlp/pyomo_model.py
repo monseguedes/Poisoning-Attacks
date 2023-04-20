@@ -172,22 +172,19 @@ class PyomoModel(pmo.block):
         model
         """
         print("Building SOS contraints")
-        if self.solver_name != "ipopt":
-            self.sos_constraints = pmo.constraint_dict()
-            for psample in range(instance_data.no_poison_samples):
-                for cat_feature in instance_data.categorical_feature_names:
-                    # TODO Check why there are categorical features without any ones.
-                    # Once it is fixed, change <= to ==.
-                    constraint = pmo.constraint(
-                        sum(
-                            self.x_poison_cat[psample, cat_feature, category]
-                            for category in instance_data.categories_in_categorical_feature[
-                                cat_feature
-                            ]
-                        )
-                        == 1
+        self.sos_constraints = pmo.constraint_dict()
+        for psample in range(instance_data.no_poison_samples):
+            for cat_feature in instance_data.categorical_feature_names:
+                constraint = pmo.constraint(
+                    sum(
+                        self.x_poison_cat[psample, cat_feature, category]
+                        for category in instance_data.categories_in_categorical_feature[
+                            cat_feature
+                        ]
                     )
-                    self.sos_constraints[psample, cat_feature] = constraint
+                    == 1
+                )
+                self.sos_constraints[psample, cat_feature] = constraint
 
         print("Building num weights contraints")
         # There is one constraint per feature
@@ -287,8 +284,10 @@ class PyomoModel(pmo.block):
         for k, v in instance_data.get_cat_x_poison_dataframe().items():
             if cat_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_cat[k].unfix()
+                self.sos_constraints[k[0], k[1]].activate()
             else:
                 self.x_poison_cat[k].fix(v)
+                self.sos_constraints[k[0], k[1]].deactivate()
 
     def solve(self):
         self.opt.solve(self, load_solutions=True, tee=self.tee)
