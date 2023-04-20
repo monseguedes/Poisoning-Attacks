@@ -65,6 +65,10 @@ def run(config, instance_data):
 
     solution_list = []
 
+    F = model.POISON_DATA_FIXED
+    O = model.POISON_DATA_OPTIMIZED
+    R = model.POISON_DATA_REMOVED
+
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
             # Modify num_feature_flag to specify which features are to be
@@ -73,18 +77,13 @@ def run(config, instance_data):
             # model.fix: 1
             # model.remove: 2
             num_feature_flag = np.full(instance_data.no_poison_samples, -1)
-            num_feature_flag[: breaks[mini_batch_index]] = model.POISON_DATA_FIXED
-            num_feature_flag[
-                breaks[mini_batch_index] : breaks[mini_batch_index + 1]
-            ] = model.POISON_DATA_OPTIMIZED
+            start, stop = breaks[mini_batch_index], breaks[mini_batch_index + 1]
+            num_feature_flag[:start] = F
+            num_feature_flag[start:stop] = O
             if incremental:
-                num_feature_flag[
-                    breaks[mini_batch_index + 1] :
-                ] = model.POISON_DATA_REMOVED
+                num_feature_flag[stop:] = R
             else:
-                num_feature_flag[
-                    breaks[mini_batch_index + 1] :
-                ] = model.POISON_DATA_FIXED
+                num_feature_flag[stop:] = F
             model.set_poison_data_status(
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
