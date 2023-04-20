@@ -56,6 +56,7 @@ class PyomoModel(pmo.block):
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
+        self.opt.options["timelimit"] = config["time_limit"]
         print("" * 2)
         print("*" * long_space)
         print("CONTINUOUS NONLINEAR MODEL")
@@ -100,7 +101,6 @@ class PyomoModel(pmo.block):
             self.x_train_num = {}
             self.x_train_cat = {}
             self.y_train = {}
-            self.x_poison_cat = {}
             self.y_poison = {}
 
             # 1 if the corresponding row is removed and 0 otherwise.

@@ -49,9 +49,7 @@ def run(config, instance_data):
     incremental = config["iterative_attack_incremental"]
 
     if incremental and (n_epochs > 1):
-        raise ValueError(
-            f"n_epochs should be 1 when incremental but got {n_epochs}"
-        )
+        raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
 
     no_poison_samples = instance_data.no_poison_samples
 
@@ -87,7 +85,8 @@ def run(config, instance_data):
                     breaks[mini_batch_index + 1] :
                 ] = model.POISON_DATA_FIXED
             model.set_poison_data_status(
-                instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED)
+                instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
+            )
             model.solve()
             # TODO Implement a method to update data.
             # model.update_data(instance_data)

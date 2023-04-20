@@ -163,9 +163,7 @@ class LASSOdataframe:
         numerical_dataframe = self.dataframe[
             [str(column) for column in self.chosen_numerical]
         ]
-        new_numerical_cols = [
-            str(i) for i in range(len(numerical_dataframe.columns))
-        ]
+        new_numerical_cols = [str(i) for i in range(len(numerical_dataframe.columns))]
         numerical_dataframe = numerical_dataframe.rename(
             columns=dict(zip(numerical_dataframe.columns, new_numerical_cols))
         )
@@ -190,7 +188,7 @@ class LASSOdataframe:
                 ) in new_categorical_columns_dict.items():
                     columns[i] = re.sub("^" + old_substring, new_substring, columns[i])
             columns = [x.replace("_", ":") for x in columns]
-            
+
             # Currently, the categories are 1-based. We are updating them to be 0-based.
             # For example, if columns are ["1:1", "1:2", "1:3", "2:1", "2:2"],
             # it ['1:0', '1:1', '1:2', '2:0', '2:1'].
