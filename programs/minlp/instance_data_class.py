@@ -9,9 +9,9 @@ This script creates the class with all the data that is then given to the benckm
 
 import copy
 from os import path
-import choosing_features
 
 import numpy as np
+import choosing_features
 import pandas as pd
 
 
@@ -153,11 +153,15 @@ class InstanceData:
 
     @property
     def chosen_numerical_feature_names(self):
-        return get_chosen_numerical_feature_names(self.train_dataframe, self.no_chosen_numerical_features) # TODO how do I add config here
+        # TODO how do I add config here
+        return get_chosen_numerical_feature_names(self.train_dataframe, self.no_chosen_numerical_features)
 
     @property
     def chosen_categorical_feature_names(self):
-        return get_chosen_categorical_feature_names(self.train_dataframe, self.no_chosen_categorical_features) # TODO how do I add config here
+        # TODO how do I add config here
+        return get_chosen_categorical_feature_names(
+            self.train_dataframe, self.no_chosen_categorical_features
+        )
 
     @property
     def no_categories_dict(self):
@@ -813,6 +817,7 @@ def get_chosen_numerical_feature_names(df, no_chosen_numerical_features):
     )[0]
 
     return chosen_numerical
+
 
 def get_chosen_categorical_feature_names(df, no_chosen_categorical_features):
     """Extract the column names of chosen numerical features

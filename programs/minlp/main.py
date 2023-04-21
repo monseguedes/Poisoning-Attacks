@@ -7,16 +7,16 @@ Main script for the paper of poisoning attacks of categorical variables.
 
 import categorical_attack
 import instance_data_class
+import iterative_attack
 import numerical_attack
 import numpy as np
 import ridge_regression
-import iterative_attack
 
 config = {
     # Dataset
     "dataset_name": "5num5cat",
-    "training_samples": 30,
-    "poison_rate": 12,
+    "training_samples": 60,
+    "poison_rate": 4,
     "seed": 3,
     # Problem
     "function": "MSE",
@@ -35,11 +35,17 @@ config = {
     "categorical_attack_mini_batch_size": 0.1,
     "categorical_attack_no_nfeatures": 0,
     "categorical_attack_no_cfeatures": 5,
+    # Iterative attack
+    "iterative_attack_n_epochs": 1,
     # Solutions
     "datatype": "test",
 }
 
 instance_data = instance_data_class.InstanceData(config)
+
+# import random_categorical_attack
+# random_categorical_attack.run(config, instance_data)
+# raise SystemExit
 
 
 # shape = (config["training_samples"], 5)

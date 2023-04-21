@@ -4,10 +4,10 @@
 
 import copy
 
+import categorical_attack
+import numerical_attack
 import numpy as np
 import pyomo_model
-import numerical_attack
-import categorical_attack
 
 long_space = 80
 short_space = 60
@@ -50,22 +50,35 @@ def run(config, instance_data, model=None):
     else:
         model.update_parameters(instance_data)
 
-    config["solver_name"] = "ipopt"
-    numerical_model = None
-    numerical_model, instance_data, regression_parameters = numerical_attack.run(
-        config, instance_data, numerical_model
-    )
+    n_epochs = config["iterative_attack_n_epochs"]
 
-    # Run categorical attack TODO improve categorical attack
-    config["solver_name"] = "gurobi"
-    categorical_model = None
-    categorical_model, instance_data, regression_parameters = categorical_attack.run(
-        config, instance_data, categorical_model
-    )
+    # Solve benchmark
+    config["iterative_attack_incremental"] = True
+    _, _, benchmark_solution = numerical_attack.run(config, instance_data)
+
+    config["iterative_attack_incremental"] = False
+    for epoch in range(n_epochs):
+        for feature in instance_data.chosen_categorical_feature_names:
+            config["solver_name"] = "ipopt"
+            numerical_model = None
+            numerical_model, instance_data, solution = numerical_attack.run(
+                config, instance_data, numerical_model
+            )
+
+            # Run categorical attack TODO improve categorical attack
+            config["solver_name"] = "gurobi"
+            categorical_model = None
+            categorical_model, instance_data, solution = categorical_attack.run(
+                config, instance_data, categorical_model, features=feature
+            )
 
     # TODO printing of solutions
-
-    solution = categorical_model.get_solution()
+    print("RESULTS")
+    print(f'Benchmark mse:  {benchmark_solution["mse"]:7.4f}')
+    print(f'Our method mse: {solution["mse"]:7.4f}')
+    print(
+        f'Improvement:    {(solution["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
+    )
 
     # TODO what do we do with model
     return model, instance_data, solution

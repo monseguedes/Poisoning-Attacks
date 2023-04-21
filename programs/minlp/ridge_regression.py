@@ -4,6 +4,7 @@
 
 import pandas as pd
 from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
 
 
 def run(config, instance_data, wide=False):
@@ -56,8 +57,12 @@ def run(config, instance_data, wide=False):
             column = f"{k[0]}:{k[1]}"
             _weights_cat[column] = [v]
 
+    y_pred = model.predict(X)
+    mse = mean_squared_error(y, y_pred)
+
     return {
         "weights_num": _weights_num,
         "weights_cat": _weights_cat,
         "bias": bias,
+        "mse": mse,
     }

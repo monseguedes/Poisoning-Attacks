@@ -40,3 +40,5 @@ def run(config, instance_data):
             # We found a better one than the current best.
             best_sol = sol
             best_instance_data = instance_data
+
+    return None, best_instance_data, best_sol
