@@ -6,6 +6,7 @@ import copy
 
 import numpy as np
 import pyomo_model
+import ridge_regression
 
 long_space = 80
 short_space = 60
@@ -69,6 +70,9 @@ def run(config, instance_data, model=None):
 
     solution_list = []
 
+    regression_parameters = ridge_regression.run(config, instance_data)
+    last_mse = regression_parameters["mse"]
+
     F = model.POISON_DATA_FIXED
     O = model.POISON_DATA_OPTIMIZED
     R = model.POISON_DATA_REMOVED
@@ -92,8 +96,11 @@ def run(config, instance_data, model=None):
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
             model.solve()
-            model.update_data(instance_data)
             solution = model.get_solution()
+            if solution["mse"] > last_mse:
+                model.update_data(instance_data)
+                last_mse = solution["mse"]
+
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
                 print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")

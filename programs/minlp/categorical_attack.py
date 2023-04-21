@@ -6,13 +6,14 @@ import copy
 
 import numpy as np
 import pyomo_model
+import ridge_regression
 
 long_space = 80
 short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model=None):
+def run(config, instance_data, model=None, features=None):
     """Run categorical attack which poison categorical data
 
     This is a hueristic to poison categorical features using gurobi.
@@ -45,6 +46,11 @@ def run(config, instance_data, model=None):
     else:
         model.update_parameters(instance_data)
 
+    if features is None:
+        features = instance_data.categorical_feature_names
+    elif not isinstance(features, list):
+        features = [features]
+
     n_epochs = config["categorical_attack_n_epochs"]
 
     no_poison_samples = instance_data.no_poison_samples
@@ -59,17 +65,17 @@ def run(config, instance_data, model=None):
     O = model.POISON_DATA_OPTIMIZED
     R = model.POISON_DATA_REMOVED
 
+    regression_parameters = ridge_regression.run(config, instance_data)
+    best_mse = regression_parameters["mse"]
+    best_solution = regression_parameters
+
     # We want to solve for a subset of numerical features given by config['categorical_attack_no_nfeatures'],
     # and a subset of categorical ones, given by config['categorical_attack_no_cfeatures']. But for categorical
     # ones we want to iterate over a subset of batches.
 
     for epoch in range(n_epochs):
         for poison_sample_index in range(no_poison_samples):
-            for (
-                categorical_feature_name
-            ) in (
-                instance_data.chosen_categorical_feature_names
-            ):  # TODO change this for selection
+            for categorical_feature_name in features:  # TODO change this to first
                 num_feature_flag = F
                 shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
                 cat_feature_flag = np.full(shape, F)
@@ -78,8 +84,11 @@ def run(config, instance_data, model=None):
                     instance_data, num_feature_flag, cat_feature_flag
                 )
                 model.solve()
-                model.update_data(instance_data)
                 solution = model.get_solution()
+                if solution["mse"] > best_mse:
+                    model.update_data(instance_data)
+                    best_mse = solution["mse"]
+                    best_solution = solution
                 solution_list.append(solution)
             if (counter) % 20 == 0:
                 print(f"{'epoch':>5s}  {'row':>5s}  {'mse':>9s}")
@@ -96,7 +105,7 @@ def run(config, instance_data, model=None):
     print("improvement from the start (%):")
     print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
 
-    return model, instance_data, solution
+    return model, instance_data, best_solution
 
 
 if __name__ == "__main__":
