@@ -711,6 +711,13 @@ def make_horizontal_numerical_dataframe(df):
     ...     "feature": [1, 2, 1, 2, 1, 2],
     ...     "sample": ["0", "0", "1", "1", "2", "2"],
     ... })
+	   feature sample
+    0        1      0
+    1        2      0
+    2        1      1
+    3        2      1
+    4        1      2
+    5        2      2
 
     >>> make_vertical_numerical_dataframe(df)
     sample  feature
