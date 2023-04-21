@@ -289,6 +289,22 @@ class PyomoModel(pmo.block):
                 self.x_poison_cat[k].fix(v)
                 self.sos_constraints[k[0], k[1]].deactivate()
 
+    def continuous_relaxation(self, mode=True):
+        """Create a continuous relaxation of the poisoning attack
+
+        This replaces binary variables with continuous variables.
+
+        Parameters
+        ----------
+        mode : bool, default True
+        """
+        if mode:
+            for value in self.x_poison_cat.values():
+                value.domain = pmo.PercentFraction
+        else:
+            for value in self.x_poison_cat.values():
+                value.domain = pmo.Binary
+
     def solve(self):
         self.opt.solve(self, load_solutions=True, tee=self.tee)
 
