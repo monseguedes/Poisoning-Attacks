@@ -39,6 +39,6 @@ def run(config, instance_data):
         else:
             # We found a better one than the current best.
             best_sol = sol
-            best_instance_data = instance_data
+            best_instance_data = instance_data.copy()
 
     return None, best_instance_data, best_sol
