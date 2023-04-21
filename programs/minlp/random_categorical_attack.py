@@ -19,9 +19,9 @@ def run(config, instance_data):
     feat_cat_list = instance_data.categorical_feature_category_tuples
 
     for iteration in range(100):
-        sample = rng.randint(instance_data.no_poison_samples)
         # Purturbe 20 categorical features.
         for j in range(20):
+            sample = rng.randint(instance_data.no_poison_samples)
             # Randomly choose a pair of categorical feature and category
             # and set the data to this sampled value.
             feat, cat = feat_cat_list[rng.choice(len(feat_cat_list))]
