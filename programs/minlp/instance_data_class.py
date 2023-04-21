@@ -6,22 +6,17 @@ This script creates the class with all the data that is then given to the benckm
 """
 
 # TODO Improve consistency of naming.
-# TODO Implement utitlity to convert wide <-> long format.
-# TODO Implement update of categorical features.
-# TODO Improve efficiency of the getter/setter functions.
-# In particular, conversion between str <-> integer is very slow
-# (e.g. creating string '1:2' from feature=1, category=2). Until the
-# performance becomes an issue, we can leave as it is. But when necesarry
-# we can think about how to improve it.
 
 import copy
 from os import path
 import choosing_features
 
+import numpy as np
 import pandas as pd
 
 
 class InstanceData:
+
     def __init__(self, config):
         """
         The initialization corresponds to the data for the first iteration.
@@ -60,18 +55,27 @@ class InstanceData:
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
 
-        # TODO Define attributes related to column information, and remove corresponding property.
-        # You dont have to remove ones related to rows, such as number of training data, since
-        # we may updage dataframe later.
         self.no_numfeatures = len(
             get_numerical_feature_column_names(self.train_dataframe)
         )
         self.no_catfeatures = len(
             get_categorical_feature_column_names(self.train_dataframe)
         )
-        self.no_chosen_numerical_features = config["categorical_attack_no_nfeatures"]  
+        self.no_chosen_numerical_features = config["categorical_attack_no_nfeatures"]
         self.no_chosen_categorical_features = config["categorical_attack_no_cfeatures"]
-        
+
+        # These attributes allows us to access the categorical features easily.
+        # For example:
+        # instance_data.cat_poison[sample_index, categorical_feature]
+        # returns the category as an integer.
+        # One can modify the category too by assigning an integer
+        # instance_data.cat_poison[sample_index, categorical_feature] = new_cat
+        # Similarly, one can get/set category using one-hot encoding
+        # via cat_poison_one_hot.
+        self.num_poison = NumFeatureAccessor(self.poison_dataframe)
+        self.cat_poison_one_hot = CatFeatureAccessor(self.poison_dataframe, one_hot=True)
+        self.cat_poison = CatFeatureAccessor(self.poison_dataframe, one_hot=False)
+
 
     def copy(self):
         """Return a deepcopy of self"""
@@ -146,11 +150,11 @@ class InstanceData:
     @property
     def no_categories_in_categorical_feature(self):
         return get_categorical_feature_to_no_categories(self.train_dataframe)
-    
+
     @property
     def chosen_numerical_feature_names(self):
         return get_chosen_numerical_feature_names(self.train_dataframe, self.no_chosen_numerical_features) # TODO how do I add config here
-    
+
     @property
     def chosen_categorical_feature_names(self):
         return get_chosen_categorical_feature_names(self.train_dataframe, self.no_chosen_categorical_features) # TODO how do I add config here
@@ -179,6 +183,163 @@ class InstanceData:
                 self.poison_dataframe.loc[index[0], f"{index[1]}:{index[2]}"] = row
         else:
             raise NotImplementedError
+
+
+def _is_0_based_index(x):
+    return np.all(x == np.arange(len(x)))
+
+
+class NumFeatureAccessor:
+    """Utility to facilitate access to numerical features
+
+    Examples
+    --------
+    >>> df = pd.DataFrame({
+    ...     "0":      [ 0,  1,  2],
+    ...     "1":      [ 3,  4,  5],
+    ...     "0:0":    [ 1,  0,  1],
+    ...     "0:1":    [ 0,  1,  0],
+    ...     "1:0":    [ 0,  0,  0],
+    ...     "1:1":    [ 0,  1,  0],
+    ...     "1:2":    [ 1,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> print(df)
+       0  1  0:0  0:1  1:0  1:1  1:2  target
+    0  0  3    1    0    0    0    1       6
+    1  1  4    0    1    0    1    0       7
+    2  2  5    1    0    0    0    1       8
+
+    >>> num = NumFeatureAccessor(df)
+    >>> print(num[0, 1])  # Get inumerical feature 1 of the first data.
+    3
+    >>> num[0, 1] = -2  # Update the feature
+    >>> print(df)
+       0  1  0:0  0:1  1:0  1:1  1:2  target
+    0  0 -2    1    0    0    0    1       6
+    1  1  4    0    1    0    1    0       7
+    2  2  5    1    0    0    0    1       8
+    """
+
+    def __init__(self, df):
+        self.df = df
+
+        if not _is_0_based_index(df.index):
+            raise ValueError('expected a dataframe with 0-based index')
+
+        # This maps integer `categorical_feature`
+        # to a list of the indices of the columns corresponding to the given
+        # category.
+        self.column_indices_from_feature = dict()
+
+        def as_num_feature(x):
+            try:
+                return int(x)
+            except ValueError:
+                return None
+
+        for column_index, column in enumerate(df.columns):
+            num_feature = as_num_feature(column)
+            if num_feature is None:
+                continue
+            self.column_indices_from_feature.setdefault(num_feature, [])
+            self.column_indices_from_feature[num_feature].append(column_index)
+
+    def __getitem__(self, key):
+        column = self.column_indices_from_feature[key[1]]
+        return self.df.iloc[key[0], column].item()
+
+    def __setitem__(self, key, value):
+        column = self.column_indices_from_feature[key[1]]
+        self.df.iloc[key[0], column] = value
+
+
+class CatFeatureAccessor:
+    """Utility to facilitate access to categorical features
+
+    Examples
+    --------
+    >>> df = pd.DataFrame({
+    ...     "0":      [ 0,  1,  2],
+    ...     "1":      [ 3,  4,  5],
+    ...     "0:0":    [ 1,  0,  1],
+    ...     "0:1":    [ 0,  1,  0],
+    ...     "1:0":    [ 0,  0,  0],
+    ...     "1:1":    [ 0,  1,  0],
+    ...     "1:2":    [ 1,  0,  1],
+    ...     "target": [ 6,  7,  8],
+    ... })
+    >>> print(df)
+       0  1  0:0  0:1  1:0  1:1  1:2  target
+    0  0  3    1    0    0    0    1       6
+    1  1  4    0    1    0    1    0       7
+    2  2  5    1    0    0    0    1       8
+
+    >>> cat = CatFeatureAccessor(df, one_hot=True)
+    >>> print(cat[0, 1])  # Get categorical feature 1 of the first data.
+    [0 0 1]
+    >>> cat[0, 1] = [1, 0, 0]  # Update the category in one-hot encoding
+    >>> print(df)
+       0  1  0:0  0:1  1:0  1:1  1:2  target
+    0  0  3    1    0    1    0    0       6
+    1  1  4    0    1    0    1    0       7
+    2  2  5    1    0    0    0    1       8
+
+    >>> cat = CatFeatureAccessor(df, one_hot=False)
+    >>> print(cat[1, 0])  # Get categorical feature 1 of the first data.
+    1
+    >>> cat[1, 0] = 0  # Update the category in one-hot encoding
+    >>> print(df)
+       0  1  0:0  0:1  1:0  1:1  1:2  target
+    0  0  3    1    0    1    0    0       6
+    1  1  4    1    0    0    1    0       7
+    2  2  5    1    0    0    0    1       8
+    """
+
+    def __init__(self, df, one_hot):
+        self.df = df
+        self.one_hot = one_hot
+
+        if not _is_0_based_index(df.index):
+            raise ValueError('expected a dataframe with 0-based index')
+
+        # This maps integer `categorical_feature`
+        # to a list of the indices of the columns corresponding to the given
+        # category.
+        self.column_indices_from_feature = dict()
+        categories_from_categorical_feature = dict()
+
+        for column_index, column in enumerate(df.columns):
+            if not isinstance(column, str) or ":" not in column:
+                continue
+            # column is something like '2:5'
+            categorical_feature, category = map(int, column.split(":"))
+            self.column_indices_from_feature.setdefault(categorical_feature, [])
+            self.column_indices_from_feature[categorical_feature].append(column_index)
+            categories_from_categorical_feature.setdefault(categorical_feature, [])
+            categories_from_categorical_feature[categorical_feature].append(category)
+
+        for tpl in categories_from_categorical_feature.items():
+            categorical_feature = tpl[0]
+            categories = tpl[1]
+            if not _is_0_based_index(categories):
+                raise ValueError(f'categorical feature {categorical_feature} has non-0-based categories {categories}')
+
+    def __getitem__(self, key):
+        column = self.column_indices_from_feature[key[1]]
+        one_hot = self.df.iloc[key[0], column].to_numpy()
+        if self.one_hot:
+            return one_hot
+        return np.argmax(one_hot)
+
+    def __setitem__(self, key, value):
+        column = self.column_indices_from_feature[key[1]]
+        if self.one_hot:
+            self.df.iloc[key[0], column] = value
+        else:
+            self.df.iloc[key[0], column] = 0
+            self.df.iloc[key[0], column[value]] = 1
+
 
 
 def get_numerical_feature_column_names(df):
