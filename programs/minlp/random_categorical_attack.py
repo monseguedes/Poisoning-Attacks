@@ -32,7 +32,7 @@ def run(config, instance_data):
             print(f"{'it':>3s}  {'mes':>9s}  {'best':>9s}")
         print(f"{iteration:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}")
         # Check if the updated data was better than the current best.
-        if best_sol['mse'] > sol['mse']:
+        if best_sol["mse"] > sol["mse"]:
             # The current data is actually worse than the current best.
             # Revert the change.
             instance_data = best_instance_data.copy()

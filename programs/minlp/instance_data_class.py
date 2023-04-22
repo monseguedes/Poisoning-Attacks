@@ -10,13 +10,12 @@ This script creates the class with all the data that is then given to the benckm
 import copy
 from os import path
 
-import numpy as np
 import choosing_features
+import numpy as np
 import pandas as pd
 
 
 class InstanceData:
-
     def __init__(self, config):
         """
         The initialization corresponds to the data for the first iteration.
@@ -73,9 +72,10 @@ class InstanceData:
         # Similarly, one can get/set category using one-hot encoding
         # via cat_poison_one_hot.
         self.num_poison = NumFeatureAccessor(self.poison_dataframe)
-        self.cat_poison_one_hot = CatFeatureAccessor(self.poison_dataframe, one_hot=True)
+        self.cat_poison_one_hot = CatFeatureAccessor(
+            self.poison_dataframe, one_hot=True
+        )
         self.cat_poison = CatFeatureAccessor(self.poison_dataframe, one_hot=False)
-
 
     def copy(self):
         """Return a deepcopy of self"""
@@ -154,7 +154,9 @@ class InstanceData:
     @property
     def chosen_numerical_feature_names(self):
         # TODO how do I add config here
-        return get_chosen_numerical_feature_names(self.train_dataframe, self.no_chosen_numerical_features)
+        return get_chosen_numerical_feature_names(
+            self.train_dataframe, self.no_chosen_numerical_features
+        )
 
     @property
     def chosen_categorical_feature_names(self):
@@ -229,7 +231,7 @@ class NumFeatureAccessor:
         self.df = df
 
         if not _is_0_based_index(df.index):
-            raise ValueError('expected a dataframe with 0-based index')
+            raise ValueError("expected a dataframe with 0-based index")
 
         # This maps integer `categorical_feature`
         # to a list of the indices of the columns corresponding to the given
@@ -305,7 +307,7 @@ class CatFeatureAccessor:
         self.one_hot = one_hot
 
         if not _is_0_based_index(df.index):
-            raise ValueError('expected a dataframe with 0-based index')
+            raise ValueError("expected a dataframe with 0-based index")
 
         # This maps integer `categorical_feature`
         # to a list of the indices of the columns corresponding to the given
@@ -327,7 +329,9 @@ class CatFeatureAccessor:
             categorical_feature = tpl[0]
             categories = tpl[1]
             if not _is_0_based_index(categories):
-                raise ValueError(f'categorical feature {categorical_feature} has non-0-based categories {categories}')
+                raise ValueError(
+                    f"categorical feature {categorical_feature} has non-0-based categories {categories}"
+                )
 
     def __getitem__(self, key):
         column = self.column_indices_from_feature[key[1]]
@@ -343,7 +347,6 @@ class CatFeatureAccessor:
         else:
             self.df.iloc[key[0], column] = 0
             self.df.iloc[key[0], column[value]] = 1
-
 
 
 def get_numerical_feature_column_names(df):
@@ -711,7 +714,7 @@ def make_horizontal_numerical_dataframe(df):
     ...     "feature": [1, 2, 1, 2, 1, 2],
     ...     "sample": ["0", "0", "1", "1", "2", "2"],
     ... })
-	   feature sample
+           feature sample
     0        1      0
     1        2      0
     2        1      1
