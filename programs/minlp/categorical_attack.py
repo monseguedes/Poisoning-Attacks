@@ -74,12 +74,14 @@ def run(config, instance_data, model=None, features=None):
     # ones we want to iterate over a subset of batches.
 
     for epoch in range(n_epochs):
-        for poison_sample_index in range(no_poison_samples):
+        # for poison_sample_index in range(no_poison_samples):
             for categorical_feature_name in features:  # TODO change this to first
                 num_feature_flag = F
                 shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
                 cat_feature_flag = np.full(shape, F)
-                cat_feature_flag[poison_sample_index, categorical_feature_name] = O
+                # TODO fix this to be flexible
+                for poison_sample_index in range(no_poison_samples):
+                    cat_feature_flag[poison_sample_index, categorical_feature_name] = O
                 model.set_poison_data_status(
                     instance_data, num_feature_flag, cat_feature_flag
                 )
@@ -92,7 +94,8 @@ def run(config, instance_data, model=None, features=None):
                 solution_list.append(solution)
             if (counter) % 20 == 0:
                 print(f"{'epoch':>5s}  {'row':>5s}  {'mse':>9s}")
-            print(f"{epoch:5d}  {poison_sample_index:5d}  {solution['mse']:9.6f}")
+            # print(f"{epoch:5d}  {poison_sample_index:5d}  {solution['mse']:9.6f}")
+            print(f"{epoch:5d}  {solution['mse']:9.6f}")
             counter += 1
 
     # This will break when objective_list is empty, but maybe it's unlikely
