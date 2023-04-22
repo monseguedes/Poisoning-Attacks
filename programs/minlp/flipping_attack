@@ -6,6 +6,7 @@ import copy
 
 import categorical_attack
 import numerical_attack
+import ridge_regression
 import numpy as np
 import pyomo_model
 
@@ -52,6 +53,8 @@ def run(config, instance_data, model=None):
 
     n_epochs = config["flipping_attack_n_epochs"]
 
+    no_poison_samples = instance_data.no_poison_samples
+
     # Solve benchmark
     config["iterative_attack_incremental"] = True
     _, _, benchmark_solution = numerical_attack.run(config, instance_data)
@@ -64,20 +67,162 @@ def run(config, instance_data, model=None):
             config, instance_data, numerical_model
         )
 
-        # Flip categorical features
 
-        # Update data
+        for poison_sample_index in range(no_poison_samples):
+            # Store the best solution found so far.
+            best_sol = ridge_regression.run(config, instance_data)
+            # And the instance data to achieve this best solution.
+            best_instance_data = instance_data.copy()
+            
+            # TODO fix to do subset of features
+            for feature in instance_data.categorical_feature_names:
+                # TODO add flip categorical features routine
+                pass
+
+
+            # Run the regression and see if the purturbation was effective or not.
+            sol = ridge_regression.run(config, instance_data)
+            # TODO add printing
+            # Check if the updated data was better than the current best.
+            if best_sol["mse"] > sol["mse"]:
+                # The current data is actually worse than the current best.
+                # Revert the change.
+                instance_data = best_instance_data.copy()
+            else:
+                # We found a better one than the current best.
+                best_sol = sol
+                best_instance_data = instance_data.copy()
+                # TODO Update data
+
+            # TODO make sure we use new weights (which are already computed)
+            # for next iteration
 
     # TODO printing of solutions
     print("RESULTS")
-    print(f'Benchmark mse:  {benchmark_solution["mse"]:7.4f}')
-    print(f'Our method mse: {solution["mse"]:7.4f}')
-    print(
-        f'Improvement:    {(solution["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
+    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.4f}')
+    print(f'Flipping method mse: {solution["mse"]:7.4f}')
+    print(f'Improvement:         {(solution["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
     )
 
     # TODO what do we do with model
     return model, instance_data, solution
+
+
+def flip_row():
+    #TODO fill
+    raise NotImplementedError
+
+# TODO remove when not needed for reference anymore
+def flipping_heuristic(config: dict, instance, solution):
+    """
+     This is the heuristic algorithm we use to get feasible
+    solutions. It works as follows. We quickly optimise numerical
+    features (locally) using ipopt. Then take these solutions and
+    fix them. Then we perturb categorical features as follow. For
+    each sample, if the response variable is smaller than 0.5, make
+    the column with the largest weight for all features be 1, and all
+    other be 0. If target is geq 0.5, make the category with the
+    smallest weight equal to 1, and everything else equal to 0.
+
+    PROBLEM:
+    """
+
+    print("" * 2)
+    print("-" * long_space)
+    print("-" * long_space)
+    print("HEURISTIC ALGORITHM: CONTINOUS + FLIPPING CATEGORICAL")
+    print("-" * long_space)
+    print("-" * long_space)
+
+    # # Solve numerical features locally
+    # _, instance, solution = solve_benchmark(config)
+    # print('Benchmark has been solved, now let us add this solution to data')
+
+    benchmark_objective = solution["objective"]
+
+    # Flip all categorical features.
+    for i in range(0, instance.no_psamples, config["heuristic_subset"]):
+        # Save the original data and try flipping. If the flipping does not improve,
+        # we restore the data.
+        original_instance = copy.deepcopy(instance)
+        original_solution = copy.deepcopy(solution)
+
+        chosen_samples = list(range(1, instance.no_psamples + 1))[
+            i : i + config["heuristic_subset"]
+        ]
+        print("Subset of samples is", chosen_samples)
+
+        for psample in chosen_samples:
+            # Make (just num) prediction
+            cat_weights = solution["weights_cat"]
+            num_weights = solution["weights_num"]
+            num_features = {
+                k: v for k, v in solution["x_poison_num"].items() if k[0] == psample
+            }
+            num_y = (
+                np.array(list(num_weights.values()))
+                @ np.array(list(num_features.values()))
+                + solution["bias"]
+            )
+            target_y = instance.y_poison_dataframe.loc[psample, "y_poison"]
+            difference = num_y - target_y
+
+            # We consider two case: Make prediction as large as possible and make prediction
+            # as small as possible. We then take the best one.
+
+            # categories_up/down[feature] is the category to push prediction up/down.
+            cat_features = list(instance.categories_dict.keys())
+            categories_up = dict()
+            categories_down = dict()
+            for feature in cat_features:
+                # Filter the keys based on given values for first two elements
+                filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
+                categories_up[feature] = max(filtered_keys, key=cat_weights.get)[1]
+                categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
+
+            # Let's compute the prediction of each case.
+            pred_up = num_y + sum(
+                cat_weights[(feature, categories_up[feature])]
+                for feature in cat_features
+            )
+            pred_down = num_y + sum(
+                cat_weights[(feature, categories_down[feature])]
+                for feature in cat_features
+            )
+
+            if np.abs(pred_up - target_y) < np.abs(pred_down - target_y):
+                # Pushing down is more effective.
+                categories_chosen = categories_down
+            else:
+                # Pushing up is more effective.
+                categories_chosen = categories_up
+
+            # Update the dataframes.
+            instance.cat_poison_dataframe_data.loc[psample, :, :] = 0
+            for feature in cat_features:
+                instance.cat_poison_dataframe_data.loc[
+                    psample, feature, categories_chosen[feature]
+                ] = 1
+                instance.complete_cat_poison_dataframe.to_numpy()[:] = (
+                    instance.cat_poison_dataframe_data["x_poison_cat"]
+                    .to_numpy()
+                    .reshape(instance.complete_cat_poison_dataframe.shape)
+                )
+                instance.update_cat_poison_dataframe()
+
+        opt = pyo.SolverFactory("ipopt")
+        _, instance, solution = iterative_attack_strategy(opt, instance, config)
+
+        if original_solution["objective"] > solution["objective"]:
+            # The flipping actually made the poisoning attack worse.
+            # We will restore the original data and try flipping the next sample.
+            solution = original_solution
+            instance = original_instance
+
+    print("Objective value is           ", solution["objective"])
+    print("Benchmark objective value is ", benchmark_objective)
+
+    return instance, solution
 
 
 if __name__ == "__main__":
