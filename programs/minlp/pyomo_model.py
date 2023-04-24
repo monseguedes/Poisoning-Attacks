@@ -443,7 +443,7 @@ class PyomoModel(pmo.block):
             for k, v in self.weights_cat.items():
                 _weights_cat.loc[k] = v.value
         else:
-            # To make wide fromat dataframes.
+            # To make wide format dataframes.
             _weights_num = pd.DataFrame()
             for k, v in self.weights_num.items():
                 _weights_num[k] = [v.value]

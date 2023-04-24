@@ -11,11 +11,12 @@ import iterative_attack
 import numerical_attack
 import numpy as np
 import ridge_regression
+import flipping_attack
 
 config = {
     # Dataset
     "dataset_name": "5num5cat",
-    "training_samples": 60,
+    "training_samples": 30,
     "poison_rate": 4,
     "seed": 3,
     # Problem
@@ -37,6 +38,8 @@ config = {
     "categorical_attack_no_cfeatures": 5,
     # Iterative attack
     "iterative_attack_n_epochs": 1,
+    # Flipping attack
+    "flipping_attack_n_epochs": 1,
     # Solutions
     "datatype": "test",
 }
@@ -61,9 +64,19 @@ instance_data = instance_data_class.InstanceData(config)
 
 numerical_model = None
 
+_, instance_data, regression_parameters = flipping_attack.run(
+    config, instance_data, numerical_model
+)
+
+numerical_model = None
+
 _, instance_data, regression_parameters = iterative_attack.run(
     config, instance_data, numerical_model
 )
+
+
+
+
 
 # # Only optimize numerical and categorical.
 # numerical_model, instance_data, regression_parameters = numerical_attack.run(
