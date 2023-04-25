@@ -16,30 +16,30 @@ import flipping_attack
 config = {
     # Dataset
     "dataset_name": "5num5cat",
-    "training_samples": 30,
-    "poison_rate": 4,
+    "training_samples": 100,
+    "poison_rate": 20,
     "seed": 3,
     # Problem
     "function": "MSE",
     "regularization": 0.6612244897959183,
-    "solver_name": "",
+    "solver_name": "ipopt",
     # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
     "time_limit": 20,
     # Numerical attack
     "numerical_attack_n_epochs": 1,
-    "iterative_attack_mini_batch_size": 0.1,
+    "iterative_attack_mini_batch_size": 0.2,
     "iterative_attack_incremental": False,
     # Categorical attack
     "categorical_attack_n_epochs": 1,
     "categorical_attack_mini_batch_size": 0.1,
     "categorical_attack_no_nfeatures": 0,
-    "categorical_attack_no_cfeatures": 5,
+    "categorical_attack_no_cfeatures": 10,
     # Iterative attack
-    "iterative_attack_n_epochs": 1,
+    "iterative_attack_n_epochs": 10,
     # Flipping attack
-    "flipping_attack_n_epochs": 1,
+    "flipping_attack_n_epochs": 5,
     # Solutions
     "datatype": "test",
 }
@@ -68,14 +68,11 @@ _, instance_data, regression_parameters = flipping_attack.run(
     config, instance_data, numerical_model
 )
 
-numerical_model = None
+# numerical_model = None
 
-_, instance_data, regression_parameters = iterative_attack.run(
-    config, instance_data, numerical_model
-)
-
-
-
+# _, instance_data, regression_parameters = iterative_attack.run(
+#     config, instance_data, numerical_model
+# )
 
 
 # # Only optimize numerical and categorical.

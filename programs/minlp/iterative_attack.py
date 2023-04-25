@@ -45,29 +45,23 @@ def run(config, instance_data, model=None):
         config["solver_name"] = "ipopt"
     np.testing.assert_equal(config["solver_name"], "ipopt")
 
-    if model is None:
-        model = pyomo_model.PyomoModel(instance_data, config)
-    else:
-        model.update_parameters(instance_data)
-
     n_epochs = config["iterative_attack_n_epochs"]
 
     # Solve benchmark
     config["iterative_attack_incremental"] = True
     _, _, benchmark_solution = numerical_attack.run(config, instance_data)
-
     config["iterative_attack_incremental"] = False
+    numerical_model = None
+    categorical_model = None
     for epoch in range(n_epochs):
         for feature in instance_data.chosen_categorical_feature_names:
             config["solver_name"] = "ipopt"
-            numerical_model = None
             numerical_model, instance_data, solution = numerical_attack.run(
                 config, instance_data, numerical_model
             )
 
             # Run categorical attack TODO improve categorical attack
             config["solver_name"] = "gurobi"
-            categorical_model = None
             categorical_model, instance_data, solution = categorical_attack.run(
                 config, instance_data, categorical_model, features=feature
             )

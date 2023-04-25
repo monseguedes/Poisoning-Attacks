@@ -244,7 +244,7 @@ class LASSOdataframe:
         whole_dataframe.to_csv(os.path.join(directory, "data-binary.csv"))
 
 
-# dataframe = create_dataframe("house")
-# model = LASSOdataframe(dataframe)
-# model.get_features_lists(5, 5)
-# model.save_new_dataframe()
+dataframe = create_dataframe("house")
+model = LASSOdataframe(dataframe)
+model.get_features_lists(10, 10)
+model.save_new_dataframe()

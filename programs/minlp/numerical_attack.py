@@ -70,12 +70,13 @@ def run(config, instance_data, model=None):
 
     solution_list = []
 
-    regression_parameters = ridge_regression.run(config, instance_data)
-    last_mse = regression_parameters["mse"]
-
     F = model.POISON_DATA_FIXED
     O = model.POISON_DATA_OPTIMIZED
     R = model.POISON_DATA_REMOVED
+
+    regression_parameters = ridge_regression.run(config, instance_data)
+    best_mse = regression_parameters["mse"]
+    best_solution = regression_parameters
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
@@ -97,9 +98,10 @@ def run(config, instance_data, model=None):
             )
             model.solve()
             solution = model.get_solution()
-            if solution["mse"] > last_mse:
+            if solution["mse"] > best_mse:
                 model.update_data(instance_data)
-                last_mse = solution["mse"]
+                best_mse = solution["mse"]
+                best_solution = solution
 
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:

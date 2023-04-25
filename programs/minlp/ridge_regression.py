@@ -65,4 +65,6 @@ def run(config, instance_data, wide=False):
         "weights_cat": _weights_cat,
         "bias": bias,
         "mse": mse,
+        "x_poison_num": instance_data.get_num_x_poison_dataframe(),
+        "x_poison_cat": instance_data.get_cat_x_poison_dataframe()
     }
