@@ -46,14 +46,22 @@ def run(config, instance_data, model=None):
     np.testing.assert_equal(config["solver_name"], "ipopt")
 
     n_epochs = config["iterative_attack_n_epochs"]
+    numerical_attack_n_epochs = config["numerical_attack_n_epochs"]
 
     # Solve benchmark
-    config["iterative_attack_incremental"] = True
+    config["numerical_attack_incremental"] = True
+    config["numerical_attack_n_epochs"] = 1
     _, _, benchmark_solution = numerical_attack.run(config, instance_data)
-    config["iterative_attack_incremental"] = False
+    config["numerical_attack_incremental"] = False
+    config["numerical_attack_n_epochs"] = numerical_attack_n_epochs
     numerical_model = None
     categorical_model = None
     for epoch in range(n_epochs):
+        if config["categorical_attack_no_cfeatures"] == 0:
+            config["solver_name"] = "ipopt"
+            numerical_model, instance_data, solution = numerical_attack.run(
+                config, instance_data, numerical_model
+            )
         for feature in instance_data.chosen_categorical_feature_names:
             config["solver_name"] = "ipopt"
             numerical_model, instance_data, solution = numerical_attack.run(
@@ -68,8 +76,8 @@ def run(config, instance_data, model=None):
 
     # TODO printing of solutions
     print("RESULTS")
-    print(f'Benchmark mse:  {benchmark_solution["mse"]:7.4f}')
-    print(f'Our method mse: {solution["mse"]:7.4f}')
+    print(f'Benchmark mse:  {benchmark_solution["mse"]:7.5f}')
+    print(f'Our method mse: {solution["mse"]:7.5f}')
     print(
         f'Improvement:    {(solution["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
     )
