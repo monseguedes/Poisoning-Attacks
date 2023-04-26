@@ -101,10 +101,10 @@ def assert_solutions_are_close(sol1, sol2):
         except AttributeError:
             return x
 
-    for key in ["weights_num", "weights_cat", "bias"]:
+    for key in ["weights_num", "weights_cat", "bias", "mse"]:
         a = flatten(sol1[key])
         b = flatten(sol2[key])
-        np.testing.assert_allclose(a, b, rtol=1e-4)
+        np.testing.assert_allclose(a, b, rtol=1e-4, err_msg=key)
 
 
 assert_solutions_are_close(regression_parameters, scikit_learn_regression_parameters)
