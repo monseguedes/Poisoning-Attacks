@@ -57,7 +57,6 @@ def run(config, instance_data, model=None):
     numerical_model = None
 
     for epoch in range(n_epochs):
-        config["solver_name"] = "gurobi"
         numerical_model, numerical_attack_instance_data, solution = numerical_attack.run(
             config, instance_data, numerical_model
         )
@@ -68,7 +67,7 @@ def run(config, instance_data, model=None):
             best_instance_data = numerical_attack_instance_data
             instance_data = numerical_attack_instance_data
 
-        for poison_sample_index in range(no_poison_samples):
+        for poison_sample_index in range(no_poison_samples): 
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
             num_weights = best_sol["weights_num"].to_dict()

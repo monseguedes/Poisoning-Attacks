@@ -49,17 +49,19 @@ def run(config, instance_data, model=None):
         model.update_parameters(instance_data)
 
     n_epochs = config["numerical_attack_n_epochs"]
-    mini_batch_size = config["iterative_attack_mini_batch_size"]
+    mini_batch_size = config["numerical_attack_mini_batch_size"]
 
-    incremental = config["iterative_attack_incremental"]
+    incremental = config["numerical_attack_incremental"]
 
     if incremental and (n_epochs > 1):
         raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
 
     no_poison_samples = instance_data.no_poison_samples
 
-    if isinstance(mini_batch_size, int):
+    if isinstance(mini_batch_size, int): # TODO what happens for the case with just one batch?
         mini_batch_absolute_size = mini_batch_size
+    elif mini_batch_size == 'all':
+        mini_batch_absolute_size = no_poison_samples
     else:
         # mini batch size is specified as a fraction
         mini_batch_absolute_size = int(no_poison_samples * mini_batch_size)
