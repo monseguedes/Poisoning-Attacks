@@ -67,11 +67,11 @@ def run(config, instance_data, model=None):
             best_instance_data = numerical_attack_instance_data
             instance_data = numerical_attack_instance_data
 
-        for poison_sample_index in range(no_poison_samples): 
+        for poison_sample_index in range(no_poison_samples):
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
             num_weights = best_sol["weights_num"].to_dict()
-   
+
             num_features = {
                 k: v
                 for k, v in best_sol["x_poison_num"].items()
@@ -149,6 +149,14 @@ def run(config, instance_data, model=None):
 
     # TODO what do we do with model
     return model, best_instance_data, best_sol
+
+
+
+def print_diff(instance_data_a, instance_data_b):
+    print(instance_data_a.get_num_x_train_dataframe()[instance_data_a.get_num_x_train_dataframe() != instance_data_b.get_num_x_train_dataframe()])
+    print(instance_data_a.get_cat_x_train_dataframe()[instance_data_a.get_cat_x_train_dataframe() != instance_data_b.get_cat_x_train_dataframe()])
+    print(instance_data_a.get_num_x_poison_dataframe()[instance_data_a.get_num_x_poison_dataframe() != instance_data_b.get_num_x_poison_dataframe()])
+    print(instance_data_a.get_cat_x_poison_dataframe()[instance_data_a.get_cat_x_poison_dataframe() != instance_data_b.get_cat_x_poison_dataframe()])
 
 
 def flip_row():
