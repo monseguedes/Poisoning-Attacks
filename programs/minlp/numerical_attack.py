@@ -107,8 +107,8 @@ def run(config, instance_data, model=None):
 
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
-                print(f"{'epoch':>5s}  " f"{'batch':>5s}  " f"{'mse':>9s}")
-            print(f"{epoch:5d}  " f"{mini_batch_index:5d}  " f"{solution['mse']:9.6f}")
+                print(f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}")
+            print(f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}")
 
     # This will break when solution_list is empty, but maybe it's unlikely
     keys = solution_list[0].keys()
