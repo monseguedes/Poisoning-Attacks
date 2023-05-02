@@ -15,8 +15,8 @@ import flipping_attack
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat",
-    "training_samples": 200,
+    "dataset_name": "10num10cat",
+    "training_samples": 100,
     "poison_rate": 4,
     "seed": 3,
     # Problem
@@ -28,8 +28,8 @@ config = {
     "feasibility": 0.00001,
     "time_limit": 20,
     # Numerical attack
-    "numerical_attack_n_epochs": 2,
-    "numerical_attack_mini_batch_size": 'all',
+    "numerical_attack_n_epochs": 1,
+    "numerical_attack_mini_batch_size": 0.1,
     "numerical_attack_incremental": False,
     # Categorical attack
     "categorical_attack_n_epochs": 1,
@@ -40,6 +40,7 @@ config = {
     "iterative_attack_n_epochs": 1,
     # Flipping attack
     "flipping_attack_n_epochs": 5,
+    "plot": False,
     # Solutions
     "datatype": "test",
 }
@@ -62,23 +63,23 @@ instance_data = instance_data_class.InstanceData(config)
 # )
 # np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
 
-# numerical_model = None
-
-# _, instance_data, regression_parameters = flipping_attack.run(
-#     config, instance_data, numerical_model
-# )
-
 numerical_model = None
+
+_, instance_data, regression_parameters = flipping_attack.run(
+    config, instance_data, numerical_model
+)
+
+# numerical_model = None
 
 # _, instance_data, regression_parameters = iterative_attack.run(
 #     config, instance_data, numerical_model
 # )
 
 
-# Only optimize numerical and categorical.
-numerical_model, instance_data, regression_parameters = numerical_attack.run(
-    config, instance_data, numerical_model
-)
+## Only optimize numerical and categorical.
+# numerical_model, instance_data, regression_parameters = numerical_attack.run(
+#     config, instance_data, numerical_model
+# )
 # # Optimize numerical and categorical.
 # categorical_model = None
 # categorical_model, instance_data, regression_parameters = categorical_attack.run(
