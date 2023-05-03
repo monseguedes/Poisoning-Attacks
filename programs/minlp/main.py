@@ -15,7 +15,7 @@ import flipping_attack
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat",
+    "dataset_name": "10num10cat",
     "training_samples": 100,
     "poison_rate": 4,
     "seed": 3,
