@@ -57,9 +57,11 @@ def run(config, instance_data, model=None):
     numerical_model = None
 
     for epoch in range(n_epochs):
-        numerical_model, numerical_attack_instance_data, solution = numerical_attack.run(
-            config, instance_data, numerical_model
-        )
+        (
+            numerical_model,
+            numerical_attack_instance_data,
+            solution,
+        ) = numerical_attack.run(config, instance_data, numerical_model)
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
             best_sol = solution
@@ -127,7 +129,9 @@ def run(config, instance_data, model=None):
             # TODO add printing
             if poison_sample_index % 20 == 0:
                 print(f"{'it':>3s}  {'mse':>9s}  {'best':>9s}")
-            print(f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}")
+            print(
+                f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}"
+            )
 
             # Check if the updated data was better than the current best.
             if best_sol["mse"] > sol["mse"]:
@@ -136,7 +140,7 @@ def run(config, instance_data, model=None):
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
-                best_sol = sol 
+                best_sol = sol
                 best_instance_data = instance_data.copy()
 
     # TODO printing of solutions
@@ -151,12 +155,31 @@ def run(config, instance_data, model=None):
     return model, best_instance_data, best_sol
 
 
-
 def print_diff(instance_data_a, instance_data_b):
-    print(instance_data_a.get_num_x_train_dataframe()[instance_data_a.get_num_x_train_dataframe() != instance_data_b.get_num_x_train_dataframe()])
-    print(instance_data_a.get_cat_x_train_dataframe()[instance_data_a.get_cat_x_train_dataframe() != instance_data_b.get_cat_x_train_dataframe()])
-    print(instance_data_a.get_num_x_poison_dataframe()[instance_data_a.get_num_x_poison_dataframe() != instance_data_b.get_num_x_poison_dataframe()])
-    print(instance_data_a.get_cat_x_poison_dataframe()[instance_data_a.get_cat_x_poison_dataframe() != instance_data_b.get_cat_x_poison_dataframe()])
+    print(
+        instance_data_a.get_num_x_train_dataframe()[
+            instance_data_a.get_num_x_train_dataframe()
+            != instance_data_b.get_num_x_train_dataframe()
+        ]
+    )
+    print(
+        instance_data_a.get_cat_x_train_dataframe()[
+            instance_data_a.get_cat_x_train_dataframe()
+            != instance_data_b.get_cat_x_train_dataframe()
+        ]
+    )
+    print(
+        instance_data_a.get_num_x_poison_dataframe()[
+            instance_data_a.get_num_x_poison_dataframe()
+            != instance_data_b.get_num_x_poison_dataframe()
+        ]
+    )
+    print(
+        instance_data_a.get_cat_x_poison_dataframe()[
+            instance_data_a.get_cat_x_poison_dataframe()
+            != instance_data_b.get_cat_x_poison_dataframe()
+        ]
+    )
 
 
 def flip_row():

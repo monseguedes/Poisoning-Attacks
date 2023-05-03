@@ -60,9 +60,7 @@ def run(config, instance_data):
 
     else:
         regularisation_parameter = instance_data.regularization
-        regularisation_parameter_matrix = regularisation_parameter * np.eye(
-            X.shape[1]
-        )
+        regularisation_parameter_matrix = regularisation_parameter * np.eye(X.shape[1])
 
         theta = np.linalg.solve(
             X.T @ X + n_samples * regularisation_parameter_matrix,
@@ -85,6 +83,7 @@ def run(config, instance_data):
         "x_poison_num": instance_data.get_num_x_poison_dataframe(),
         "x_poison_cat": instance_data.get_cat_x_poison_dataframe(),
     }
+
 
 def main():
     config = {
@@ -119,9 +118,7 @@ def main():
     }
     instance_data = instance_data_class.InstanceData(config)
 
-    scikit_learn_regression_parameters = ridge_regression.run(
-        config, instance_data
-    )
+    scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
     def assert_solutions_are_close(sol1, sol2):
         def flatten(x):
@@ -140,10 +137,7 @@ def main():
             np.testing.assert_allclose(a, b, rtol=1e-4, atol=1e-4, err_msg=key)
 
     manual_solution = run(config, instance_data)
-    assert_solutions_are_close(
-        manual_solution, scikit_learn_regression_parameters
-    )
-
+    assert_solutions_are_close(manual_solution, scikit_learn_regression_parameters)
 
 
 if __name__ == "__main__":

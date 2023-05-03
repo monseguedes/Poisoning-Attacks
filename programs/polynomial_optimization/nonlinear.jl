@@ -22,7 +22,9 @@ t = rand(Float64, (1,3))
 @variable(model, bias)
 println(size(w))
 println(size(x))
+println(size(t'))
 @objective(model, Min, -(dot(w, t') + bias - y[1])^2)
+
 
 for i = 1:3
     @NLconstraint(model, 2 * ((sum(w[i] * t[i] for i in 1:3) + bias - y[1]) * t[i] 
