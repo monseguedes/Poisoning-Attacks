@@ -136,7 +136,7 @@ def run(config, instance_data, model=None):
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
-                best_sol = sol  # TODO make sure we use new weights (which are already computed)
+                best_sol = sol 
                 best_instance_data = instance_data.copy()
 
     # TODO printing of solutions
