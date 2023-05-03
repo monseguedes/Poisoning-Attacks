@@ -48,13 +48,13 @@ class InstanceData:
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
 
         self.train_dataframe.reset_index(drop=True, inplace=True)
-        self.train_dataframe.to_csv("train_dataframe.csv")
+        #self.train_dataframe.to_csv("train_dataframe.csv")
 
         poison_rate = config["poison_rate"] / 100
         self.poison_dataframe = self.train_dataframe.sample(
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
-        self.poison_dataframe.to_csv("poison_dataframe.csv")
+        #self.poison_dataframe.to_csv("poison_dataframe.csv")
 
         self.no_numfeatures = len(
             get_numerical_feature_column_names(self.train_dataframe)

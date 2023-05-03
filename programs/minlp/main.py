@@ -15,7 +15,7 @@ import flipping_attack
 
 config = {
     # Dataset
-    "dataset_name": "10num10cat",
+    "dataset_name": "5num5cat",
     "training_samples": 100,
     "poison_rate": 4,
     "seed": 3,
@@ -40,7 +40,6 @@ config = {
     "iterative_attack_n_epochs": 1,
     # Flipping attack
     "flipping_attack_n_epochs": 5,
-    "plot": False,
     # Solutions
     "datatype": "test",
 }
