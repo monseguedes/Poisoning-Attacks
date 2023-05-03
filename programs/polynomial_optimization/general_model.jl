@@ -1,4 +1,9 @@
 using JuMP, CSDP, SumOfSquares
+using DynamicPolynomials
+using SumOfSquares
+using Ipopt
+using Random
+using LinearAlgebra
 
 # Define the number of variables and constraints
 n_numerical_features = 3
@@ -20,7 +25,11 @@ lambda = 0.1
 p = -(sum((sum(w[i] * t[i] for i in 1:n_numerical_features) + bias - y[j])^2 for j in 1:n_training_samples))
 
 # Define the set of constraints
-S = @set [x[i]*(1-x[i]) >= 0 for i in 1:n_numerical_features]... # `...` is the splat operator to unpack arrays
+S = @set x[1]*(1-x[1]) >= 0
+for i in 2:n_numerical_features
+    c = x[i]*(1-x[i])  
+    push!(S, c >= 0)
+end
 for j in 1:n_numerical_features
     c = 2 * ((sum(w[i] * t[i] for i in 1:n_numerical_features) + bias - y[n_training_samples]) * t[j] + 
              (sum(w[i] * x[i] for i in 1:n_numerical_features) + bias - y[n_training_samples + 1]) * x[j]) +
