@@ -31,6 +31,7 @@ cat_poison = reshape(cat_poison_data, (1,4))
 @variable(model, 0 <= num_poison[1:2] <= 1)
 @variable(model, num_weights[1:2])
 @variable(model, cat_weights[1:4])
+# @variable(model, cat_poison[1:4])
 @variable(model, bias)
 @variable(model, t)
 @objective(model, Min, -((dot(num_weights, num_training[1, :]) + dot(cat_weights, cat_training[1, :]) + bias - y[1])^2 
@@ -94,7 +95,9 @@ S = @set num_poison[1]*(1-num_poison[1]) >= 0 &&
             +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) 
             + t)  == 0 &&
         t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0 &&
-        cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
+        #cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
+        cat_poison[1] * cat_poison[2] == 0 &&
+        cat_poison[3] * cat_poison[4] == 0 
 
 
 import CSDP
@@ -103,7 +106,7 @@ solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
 model = SOSModel(solver)
 @variable(model, α)
 @objective(model, Max, α)
-@constraint(model, p >= α, domain = S)
+@constraint(model, p >= α, domain = S, maxdegree=2)
 optimize!(model)
 @show termination_status(model)
 @show objective_value(model)
