@@ -39,7 +39,7 @@ config = {
     # Iterative attack
     "iterative_attack_n_epochs": 1,
     # Flipping attack
-    "flipping_attack_n_epochs": 5,
+    "flipping_attack_n_epochs": 2,
     # Solutions
     "datatype": "test",
 }
@@ -100,10 +100,10 @@ def assert_solutions_are_close(sol1, sol2):
             return x.ravel()
         except AttributeError:
             return x
-
     for key in ["weights_num", "weights_cat", "bias", "mse"]:
         a = flatten(sol1[key])
         b = flatten(sol2[key])
+
         np.testing.assert_allclose(a, b, rtol=1e-4, err_msg=key)
 
 

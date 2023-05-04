@@ -133,7 +133,7 @@ class PyomoModel(pmo.block):
                     domain=pmo.PercentFraction
                 )
 
-        # Numerical feature vector of poisoned samples
+        # Categorical feature vector of poisoned samples
         self.x_poison_cat = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
             for catfeature in instance_data.categorical_feature_category_tuples:

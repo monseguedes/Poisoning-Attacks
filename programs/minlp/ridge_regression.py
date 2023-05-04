@@ -27,7 +27,7 @@ def run(config, instance_data, wide=False):
         [instance_data.get_y_train_dataframe(), instance_data.get_y_poison_dataframe()]
     )
     y = y_df.to_numpy()
-    model = Ridge(alpha=len(X) * config["regularization"], fit_intercept=True)
+    model = Ridge(alpha=len(X) * config["regularization"], fit_intercept=True, solver='svd')
     model.fit(X, y)
 
     weights_num = model.coef_[: instance_data.no_numfeatures]
@@ -57,8 +57,8 @@ def run(config, instance_data, wide=False):
             column = f"{k[0]}:{k[1]}"
             _weights_cat[column] = [v]
 
-    y_pred = model.predict(X[: instance_data.no_train_samples])
-    mse = mean_squared_error(y[: instance_data.no_train_samples], y_pred)
+    y_pred = model.predict(X[:instance_data.no_train_samples])
+    mse = mean_squared_error(y[:instance_data.no_train_samples], y_pred)
 
     return {
         "weights_num": _weights_num,
@@ -66,5 +66,5 @@ def run(config, instance_data, wide=False):
         "bias": bias,
         "mse": mse,
         "x_poison_num": instance_data.get_num_x_poison_dataframe(),
-        "x_poison_cat": instance_data.get_cat_x_poison_dataframe(),
+        "x_poison_cat": instance_data.get_cat_x_poison_dataframe()
     }

@@ -57,19 +57,21 @@ def run(config, instance_data, model=None):
     numerical_model = None
 
     for epoch in range(n_epochs):
-        (
-            numerical_model,
-            numerical_attack_instance_data,
-            solution,
-        ) = numerical_attack.run(config, instance_data, numerical_model)
+        numerical_model, numerical_attack_instance_data, solution = numerical_attack.run(
+            config, instance_data, numerical_model
+        )
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
             best_sol = solution
             # And the instance data to achieve this best solution.
             best_instance_data = numerical_attack_instance_data
             instance_data = numerical_attack_instance_data
+        else:
+            instance_data = best_instance_data.copy()
 
         for poison_sample_index in range(no_poison_samples):
+            if epoch == 1:
+                break
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
             num_weights = best_sol["weights_num"].to_dict()
@@ -125,13 +127,13 @@ def run(config, instance_data, model=None):
 
             # Run the regression and see if the purturbation was effective or not.
             sol = ridge_regression.run(config, instance_data)
+            print("Testing flipping")
+            run_test(config, instance_data, sol)
 
             # TODO add printing
             if poison_sample_index % 20 == 0:
                 print(f"{'it':>3s}  {'mse':>9s}  {'best':>9s}")
-            print(
-                f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}"
-            )
+            print(f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}")
 
             # Check if the updated data was better than the current best.
             if best_sol["mse"] > sol["mse"]:
@@ -140,8 +142,10 @@ def run(config, instance_data, model=None):
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
-                best_sol = sol
+                best_sol = sol  # TODO make sure we use new weights (which are already computed)
                 best_instance_data = instance_data.copy()
+                print("Testing flipping when updated")
+                run_test(config, best_instance_data, best_sol)
 
     # TODO printing of solutions
     print("RESULTS")
@@ -180,6 +184,36 @@ def print_diff(instance_data_a, instance_data_b):
             != instance_data_b.get_cat_x_poison_dataframe()
         ]
     )
+
+
+# Run the utitlity to check the results with scikitlearn.
+def run_test(config, instance_data, solution):
+    scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
+
+    def assert_solutions_are_close(sol1, sol2):
+        def flatten(x):
+            try:
+                x = x.to_numpy()
+            except AttributeError:
+                pass
+            try:
+                return x.ravel()
+            except AttributeError:
+                return x
+            
+        failed = []
+        for key in ["weights_num", "weights_cat", "bias", "mse"]:
+            a = flatten(sol1[key])
+            b = flatten(sol2[key])
+            if not np.allclose(a, b, rtol=1e-4):
+                failed.append(key)
+            #np.testing.assert_allclose(a, b, rtol=1e-4, err_msg=key)
+
+        if failed:
+            raise AssertionError(f'Failed on value {",".join(failed)}')
+    
+    assert_solutions_are_close(solution, scikit_learn_regression_parameters)
+
 
 
 def flip_row():
