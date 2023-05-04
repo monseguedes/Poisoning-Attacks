@@ -3,11 +3,12 @@
 """Run iterative attack which which poison training data row by row"""
 
 import copy
-import pandas as pd
 
 import numpy as np
+import pandas as pd
 import pyomo_model
 import ridge_regression
+import testing
 
 long_space = 80
 short_space = 60
@@ -102,25 +103,25 @@ def run(config, instance_data, model=None):
             model.set_poison_data_status(
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
-            run_test(config, best_instance_data, best_solution)
+            testing.validate_solution(config, best_instance_data, best_solution)
             print('Solving model')
             model.solve()
             print('Testing after solve')
-            run_test(config, best_instance_data, best_solution)
+            testing.validate_solution(config, best_instance_data, best_solution)
             solution = model.get_solution()
             print('Testing after solve')
-            run_test(config, best_instance_data, best_solution)
+            testing.validate_solution(config, best_instance_data, best_solution)
             if solution["mse"] > best_mse:
                 buff = instance_data.copy()
                 model.update_data(instance_data)
                 print('Testing solution')
-                run_test(config, instance_data, solution)
+                testing.validate_solution(config, instance_data, solution)
                 best_mse = solution["mse"]
                 best_solution = solution
                 best_instance_data = instance_data.copy()
                 print('Best solution updated')
-                run_test(config, best_instance_data, best_solution)
-            
+                testing.validate_solution(config, best_instance_data, best_solution)
+
             else:
                 instance_data = best_instance_data.copy()
 
@@ -128,7 +129,7 @@ def run(config, instance_data, model=None):
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
                 print(f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}")
             print(f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}")
-            run_test(config, best_instance_data, best_solution)
+            testing.validate_solution(config, best_instance_data, best_solution)
 
     # This will break when solution_list is empty, but maybe it's unlikely
     keys = solution_list[0].keys()
@@ -140,60 +141,6 @@ def run(config, instance_data, model=None):
     print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
 
     return model, best_instance_data, best_solution
-
-# Run the utitlity to check the results with scikitlearn.
-def run_test(config, instance_data, solution):
-    scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
-
-    def assert_solutions_are_close(sol1, sol2):
-        def flatten(x):
-            try:
-                x = x.to_numpy()
-            except AttributeError:
-                pass
-            try:
-                return x.ravel()
-            except AttributeError:
-                return x
-            
-        failed = []
-        for key in ["weights_num", "weights_cat", "bias", "mse"]:
-            a = flatten(sol1[key])
-            b = flatten(sol2[key])
-            if not np.allclose(a, b, rtol=1e-4, atol=1e-4):
-                failed.append(key)
-            np.testing.assert_allclose(a, b, rtol=1e-4, atol=1e-4, err_msg=key)
-
-        if failed:
-            raise AssertionError(f'Failed on value {",".join(failed)}')
-    
-    assert_solutions_are_close(solution, scikit_learn_regression_parameters)
-
-def print_diff(instance_data_a, instance_data_b):
-    print(
-        instance_data_a.get_num_x_train_dataframe()[
-            instance_data_a.get_num_x_train_dataframe()
-            != instance_data_b.get_num_x_train_dataframe()
-        ]
-    )
-    print(
-        instance_data_a.get_cat_x_train_dataframe()[
-            instance_data_a.get_cat_x_train_dataframe()
-            != instance_data_b.get_cat_x_train_dataframe()
-        ]
-    )
-    print(
-        instance_data_a.get_num_x_poison_dataframe()[
-            instance_data_a.get_num_x_poison_dataframe()
-            != instance_data_b.get_num_x_poison_dataframe()
-        ]
-    )
-    print(
-        instance_data_a.get_cat_x_poison_dataframe()[
-            instance_data_a.get_cat_x_poison_dataframe()
-            != instance_data_b.get_cat_x_poison_dataframe()
-        ]
-    )
 
 if __name__ == "__main__":
     import doctest

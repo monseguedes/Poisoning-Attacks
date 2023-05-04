@@ -6,12 +6,13 @@ Main script for the paper of poisoning attacks of categorical variables.
 """
 
 import categorical_attack
+import flipping_attack
 import instance_data_class
 import iterative_attack
 import numerical_attack
 import numpy as np
 import ridge_regression
-import flipping_attack
+import testing
 
 config = {
     # Dataset
@@ -90,32 +91,5 @@ _, instance_data, regression_parameters = flipping_attack.run(
 scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
 
-def assert_solutions_are_close(sol1, sol2):
-    def flatten(x):
-        try:
-            x = x.to_numpy()
-        except AttributeError:
-            pass
-        try:
-            return x.ravel()
-        except AttributeError:
-            return x
-
-    msg = []
-
-    for key in ["weights_num", "weights_cat", "bias", "mse"]:
-        a = flatten(sol1[key])
-        b = flatten(sol2[key])
-
-        try:
-            np.testing.assert_allclose(a, b, rtol=1e-4, atol=1e-4, err_msg=key)
-        except AssertionError as e:
-            # print(e)
-            msg.append(str(e))
-
-    if msg:
-        raise AssertionError(("\n" + "- " * 30).join(msg))
-
-
-assert_solutions_are_close(regression_parameters, scikit_learn_regression_parameters)
+testing.assert_solutions_are_close(regression_parameters, scikit_learn_regression_parameters)
 print("test passed")
