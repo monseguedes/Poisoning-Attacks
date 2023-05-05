@@ -17,8 +17,8 @@ import testing
 config = {
     # Dataset
     "dataset_name": "10num10cat",
-    "training_samples": 100,
-    "poison_rate": 4,
+    "training_samples": 300,
+    "poison_rate": 20,
     "seed": 3,
     # Problem
     "function": "MSE",
@@ -30,7 +30,7 @@ config = {
     "time_limit": 20,
     # Numerical attack
     "numerical_attack_n_epochs": 1,
-    "numerical_attack_mini_batch_size": 0.1,
+    "numerical_attack_mini_batch_size": 0.2,
     "numerical_attack_incremental": False,
     # Categorical attack
     "categorical_attack_n_epochs": 1,
@@ -38,7 +38,7 @@ config = {
     "categorical_attack_no_nfeatures": 0,
     "categorical_attack_no_cfeatures": 0,
     # Iterative attack
-    "iterative_attack_n_epochs": 1,
+    "iterative_attack_n_epochs": 2,
     # Flipping attack
     "flipping_attack_n_epochs": 2,
     # Solutions

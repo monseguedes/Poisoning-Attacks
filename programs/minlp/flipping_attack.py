@@ -70,8 +70,6 @@ def run(config, instance_data, model=None):
             instance_data = best_instance_data.copy()
 
         for poison_sample_index in range(no_poison_samples):
-            if epoch == 1:
-                break
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
             num_weights = best_sol["weights_num"].to_dict()
@@ -127,8 +125,6 @@ def run(config, instance_data, model=None):
 
             # Run the regression and see if the purturbation was effective or not.
             sol = ridge_regression.run(config, instance_data)
-            print("Testing flipping")
-            run_test(config, instance_data, sol)
 
             # TODO add printing
             if poison_sample_index % 20 == 0:
@@ -144,8 +140,7 @@ def run(config, instance_data, model=None):
                 # We found a better one than the current best.
                 best_sol = sol  # TODO make sure we use new weights (which are already computed)
                 best_instance_data = instance_data.copy()
-                print("Testing flipping when updated")
-                run_test(config, best_instance_data, best_sol)
+            
 
     # TODO printing of solutions
     print("RESULTS")

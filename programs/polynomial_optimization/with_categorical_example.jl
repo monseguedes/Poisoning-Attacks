@@ -95,18 +95,20 @@ S = @set num_poison[1]*(1-num_poison[1]) >= 0 &&
             +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) 
             + t)  == 0 &&
         t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0 &&
-        #cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
+        cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
         cat_poison[1] * cat_poison[2] == 0 &&
         cat_poison[3] * cat_poison[4] == 0 
 
 
 import CSDP
-solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
+using MosekTools
+
+solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => true)
 
 model = SOSModel(solver)
 @variable(model, α)
 @objective(model, Max, α)
-@constraint(model, p >= α, domain = S, maxdegree=2)
+@constraint(model, p >= α, domain = S, maxdegree=4)
 optimize!(model)
 @show termination_status(model)
 @show objective_value(model)

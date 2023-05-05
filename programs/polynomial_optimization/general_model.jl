@@ -1,64 +1,119 @@
-using JuMP, CSDP, SumOfSquares
+"""
+Code to build the continuous version of 
+poisoning attacks.
+"""
+
 using DynamicPolynomials
 using SumOfSquares
 using Ipopt
+using Gurobi
 using Random
 using LinearAlgebra
 
-# Define the number of variables and constraints
-n_numerical_features = 3
-n_categrocial_features = 3
-n_categories = 3
-n_samples = 2
-n_training_samples = 1
-
-
-# Define the variables and parameters
-@polyvar w[1:n_numerical_features] x[1:n_numerical_features] bias
+### NLP model
+# Set regularisation parameter
+lambda = 0.1
+model = Model(optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0))
 # Set a random seed
 Random.seed!(123)
-y = rand(Float64, (n_samples,1))
-t = rand(Float64, (1,n_numerical_features))
-lambda = 0.1
+y = rand(Float64, (2,1))
+y_data = [0.78, 0.34, 0.56]
+y = reshape(y_data, (3,1))
 
-# Define the objective function
-p = -(sum((sum(w[i] * t[i] for i in 1:n_numerical_features) + bias - y[j])^2 for j in 1:n_training_samples))
+num_training_data = [[0.52, 0.23] [0.43, 0.76]]
+num_training = reshape(num_training_data, (2,2))
 
-# Define the set of constraints
-S = @set (x[1]*(1-x[1]) >= 0 )
-push!(S{Any}, (x[1]*(1-x[1]) >= 0 ))
-println(S)
-S = [1]
-for i in 2:n_numerical_features
-    push!(S, 1)
-    #push!(S, x[i]*(1-x[i])  >= 0)
+cat_training_data = [[1, 0, 0, 1] [0, 1, 1, 0]]
+cat_training = reshape(cat_training_data, (2,4))
+cat_poison_data = [0,1,1,0]
+cat_poison = reshape(cat_poison_data, (1,4))
+
+@variable(model, 0 <= num_poison[1:2] <= 1)
+@variable(model, num_weights[1:2])
+@variable(model, cat_weights[1:4])
+# @variable(model, cat_poison[1:4])
+@variable(model, bias)
+@variable(model, t)
+@objective(model, Min, -((dot(num_weights, num_training[1, :]) + dot(cat_weights, cat_training[1, :]) + bias - y[1])^2 
+                        + (dot(num_weights, num_training[2, :]) + dot(cat_weights, cat_training[2, :]) + bias - y[2])^2))
+
+
+for j = 1:2
+    @NLconstraint(model, 2/3 * ((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) * num_training[1,j] 
+                            + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2, j] 
+                            + t * num_poison[j] + 2 * lambda * num_weights[j]) == 0)
 end
-for j in 1:n_numerical_features
-    c = 2 * ((sum(w[i] * t[i] for i in 1:n_numerical_features) + bias - y[n_training_samples]) * t[j] + 
-             (sum(w[i] * x[i] for i in 1:n_numerical_features) + bias - y[n_training_samples + 1]) * x[j]) +
-        2 * lambda * w[j]
-    push!(S, c == 0)
+
+for j = 1:4
+    @NLconstraint(model, 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) * cat_training[1,j] 
+                            + (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2]) * cat_training[2, j] 
+                            + t * cat_poison[j] + 2 * lambda * cat_weights[j]) == 0)
 end
-println(S)
 
-# # Define the optimizer
-# solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
+@NLconstraint(model, 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) 
+                          + (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2]) 
+                          + t)  == 0)
 
-# # Define the SOS model
-# model = SOSModel(solver)
+@NLconstraint(model, t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0)  
 
-# # Define the variables
-# @variable(model, α)
+optimize!(model)
+solution_summary(model)
+@show objective_value(model)
 
-# # Define the objective function
-# @objective(model, Max, α)
+@polyvar num_weights[1:2] cat_weights[1:4] num_poison[1:2] bias t cat_poison[1:4]
+p = -((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) 
+    + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2]))
 
-# # Define the constraint
-# @constraint(model, p >= α, domain = S)
+# using SumOfSquares
+# S = @set num_poison[1]*(1-num_poison[1]) >= 0 && 
+#         num_poison[2]*(1-num_poison[2]) >= 0 &&
+#         cat_poison[1] * (cat_poison[1] - 1) == 0 
+        # cat_poison[2] * (cat_poison[2] - 1) == 0 &&
+        # cat_poison[3] * (cat_poison[3] - 1) == 0 &&
+        # cat_poison[4] * (cat_poison[4] - 1) == 0 &&
+        # sum(cat_poison[i] for i in 1:2) == 1 &&
+        # sum(cat_poison[i] for i in 2:4) == 1 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * num_training[1,1] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2,1]
+        #     +  (t * num_poison[1])) + (2 * lambda * num_weights[1]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * num_training[1,2] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2,2] 
+        #     +  (t * num_poison[2])) + (2 * lambda * num_weights[2]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,1] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,1] 
+        #     +  (t * cat_poison[1])) + (2 * lambda * cat_weights[1]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, ] for i in 1:4) + bias - y[1]) * cat_training[1,2] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,2] 
+        #     +  (t * cat_poison[2])) + (2 * lambda * cat_weights[2]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,3] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,3] 
+        #     +  (t * cat_poison[3])) + (2 * lambda * cat_weights[3]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,4] 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,4] 
+        #     +  (t * cat_poison[4])) + (2 * lambda * cat_weights[4]) == 0 &&
+        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) 
+        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) 
+        #     + t)  == 0 &&
+        # t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0 &&
+        # #cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
+        # cat_poison[1] * cat_poison[2] == 0 &&
+        # cat_poison[3] * cat_poison[4] == 0 
 
-# # Optimize the model
-# optimize!(model)
+S = algebraicset([cat_poisoni * (cat_poisoni - 1)  for cat_poisoni in cat_poison])
+#S = semialgebraicset(num_poison[1]*(1-num_poison[1]) >= 0)
 
-# # Print the results
-# @show termination_status(model)
-# @show objective_value(model)
+
+
+import CSDP
+solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
+
+model = SOSModel(solver)
+@variable(model, α)
+@objective(model, Max, α)
+@constraint(model, p >= α, domain = S, maxdegree=4)
+
+@constraint(model, cat_poison[2] * (cat_poison[2] - 1) == 0)
+
+optimize!(model)
+@show termination_status(model)
+@show objective_value(model)

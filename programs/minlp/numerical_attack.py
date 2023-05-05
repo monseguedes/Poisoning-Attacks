@@ -84,9 +84,7 @@ def run(config, instance_data, model=None):
     best_instance_data = instance_data
 
     for epoch in range(n_epochs):
-        print(f'Starting epoch {epoch}')
         for mini_batch_index in range(n_mini_batches):
-            print(f'Starting minibatch {mini_batch_index}')
             # Modify num_feature_flag to specify which features are to be
             # optimized, fixed and removed.
             # model.unfix: 0
@@ -103,25 +101,14 @@ def run(config, instance_data, model=None):
             model.set_poison_data_status(
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
-            testing.validate_solution(config, best_instance_data, best_solution)
-            print('Solving model')
             model.solve()
-            print('Testing after solve')
-            testing.validate_solution(config, best_instance_data, best_solution)
             solution = model.get_solution()
-            print('Testing after solve')
-            testing.validate_solution(config, best_instance_data, best_solution)
             if solution["mse"] > best_mse:
                 buff = instance_data.copy()
                 model.update_data(instance_data)
-                print('Testing solution')
-                testing.validate_solution(config, instance_data, solution)
                 best_mse = solution["mse"]
                 best_solution = solution
                 best_instance_data = instance_data.copy()
-                print('Best solution updated')
-                testing.validate_solution(config, best_instance_data, best_solution)
-
             else:
                 instance_data = best_instance_data.copy()
 
