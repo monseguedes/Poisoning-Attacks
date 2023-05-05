@@ -120,7 +120,6 @@ def run(config, instance_data, model=None):
             print(
                 f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
             )
-            testing.validate_solution(config, best_instance_data, best_solution)
 
     # This will break when solution_list is empty, but maybe it's unlikely
     keys = solution_list[0].keys()

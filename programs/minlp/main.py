@@ -23,7 +23,7 @@ config = {
     # Problem
     "function": "MSE",
     "regularization": 0.6612244897959183,
-    "solver_name": "ipopt",
+    "solver_name": "gurobi",
     # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
@@ -65,26 +65,18 @@ instance_data = instance_data_class.InstanceData(config)
 
 numerical_model = None
 
-_, instance_data, regression_parameters = flipping_attack.run(
-    config, instance_data, numerical_model
-)
-
-# numerical_model = None
+# _, instance_data, regression_parameters = flipping_attack.run(
+#     config, instance_data, numerical_model
+# )
 
 # _, instance_data, regression_parameters = iterative_attack.run(
 #     config, instance_data, numerical_model
 # )
 
+numerical_model, instance_data, regression_parameters = numerical_attack.run(
+    config, instance_data, numerical_model
+)
 
-## Only optimize numerical and categorical.
-# numerical_model, instance_data, regression_parameters = numerical_attack.run(
-#     config, instance_data, numerical_model
-# )
-# # Optimize numerical and categorical.
-# categorical_model = None
-# categorical_model, instance_data, regression_parameters = categorical_attack.run(
-#     config, instance_data, categorical_model
-# )
 
 
 # Run the utitlity to check the results with scikitlearn.

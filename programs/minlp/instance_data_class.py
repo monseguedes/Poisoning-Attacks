@@ -189,6 +189,7 @@ class InstanceData:
                 self.poison_dataframe.loc[index[0], f"{index[1]}:{index[2]}"] = row
         else:
             raise NotImplementedError
+        
 
 
 def _is_0_based_index(x):

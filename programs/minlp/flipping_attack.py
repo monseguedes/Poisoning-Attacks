@@ -50,14 +50,17 @@ def run(config, instance_data, model=None):
 
     no_poison_samples = instance_data.no_poison_samples
 
+    it =0
+    instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+    it += 1
+
     # Solve benchmark
     config["iterative_attack_incremental"] = True
-    _, _, benchmark_solution = numerical_attack.run(config, instance_data)
+    _, benchmark_data, benchmark_solution = numerical_attack.run(config, instance_data)
     config["iterative_attack_incremental"] = False
     numerical_model = None
 
-    it =0
-    instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+    benchmark_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
     it += 1
     for epoch in range(n_epochs):
         (
@@ -159,14 +162,25 @@ def run(config, instance_data, model=None):
             numerical_attack_instance_data,
             solution,
         ) = numerical_attack.run(config, instance_data, numerical_model)
+        if best_sol["mse"] <= solution["mse"]:
+            # Store the best solution found so far.
+            best_sol = solution
+            # And the instance data to achieve this best solution.
+            best_instance_data = numerical_attack_instance_data
+            instance_data = numerical_attack_instance_data
+        else:
+            instance_data = best_instance_data.copy()
         best_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
         it += 1
+        # Project numerical features
+        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.round(decimals=0)
+        best_sol = ridge_regression.run(config, instance_data)
 
     print("RESULTS")
-    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.4f}')
-    print(f'Flipping method mse: {best_sol["mse"]:7.4f}')
+    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
+    print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
     print(
-        f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
+        f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
 
     return model, best_instance_data, best_sol
