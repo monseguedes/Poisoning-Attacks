@@ -60,49 +60,41 @@ optimize!(model)
 solution_summary(model)
 @show objective_value(model)
 
+
+using SumOfSquares 
 @polyvar num_weights[1:2] cat_weights[1:4] num_poison[1:2] bias t cat_poison[1:4]
 p = -((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) 
     + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2]))
 
-# using SumOfSquares
-# S = @set num_poison[1]*(1-num_poison[1]) >= 0 && 
-#         num_poison[2]*(1-num_poison[2]) >= 0 &&
-#         cat_poison[1] * (cat_poison[1] - 1) == 0 
-        # cat_poison[2] * (cat_poison[2] - 1) == 0 &&
-        # cat_poison[3] * (cat_poison[3] - 1) == 0 &&
-        # cat_poison[4] * (cat_poison[4] - 1) == 0 &&
-        # sum(cat_poison[i] for i in 1:2) == 1 &&
-        # sum(cat_poison[i] for i in 2:4) == 1 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * num_training[1,1] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2,1]
-        #     +  (t * num_poison[1])) + (2 * lambda * num_weights[1]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * num_training[1,2] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2,2] 
-        #     +  (t * num_poison[2])) + (2 * lambda * num_weights[2]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,1] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,1] 
-        #     +  (t * cat_poison[1])) + (2 * lambda * cat_weights[1]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, ] for i in 1:4) + bias - y[1]) * cat_training[1,2] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,2] 
-        #     +  (t * cat_poison[2])) + (2 * lambda * cat_weights[2]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,3] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,3] 
-        #     +  (t * cat_poison[3])) + (2 * lambda * cat_weights[3]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,4] 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,4] 
-        #     +  (t * cat_poison[4])) + (2 * lambda * cat_weights[4]) == 0 &&
-        # 2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) 
-        #     +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) 
-        #     + t)  == 0 &&
-        # t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0 &&
-        # #cat_poison[1] * cat_poison[2] * cat_poison[3]* cat_poison[4] == 0 &&
-        # cat_poison[1] * cat_poison[2] == 0 &&
-        # cat_poison[3] * cat_poison[4] == 0 
+S = @set num_poison[1]*(1-num_poison[1]) >= 0 && 
+         num_poison[2]*(1-num_poison[2]) >= 0 
 
-S = algebraicset([cat_poisoni * (cat_poisoni - 1)  for cat_poisoni in cat_poison])
-#S = semialgebraicset(num_poison[1]*(1-num_poison[1]) >= 0)
+for i in 1:4    # Binary constraints
+    global S = S ∩ @set(cat_poison[i] * (cat_poison[i] - 1) == 0)
+end
 
+for i in 1:2    # SOS1 constraint
+    global S = S ∩ @set(sum(cat_poison[i] for i in 1:2) == 1)
+end
 
+for i in 1:2    # Num weights constraints
+    global S = S ∩ @set(2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * num_training[1,i] 
+                            +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * num_training[2,i]
+                            +  (t * num_poison[i])) + (2 * lambda * num_weights[i]) == 0)
+end
+
+for i in 1:4    # Cat weights constraints
+    global S = S ∩ @set(2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) * cat_training[1,i] 
+                            +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) * cat_training[2,i] 
+                            +  (t * cat_poison[i])) + (2 * lambda * cat_weights[i]) == 0)
+end
+
+# Bias constraint
+S = S ∩ @set(2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + sum(cat_weights[i] * cat_training[1,i] for i in 1:4) + bias - y[1]) 
+                 +  (sum(num_weights[i] * num_training[2,i] for i in 1:2) + sum(cat_weights[i] * cat_training[2,i] for i in 1:4) + bias - y[2]) 
+                 +   t)  == 0)
+
+println(S)
 
 import CSDP
 solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
@@ -110,7 +102,7 @@ solver = optimizer_with_attributes(CSDP.Optimizer, MOI.Silent() => true)
 model = SOSModel(solver)
 @variable(model, α)
 @objective(model, Max, α)
-@constraint(model, p >= α, domain = S, maxdegree=4)
+@constraint(model, p >= α, domain = S, maxdegree=2)
 
 @constraint(model, cat_poison[2] * (cat_poison[2] - 1) == 0)
 
