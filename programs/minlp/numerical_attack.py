@@ -60,9 +60,11 @@ def run(config, instance_data, model=None):
 
     no_poison_samples = instance_data.no_poison_samples
 
-    if isinstance(mini_batch_size, int): # TODO what happens for the case with just one batch?
+    if isinstance(
+        mini_batch_size, int
+    ):  # TODO what happens for the case with just one batch?
         mini_batch_absolute_size = mini_batch_size
-    elif mini_batch_size == 'all':
+    elif mini_batch_size == "all":
         mini_batch_absolute_size = no_poison_samples
     else:
         # mini batch size is specified as a fraction
@@ -115,7 +117,9 @@ def run(config, instance_data, model=None):
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
                 print(f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}")
-            print(f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}")
+            print(
+                f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
+            )
             testing.validate_solution(config, best_instance_data, best_solution)
 
     # This will break when solution_list is empty, but maybe it's unlikely
@@ -128,6 +132,7 @@ def run(config, instance_data, model=None):
     print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
 
     return model, best_instance_data, best_solution
+
 
 if __name__ == "__main__":
     import doctest

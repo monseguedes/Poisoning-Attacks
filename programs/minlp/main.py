@@ -16,8 +16,8 @@ import testing
 
 config = {
     # Dataset
-    "dataset_name": "10num10cat",
-    "training_samples": 300,
+    "dataset_name": "5num5cat",
+    "training_samples": 100,
     "poison_rate": 20,
     "seed": 3,
     # Problem
@@ -38,9 +38,9 @@ config = {
     "categorical_attack_no_nfeatures": 0,
     "categorical_attack_no_cfeatures": 0,
     # Iterative attack
-    "iterative_attack_n_epochs": 2,
+    "iterative_attack_n_epochs": 1,
     # Flipping attack
-    "flipping_attack_n_epochs": 2,
+    "flipping_attack_n_epochs": 1,
     # Solutions
     "datatype": "test",
 }

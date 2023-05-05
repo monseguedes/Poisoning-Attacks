@@ -6,6 +6,7 @@ import numpy as np
 
 import ridge_regression
 
+
 def assert_solutions_are_close(sol1, sol2):
     def flatten(x):
         try:

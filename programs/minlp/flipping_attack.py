@@ -56,10 +56,18 @@ def run(config, instance_data, model=None):
     config["iterative_attack_incremental"] = False
     numerical_model = None
 
+    it =0
+    instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+    it += 1
     for epoch in range(n_epochs):
-        numerical_model, numerical_attack_instance_data, solution = numerical_attack.run(
-            config, instance_data, numerical_model
-        )
+        (
+            numerical_model,
+            numerical_attack_instance_data,
+            solution,
+        ) = numerical_attack.run(config, instance_data, numerical_model)
+        # Save poisoning samples after numerical attack
+        numerical_attack_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+        it += 1
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
             best_sol = solution
@@ -102,7 +110,6 @@ def run(config, instance_data, model=None):
                 categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
 
             # Let's compute the prediction of each case.
-            # TODO Why do we get key error when key exists? type?
             pred_up = num_y + sum(
                 cat_weights[(feature, categories_up[feature])]
                 for feature in cat_features
@@ -126,10 +133,11 @@ def run(config, instance_data, model=None):
             # Run the regression and see if the purturbation was effective or not.
             sol = ridge_regression.run(config, instance_data)
 
-            # TODO add printing
             if poison_sample_index % 20 == 0:
                 print(f"{'it':>3s}  {'mse':>9s}  {'best':>9s}")
-            print(f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}")
+            print(
+                f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}"
+            )
 
             # Check if the updated data was better than the current best.
             if best_sol["mse"] > sol["mse"]:
@@ -138,11 +146,22 @@ def run(config, instance_data, model=None):
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
-                best_sol = sol  # TODO make sure we use new weights (which are already computed)
+                best_sol = sol  
                 best_instance_data = instance_data.copy()
             
+            # Save poisoning samples
+            best_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+            it += 1
+        
+        config["numerical_attack_mini_batch_size"] = 0.5
+        (
+            numerical_model,
+            numerical_attack_instance_data,
+            solution,
+        ) = numerical_attack.run(config, instance_data, numerical_model)
+        best_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+        it += 1
 
-    # TODO printing of solutions
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.4f}')
     print(f'Flipping method mse: {best_sol["mse"]:7.4f}')
@@ -150,7 +169,6 @@ def run(config, instance_data, model=None):
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.4f}'
     )
 
-    # TODO what do we do with model
     return model, best_instance_data, best_sol
 
 
@@ -195,20 +213,19 @@ def run_test(config, instance_data, solution):
                 return x.ravel()
             except AttributeError:
                 return x
-            
+
         failed = []
         for key in ["weights_num", "weights_cat", "bias", "mse"]:
             a = flatten(sol1[key])
             b = flatten(sol2[key])
             if not np.allclose(a, b, rtol=1e-4):
                 failed.append(key)
-            #np.testing.assert_allclose(a, b, rtol=1e-4, err_msg=key)
+            # np.testing.assert_allclose(a, b, rtol=1e-4, err_msg=key)
 
         if failed:
             raise AssertionError(f'Failed on value {",".join(failed)}')
-    
-    assert_solutions_are_close(solution, scikit_learn_regression_parameters)
 
+    assert_solutions_are_close(solution, scikit_learn_regression_parameters)
 
 
 def flip_row():

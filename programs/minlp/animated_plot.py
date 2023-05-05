@@ -1,51 +1,23 @@
-"""
-Example of code for animated plot.
-"""
-
-import random
-
-
-def improve_points(points):
-    new_points = []
-    for point in points:
-        new_point = point + random.uniform(-0.1, 0.1)
-        if new_point < 0:
-            new_point = 0
-        elif new_point > 1:
-            new_point = 1
-        new_points.append(new_point)
-    return new_points
-
-
+import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from matplotlib.animation import FuncAnimation
 
-plt.style.use("seaborn")
+dataframes = []
 
-# Generate some initial points
-points = [random.random() for i in range(20)]
+for i in range(22):
+    df = pd.read_csv(f"programs/minlp/attacks/5num5cat/poison_dataframe{i}.csv")
+    dataframes.append(df)
 
-# Create a figure and axis for the plot
+
 fig, ax = plt.subplots()
 
-
-# Define a function to update the plot with new data
 def update(frame):
-    global points
-    points = improve_points(points)
+    df = dataframes[frame]
     ax.clear()
-    colors = ["r", "g", "b", "c", "m", "y", "k"] * ((len(points) // 5) + 1)
-    for i in range(0, len(points), 5):
-        ax.scatter([i] * 5, points[i : i + 5], c=colors[i // 5])
-    mean = sum(points) / len(points)
-    ax.axhline(mean, color="black", linestyle="--", label=f"Mean = {mean:.2f}")
-    ax.legend(loc="upper right")
-    ax.set_ylim(0, 1)
-    ax.set_title(f"Iteration {frame}")
+    for i in range(len(df)):
+        ax.scatter(list(df.columns), list(df.iloc[i]))
+    ax.set_ylim(-0.1, 1.1) # set the y-axis limit to a fixed range
+    ax.set_title(f"Dataframe {frame}")
 
-
-# Create the animation
-ani = animation.FuncAnimation(fig, update, frames=range(50), interval=100)
-
-# Show the plot
+anim = FuncAnimation(fig, update, frames=len(dataframes), interval=200)
 plt.show()
