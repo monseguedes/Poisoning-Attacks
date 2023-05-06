@@ -107,7 +107,7 @@ class PyomoModel(pmo.block):
             return u
         if u.is_binary() and v.is_binary():
             # Both are binary variables.
-            z = pmo.variable(lb=0, ub=1, domain=pmo.Binary)
+            z = pmo.variable(domain=pmo.Binary)
             self.bilinear_term_variable_list.append(z)
             self.bilinear_term_constraint_list.append(pmo.constraint(z <= u))
             self.bilinear_term_constraint_list.append(pmo.constraint(z <= v))
