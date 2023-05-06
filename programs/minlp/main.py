@@ -23,13 +23,13 @@ config = {
     "seed": 3,
     # Problem
     "function": "MSE",
-    "binary": False, 
+    "binary": False,
     "regularization": 0.6612244897959183,
     "solver_name": "ipopt",
     # Solvers
     "solver_output": True,
     "feasibility": 0.00001,
-    "time_limit": 20,
+    "time_limit": 600,
     # Numerical attack
     "numerical_attack_n_epochs": 1,
     "numerical_attack_mini_batch_size": 0.5,
@@ -75,6 +75,8 @@ numerical_model = None
 #     config, instance_data, numerical_model
 # )
 
+# config["binary"] = True
+# config["solver_name"] = "gurobi"
 # numerical_model, instance_data, regression_parameters = numerical_attack.run(
 #     config, instance_data, numerical_model
 # )
@@ -97,5 +99,7 @@ print(f"mse of projected data is {best_sol['mse']}")
 scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
 
-testing.assert_solutions_are_close(regression_parameters, scikit_learn_regression_parameters)
+testing.assert_solutions_are_close(
+    regression_parameters, scikit_learn_regression_parameters
+)
 print("test passed")

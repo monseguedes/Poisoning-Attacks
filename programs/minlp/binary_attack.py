@@ -1,4 +1,3 @@
-
 """Run binary attack """
 
 import copy
@@ -58,18 +57,18 @@ def run(config, instance_data, model=None):
 
     # Solve benchmark
     config["iterative_attack_incremental"] = True
-    _, benchmark_data, benchmark_solution = numerical_attack.run(config, instance_data, model)
+    _, benchmark_data, benchmark_solution = numerical_attack.run(
+        config, instance_data, model
+    )
 
     # Poison everything
     config["binary"] = True
-    config["solver_name"] = 'gurobi'
+    config["solver_name"] = "gurobi"
     model = pyomo_model.PyomoModel(instance_data, config)
     num_feature_flag = O
     shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
     cat_feature_flag = np.full(shape, O)
-    model.set_poison_data_status(
-        instance_data, num_feature_flag, cat_feature_flag
-    )
+    model.set_poison_data_status(instance_data, num_feature_flag, cat_feature_flag)
     model.solve()
     solution = model.get_solution()
     model.update_data(instance_data)

@@ -1,4 +1,3 @@
-
 """Run iterative attack which which poison training data row by row"""
 
 import copy
