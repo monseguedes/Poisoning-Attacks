@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """Run iterative attack which which poison training data row by row"""
 

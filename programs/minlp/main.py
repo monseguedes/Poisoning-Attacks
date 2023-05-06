@@ -12,6 +12,7 @@ import iterative_attack
 import numerical_attack
 import numpy as np
 import ridge_regression
+import binary_attack
 import testing
 
 config = {
@@ -22,9 +23,9 @@ config = {
     "seed": 3,
     # Problem
     "function": "MSE",
-    "binary": True, 
+    "binary": False, 
     "regularization": 0.6612244897959183,
-    "solver_name": "gurobi",
+    "solver_name": "ipopt",
     # Solvers
     "solver_output": True,
     "feasibility": 0.00001,
@@ -74,7 +75,11 @@ numerical_model = None
 #     config, instance_data, numerical_model
 # )
 
-numerical_model, instance_data, regression_parameters = numerical_attack.run(
+# numerical_model, instance_data, regression_parameters = numerical_attack.run(
+#     config, instance_data, numerical_model
+# )
+
+numerical_model, instance_data, regression_parameters = binary_attack.run(
     config, instance_data, numerical_model
 )
 

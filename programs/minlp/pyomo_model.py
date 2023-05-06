@@ -50,6 +50,7 @@ class PyomoModel(pmo.block):
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
+            self.opt.options["timelimit"] = config["time_limit"]
         else:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
             self.opt.options["NonConvex"] = 2
@@ -77,7 +78,7 @@ class PyomoModel(pmo.block):
         elif self.solver_name == "gurobi" and not self.binary:
             return self._prod_gurobi(a, b)
         elif self.binary:
-            return self._prod_linearise(a,b)
+            return self._prod_gurobi(a, b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
         
