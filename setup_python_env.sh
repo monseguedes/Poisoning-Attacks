@@ -10,9 +10,19 @@ if [ -d "env" ]; then
     exit 0
 fi
 
-python3.9 -m venv env
+python3 -m venv env
 
 . ./env/bin/activate
 
 pip install -U pip
-pip install black gurobipy matplotlib numpy pandas pyomo scikit-learn seaborn
+pip install \
+    black \
+    gurobipy \
+    isort \
+    matplotlib \
+    numpy \
+    pandas \
+    pyomo \
+    scikit-learn \
+    seaborn \
+    torch
