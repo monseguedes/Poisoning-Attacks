@@ -100,7 +100,12 @@ class PyomoModel(pmo.block):
         return a * b * c
 
     def _prod_gurobi(self, a, b):
-        u, v = (a, b) if id(a) < id(b) else (b, a)
+        # MODIFIED
+        # >>>>>
+        # u, v = (a, b) if id(a) < id(b) else (b, a)
+        # -----
+        u, v = sorted((a, b), key=id)
+        # <<<<<
         key = (id(u), id(v))
         if key in self.bilinear_term_cache:
             return self.bilinear_term_cache[key]
@@ -147,11 +152,16 @@ class PyomoModel(pmo.block):
     #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
 
     def _triple_prod_linearise(self, a, b, c):
-        array = [a, b, c]
-        ids = [id(a), id(b), id(c)]
-        sorted = np.argsort(ids)
+        # MODIFIED
+        # >>>>>
+        # array = [a, b, c]
+        # ids = [id(a), id(b), id(c)]
+        # sorted = np.argsort(ids)
+        # u, v, w = (array[sorted[0]], array[sorted[1]], array[sorted[2]])
+        # -----
+        u, v, w = sorted((a, b, c), key=id)
+        # <<<<<
 
-        u, v, w = (array[sorted[0]], array[sorted[1]], array[sorted[2]])
         key = (id(u), id(v), id(w))
         if key in self.bilinear_term_cache:
             return self.bilinear_term_cache[key]
