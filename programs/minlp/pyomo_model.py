@@ -46,13 +46,13 @@ class PyomoModel(pmo.block):
             self.opt = pyo.SolverFactory("ipopt")
         elif self.binary:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
+            self.opt.options["NonConvex"] = 2
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
         else:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
-            if not self.binary:
-                self.opt.options["NonConvex"] = 2
+            self.opt.options["NonConvex"] = 2
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
@@ -331,8 +331,11 @@ class PyomoModel(pmo.block):
         for k, v in instance_data.get_num_x_poison_dataframe().items():
             if num_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
                 self.x_poison_num[k].unfix()
+                if self.binary:
+                    self.x_poison_num[k].domain = pyo.Binary
             else:
                 self.x_poison_num[k].fix(v)
+                self.x_poison_num[k].domain = pyo.PercentFraction
 
         for k, v in instance_data.get_cat_x_poison_dataframe().items():
             if cat_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
