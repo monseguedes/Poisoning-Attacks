@@ -40,8 +40,15 @@ class PyomoModel(pmo.block):
         self.function = config["function"]
         self.solver_name = config["solver_name"]
         self.tee = config["solver_output"]
+        self.binary = config["binary"]
+        self.upper_bound = 1000
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
+        elif self.binary:
+            self.opt = pyo.SolverFactory("gurobi", solver_io="python")
+            self.bilinear_term_cache = dict()
+            self.bilinear_term_variable_list = pmo.variable_list()
+            self.bilinear_term_constraint_list = pmo.constraint_list()
         else:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
             self.opt.options["NonConvex"] = 2
@@ -66,8 +73,10 @@ class PyomoModel(pmo.block):
         """Return the product of two expressions"""
         if self.solver_name == "ipopt":
             return self._prod_ipopt(a, b)
-        elif self.solver_name == "gurobi":
+        elif self.solver_name == "gurobi" and not self.binary:
             return self._prod_gurobi(a, b)
+        elif self.binary:
+            return self._prod_linearise(a,b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
 
@@ -84,6 +93,20 @@ class PyomoModel(pmo.block):
         self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
         self.bilinear_term_cache[key] = x
         return x
+    
+    def _prod_linearise(self, a, b):
+        u, v = (a, b) if id(a) < id(b) else (b, a)
+        key = (id(u), id(v))
+        if key in self.bilinear_term_cache:
+            return self.bilinear_term_cache[key]
+        z = pmo.variable()
+        self.bilinear_term_variable_list.append(z)
+        self.bilinear_term_constraint_list.append(pmo.constraint(z <= v * self.upper_bound))
+        self.bilinear_term_constraint_list.append(pmo.constraint(v * -self.upper_bound <= z))
+        self.bilinear_term_constraint_list.append(pmo.constraint(u - z <= self.upper_bound * (1-v)))
+        self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
+        self.bilinear_term_cache[key] = z
+        return z
 
     def update_parameters(self, instance_data, build=False):
         """
@@ -126,11 +149,16 @@ class PyomoModel(pmo.block):
         print("Creating variables")
 
         # Numerical feature vector of poisoned samples
+        if self.binary:
+            domain = pmo.Binary
+        else:
+            domain = pmo.PercentFraction
+            
         self.x_poison_num = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
             for numfeature in instance_data.numerical_feature_names:
                 self.x_poison_num[psample, numfeature] = pmo.variable(
-                    domain=pmo.PercentFraction
+                    domain=domain
                 )
 
         # Categorical feature vector of poisoned samples

@@ -22,11 +22,11 @@ config = {
     "seed": 3,
     # Problem
     "function": "MSE",
-    "binary": False, 
+    "binary": True, 
     "regularization": 0.6612244897959183,
-    "solver_name": "ipopt",
+    "solver_name": "gurobi",
     # Solvers
-    "solver_output": False,
+    "solver_output": True,
     "feasibility": 0.00001,
     "time_limit": 20,
     # Numerical attack
