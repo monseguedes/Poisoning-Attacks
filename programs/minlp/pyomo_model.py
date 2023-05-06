@@ -296,34 +296,34 @@ class PyomoModel(pmo.block):
                 )
                 self.sos_constraints[psample, cat_feature] = constraint
 
-        # print("Building num weights contraints")
-        # # There is one constraint per feature
-        # self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()
-        # for numfeature in instance_data.numerical_feature_names:
-        #     constraint = pmo.constraint(
-        #         body=loss_function_derivative_num_weights(
-        #             instance_data, self, numfeature, self.function
-        #         ),
-        #         rhs=0,
-        #     )
-        #     self.cons_first_order_optimality_conditions_num_weights[
-        #         numfeature
-        #     ] = constraint
-        # print("Building cat weights contraints")
-        # self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
-        # for cat_feature in instance_data.categorical_feature_names:
-        #     for category in instance_data.categories_in_categorical_feature[
-        #         cat_feature
-        #     ]:
-        #         constraint = pmo.constraint(
-        #             body=loss_function_derivative_cat_weights(
-        #                 instance_data, self, cat_feature, category, self.function
-        #             ),
-        #             rhs=0,
-        #         )
-        #         self.cons_first_order_optimality_conditions_cat_weights[
-        #             cat_feature, category
-        #         ] = constraint
+        print("Building num weights contraints")
+        # There is one constraint per feature
+        self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()
+        for numfeature in instance_data.numerical_feature_names:
+            constraint = pmo.constraint(
+                body=loss_function_derivative_num_weights(
+                    instance_data, self, numfeature, self.function
+                ),
+                rhs=0,
+            )
+            self.cons_first_order_optimality_conditions_num_weights[
+                numfeature
+            ] = constraint
+        print("Building cat weights contraints")
+        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
+        for cat_feature in instance_data.categorical_feature_names:
+            for category in instance_data.categories_in_categorical_feature[
+                cat_feature
+            ]:
+                constraint = pmo.constraint(
+                    body=loss_function_derivative_cat_weights(
+                        instance_data, self, cat_feature, category, self.function
+                    ),
+                    rhs=0,
+                )
+                self.cons_first_order_optimality_conditions_cat_weights[
+                    cat_feature, category
+                ] = constraint
 
         print("Building bias constraints")
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(
@@ -609,24 +609,19 @@ def linear_regression_function(instance_data, model, no_sample):
     LRF (prediction) = weight * sample + bias
     """
 
-    # # Predict values using linear regression
-    # numerical_part = sum(
-    #     model.x_train_num[no_sample, j] * model.weights_num[j]
-    #     for j in instance_data.numerical_feature_names
-    # )
+    # Predict values using linear regression
     numerical_part = sum(
         model.x_train_num[no_sample, j] * model.weights_num[j]
         for j in instance_data.numerical_feature_names
     )
-    # numerical_part = 0
-    categorical_part = 0
-    # categorical_part = sum(
-    #     sum(
-    #         model.weights_cat[j, z] * model.x_train_cat[no_sample, j, z]
-    #         for z in instance_data.categories_in_categorical_feature[j]
-    #     )
-    #     for j in instance_data.categorical_feature_names
-    # )
+
+    categorical_part = sum(
+        sum(
+            model.weights_cat[j, z] * model.x_train_cat[no_sample, j, z]
+            for z in instance_data.categories_in_categorical_feature[j]
+        )
+        for j in instance_data.categorical_feature_names
+    )
     y_hat = numerical_part + categorical_part + model.bias
     return y_hat
 
@@ -792,26 +787,25 @@ def loss_function_derivative_bias(instance_data, model, function):
         for i in range(instance_data.no_train_samples)
     )
 
-    poison_samples_component = 0
-    # poison_samples_component = sum(
-    #     (
-    #         sum(
-    #             model.prod(model.weights_num[j], model.x_poison_num[q, j])
-    #             for j in instance_data.numerical_feature_names
-    #         )
-    #         + sum(
-    #             sum(
-    #                 model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
-    #                 for z in instance_data.categories_in_categorical_feature[j]
-    #             )
-    #             for j in instance_data.categorical_feature_names
-    #         )
-    #         + model.bias
-    #         - model.y_poison[q]
-    #     )
-    #     * (1 - model.poison_data_is_removed[q])
-    #     for q in range(instance_data.no_poison_samples)
-    # )
+    poison_samples_component = sum(
+        (
+            sum(
+                model.prod(model.weights_num[j], model.x_poison_num[q, j])
+                for j in instance_data.numerical_feature_names
+            )
+            + sum(
+                sum(
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
+                    for z in instance_data.categories_in_categorical_feature[j]
+                )
+                for j in instance_data.categorical_feature_names
+            )
+            + model.bias
+            - model.y_poison[q]
+        )
+        * (1 - model.poison_data_is_removed[q])
+        for q in range(instance_data.no_poison_samples)
+    )
 
     n_train_and_poison_samples = (
         instance_data.no_train_samples + model.no_poison_samples_in_model
