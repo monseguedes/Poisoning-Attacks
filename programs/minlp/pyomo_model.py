@@ -51,7 +51,8 @@ class PyomoModel(pmo.block):
             self.bilinear_term_constraint_list = pmo.constraint_list()
         else:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
-            self.opt.options["NonConvex"] = 2
+            if not self.binary:
+                self.opt.options["NonConvex"] = 2
             self.bilinear_term_cache = dict()
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
@@ -93,18 +94,42 @@ class PyomoModel(pmo.block):
         self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
         self.bilinear_term_cache[key] = x
         return x
-    
+
     def _prod_linearise(self, a, b):
         u, v = (a, b) if id(a) < id(b) else (b, a)
         key = (id(u), id(v))
         if key in self.bilinear_term_cache:
             return self.bilinear_term_cache[key]
-        z = pmo.variable()
+        if (not u.is_binary()) and (not v.is_binary()):
+            raise ValueError("at least one variables must be binary")
+        if id(u) == id(v):
+            # The same variable is given. x^2 = x, so return itself.
+            return u
+        if u.is_binary() and v.is_binary():
+            # Both are binary variables.
+            z = pmo.variable(lb=0, ub=1, domain=pmo.Binary)
+            self.bilinear_term_variable_list.append(z)
+            self.bilinear_term_constraint_list.append(pmo.constraint(z <= u))
+            self.bilinear_term_constraint_list.append(pmo.constraint(z <= v))
+            self.bilinear_term_constraint_list.append(pmo.constraint(z >= u + v - 1))
+            self.bilinear_term_cache[key] = z
+            return z
+        # One binary, one continuous.
+        binary = u if u.is_binary() else v
+        continuous = v if u.is_binary() else u
+        lb = continuous.lb
+        ub = continuous.ub
+
+        z = pmo.variable(lb=min(0, lb), ub=max(0, ub))
         self.bilinear_term_variable_list.append(z)
-        self.bilinear_term_constraint_list.append(pmo.constraint(z <= v * self.upper_bound))
-        self.bilinear_term_constraint_list.append(pmo.constraint(v * -self.upper_bound <= z))
-        self.bilinear_term_constraint_list.append(pmo.constraint(u - z <= self.upper_bound * (1-v)))
-        self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
+        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary))
+        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary <= z))
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(continuous - z <= ub * (1 - binary))
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(lb * (1 - binary) <= continuous - z)
+        )
         self.bilinear_term_cache[key] = z
         return z
 
@@ -153,7 +178,7 @@ class PyomoModel(pmo.block):
             domain = pmo.Binary
         else:
             domain = pmo.PercentFraction
-            
+
         self.x_poison_num = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
             for numfeature in instance_data.numerical_feature_names:
@@ -687,7 +712,7 @@ def loss_function_derivative_bias(instance_data, model, function):
     poison_samples_component = sum(
         (
             sum(
-                model.prod(model.weights_num[j], model.x_poison_num[q, j]) 
+                model.prod(model.weights_num[j], model.x_poison_num[q, j])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
