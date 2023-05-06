@@ -79,7 +79,7 @@ class PyomoModel(pmo.block):
         elif self.solver_name == "gurobi" and not self.binary:
             return self._prod_gurobi(a, b)
         elif self.binary:
-            return self._prod_gurobi(a, b)
+            return self._prod_linearise(a, b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
 
@@ -87,9 +87,9 @@ class PyomoModel(pmo.block):
         if self.solver_name == "ipopt":
             return self._triple_prod_ipopt(a, b, c)
         elif self.solver_name == "gurobi" and not self.binary:
-            return self._triple_prod_gurobi(a, b)
+            raise NotImplementedError
         elif self.binary:
-            return self._triple_prod_linearise(a,b, c)
+            return self._triple_prod_linearise(a, b, c)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
 
@@ -108,6 +108,7 @@ class PyomoModel(pmo.block):
         self.bilinear_term_variable_list.append(x)
         self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
         self.bilinear_term_cache[key] = x
+        raise KeyError
         return x
 
     # def _prod_linearise(self, a, b):
@@ -145,12 +146,49 @@ class PyomoModel(pmo.block):
     #     self.bilinear_term_constraint_list.append(pmo.constraint(u - z <= self.upper_bound * (1-v)))
     #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
 
-    #     self.bilinear_term_constraint_list.append(pmo.constraint(r <= w * self.upper_bound))
-    #     self.bilinear_term_constraint_list.append(pmo.constraint(w * -self.upper_bound <= r))
-    #     self.bilinear_term_constraint_list.append(pmo.constraint(z - r <= self.upper_bound * (1-w)))
-    #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-w) <= z - r))
-    #     # self.bilinear_term_cache[key] = z
-    #     return r
+    def _triple_prod_linearise(self, a, b, c):
+        array = [a, b, c]
+        ids = [id(a), id(b), id(c)]
+        sorted = np.argsort(ids)
+
+        u, v, w = (array[sorted[0]], array[sorted[1]], array[sorted[2]])
+        key = (id(u), id(v), id(w))
+        if key in self.bilinear_term_cache:
+            return self.bilinear_term_cache[key]
+
+        if a.is_binary() + b.is_binary() + c.is_binary() != 2:
+            raise ValueError("two variables must be binary")
+
+        # One binary, one continuous.
+        if u.is_binary() and w.is_binary():
+            binary_1 = u
+            binary_2 = w
+            continuous = v
+        elif v.is_binary() and w.is_binary():
+            binary_1 = v
+            binary_2 = w
+            continuous = u
+        else:
+            binary_1 = u
+            binary_2 = v
+            continuous = w
+        lb = continuous.lb
+        ub = continuous.ub
+
+        z = pmo.variable(lb=min(0, lb), ub=max(0, ub))
+        self.bilinear_term_variable_list.append(z)
+        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary_1))
+        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary_1 <= z))
+        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary_2))
+        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary_2 <= z))
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(continuous - z <= ub * (2 - binary_1 - binary_2))
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(lb * (2 - binary_1 - binary_2) <= continuous - z)
+        )
+        self.bilinear_term_cache[key] = z
+        return z
 
     def _prod_linearise(self, a, b):
         u, v = (a, b) if id(a) < id(b) else (b, a)
@@ -239,9 +277,7 @@ class PyomoModel(pmo.block):
         self.x_poison_num = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
             for numfeature in instance_data.numerical_feature_names:
-                self.x_poison_num[psample, numfeature] = pmo.variable(
-                    domain=domain
-                )
+                self.x_poison_num[psample, numfeature] = pmo.variable(domain=domain)
 
         # Categorical feature vector of poisoned samples
         self.x_poison_cat = pmo.variable_dict()
@@ -621,6 +657,7 @@ def linear_regression_function(instance_data, model, no_sample):
         model.x_train_num[no_sample, j] * model.weights_num[j]
         for j in instance_data.numerical_feature_names
     )
+
     categorical_part = sum(
         sum(
             model.weights_cat[j, z] * model.x_train_cat[no_sample, j, z]
@@ -668,12 +705,20 @@ def loss_function_derivative_num_weights(instance_data, model, m, function):
     poison_samples_component = sum(
         (
             sum(
-                model.prod(model.prod(model.weights_num[j], model.x_poison_num[q, j]), model.x_poison_num[q, m])
+                model.triple_prod(
+                    model.weights_num[j],
+                    model.x_poison_num[q, j],
+                    model.x_poison_num[q, m],
+                )
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.prod(model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z]), model.x_poison_num[q, m])
+                    model.triple_prod(
+                        model.weights_cat[j, z],
+                        model.x_poison_cat[q, j, z],
+                        model.x_poison_num[q, m],
+                    )
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
@@ -681,7 +726,7 @@ def loss_function_derivative_num_weights(instance_data, model, m, function):
             + model.prod(model.bias, model.x_poison_num[q, m])
             - model.y_poison[q] * model.x_poison_num[q, m]
         )
-        #* model.x_poison_num[q, j]
+        # * model.x_poison_num[q, j]
         * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )
@@ -726,12 +771,20 @@ def loss_function_derivative_cat_weights(instance_data, model, m, w, function):
     poison_samples_component = sum(
         (
             sum(
-                model.prod(model.prod(model.weights_num[j], model.x_poison_num[q, j]), model.x_poison_cat[q, m, w])
+                model.triple_prod(
+                    model.weights_num[j],
+                    model.x_poison_num[q, j],
+                    model.x_poison_cat[q, m, w],
+                )
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.prod(model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z]), model.x_poison_cat[q, m, w])
+                    model.triple_prod(
+                        model.weights_cat[j, z],
+                        model.x_poison_cat[q, j, z],
+                        model.x_poison_cat[q, m, w],
+                    )
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
@@ -739,7 +792,7 @@ def loss_function_derivative_cat_weights(instance_data, model, m, w, function):
             + model.prod(model.bias, model.x_poison_cat[q, m, w])
             - model.y_poison[q] * model.x_poison_cat[q, m, w]
         )
-        #* model.x_poison_cat[q, j, w]
+        # * model.x_poison_cat[q, j, w]
         * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )  # Component involving the sum of poison samples errors
@@ -776,6 +829,7 @@ def loss_function_derivative_bias(instance_data, model, function):
         (linear_regression_function(instance_data, model, i) - model.y_train[i])
         for i in range(instance_data.no_train_samples)
     )
+
     poison_samples_component = sum(
         (
             sum(

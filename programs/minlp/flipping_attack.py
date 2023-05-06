@@ -50,8 +50,12 @@ def run(config, instance_data, model=None):
 
     no_poison_samples = instance_data.no_poison_samples
 
-    it =0
-    instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+    it = 0
+    instance_data.poison_dataframe.to_csv(
+        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+            config["dataset_name"], it
+        )
+    )
     it += 1
 
     # Solve benchmark
@@ -60,7 +64,11 @@ def run(config, instance_data, model=None):
     config["iterative_attack_incremental"] = False
     numerical_model = None
 
-    benchmark_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+    benchmark_data.poison_dataframe.to_csv(
+        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+            config["dataset_name"], it
+        )
+    )
     it += 1
     for epoch in range(n_epochs):
         (
@@ -69,7 +77,11 @@ def run(config, instance_data, model=None):
             solution,
         ) = numerical_attack.run(config, instance_data, numerical_model)
         # Save poisoning samples after numerical attack
-        numerical_attack_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+        numerical_attack_instance_data.poison_dataframe.to_csv(
+            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+                config["dataset_name"], it
+            )
+        )
         it += 1
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
@@ -149,13 +161,17 @@ def run(config, instance_data, model=None):
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
-                best_sol = sol  
+                best_sol = sol
                 best_instance_data = instance_data.copy()
-            
+
             # Save poisoning samples
-            best_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+            best_instance_data.poison_dataframe.to_csv(
+                "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+                    config["dataset_name"], it
+                )
+            )
             it += 1
-        
+
         config["numerical_attack_mini_batch_size"] = 0.5
         (
             numerical_model,
@@ -170,10 +186,16 @@ def run(config, instance_data, model=None):
             instance_data = numerical_attack_instance_data
         else:
             instance_data = best_instance_data.copy()
-        best_instance_data.poison_dataframe.to_csv('programs/minlp/attacks/{}/poison_dataframe{}.csv'.format(config['dataset_name'], it))
+        best_instance_data.poison_dataframe.to_csv(
+            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+                config["dataset_name"], it
+            )
+        )
         it += 1
         # Project numerical features
-        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.round(decimals=0)
+        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.round(
+            decimals=0
+        )
         best_sol = ridge_regression.run(config, instance_data)
 
     print("RESULTS")

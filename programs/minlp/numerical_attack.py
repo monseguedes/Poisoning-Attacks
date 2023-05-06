@@ -1,4 +1,3 @@
-
 """Run iterative attack which which poison training data row by row"""
 
 import copy
@@ -102,6 +101,8 @@ def run(config, instance_data, model=None):
             model.set_poison_data_status(
                 instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
             )
+            model.write("out.lp")
+            
             model.solve()
             solution = model.get_solution()
             if solution["mse"] > best_mse:
