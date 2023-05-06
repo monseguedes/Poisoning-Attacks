@@ -4,6 +4,7 @@
 
 import numpy as np
 import pandas as pd
+import pyomo
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
 
@@ -81,7 +82,7 @@ class PyomoModel(pmo.block):
             return self._prod_gurobi(a, b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
-        
+
     def triple_prod(self, a, b, c):
         if self.solver_name == "ipopt":
             return self._triple_prod_ipopt(a, b, c)
@@ -94,7 +95,7 @@ class PyomoModel(pmo.block):
 
     def _prod_ipopt(self, a, b):
         return a * b
-    
+
     def _triple_prod_ipopt(self, a, b, c):
         return a * b * c
 
@@ -108,7 +109,7 @@ class PyomoModel(pmo.block):
         self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
         self.bilinear_term_cache[key] = x
         return x
-    
+
     # def _prod_linearise(self, a, b):
     #     u, v = (a, b) #if id(a) < id(b) else (b, a) TODO fix
     #     key = (id(u), id(v))
@@ -122,7 +123,7 @@ class PyomoModel(pmo.block):
     #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
     #     self.bilinear_term_cache[key] = z
     #     return z
-    
+
     # def _triple_prod_linearise(self, a, b, c):
     #     # This is always continuos - binary - binary
     #     # TODO fix
@@ -418,7 +419,14 @@ class PyomoModel(pmo.block):
                 value.domain = pmo.Binary
 
     def solve(self):
-        self.opt.solve(self, load_solutions=True, tee=self.tee)
+        self.results = self.opt.solve(self, load_solutions=True, tee=self.tee)
+
+    def assert_optimal(self):
+        results = self.results
+        if (results.solver.status == pyomo.opt.SolverStatus.ok) and (results.solver.termination_condition == pyomo.opt.TerminationCondition.optimal):
+            return
+        raise ValueError(
+            f"status={results.solver.status}   termination_condition={results.solver.termination_condition}")
 
     def get_mse(self):
         """Get the MSE on the training data after poisoning
