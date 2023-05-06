@@ -16,7 +16,7 @@ import testing
 
 config = {
     # Dataset
-    "dataset_name": "10num10cat",
+    "dataset_name": "5num5cat",
     "training_samples": 100,
     "poison_rate": 20,
     "seed": 3,
@@ -31,7 +31,7 @@ config = {
     "time_limit": 20,
     # Numerical attack
     "numerical_attack_n_epochs": 1,
-    "numerical_attack_mini_batch_size": 0.2,
+    "numerical_attack_mini_batch_size": 0.5,
     "numerical_attack_incremental": False,
     # Categorical attack
     "categorical_attack_n_epochs": 1,

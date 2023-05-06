@@ -80,9 +80,22 @@ class PyomoModel(pmo.block):
             return self._prod_linearise(a,b)
         else:
             raise ValueError(f"unknown solver name {self.solver_name}")
+        
+    def triple_prod(self, a, b, c):
+        if self.solver_name == "ipopt":
+            return self._triple_prod_ipopt(a, b, c)
+        elif self.solver_name == "gurobi" and not self.binary:
+            return self._triple_prod_gurobi(a, b)
+        elif self.binary:
+            return self._triple_prod_linearise(a,b, c)
+        else:
+            raise ValueError(f"unknown solver name {self.solver_name}")
 
     def _prod_ipopt(self, a, b):
         return a * b
+    
+    def _triple_prod_ipopt(self, a, b, c):
+        return a * b * c
 
     def _prod_gurobi(self, a, b):
         u, v = (a, b) if id(a) < id(b) else (b, a)
@@ -94,6 +107,48 @@ class PyomoModel(pmo.block):
         self.bilinear_term_constraint_list.append(pmo.constraint(x == u * v))
         self.bilinear_term_cache[key] = x
         return x
+    
+    # def _prod_linearise(self, a, b):
+    #     u, v = (a, b) #if id(a) < id(b) else (b, a) TODO fix
+    #     key = (id(u), id(v))
+    #     if key in self.bilinear_term_cache:
+    #         return self.bilinear_term_cache[key]
+    #     z = pmo.variable()
+    #     self.bilinear_term_variable_list.append(z)
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(z <= v * self.upper_bound))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(v * -self.upper_bound <= z))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(u - z <= self.upper_bound * (1-v)))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
+    #     self.bilinear_term_cache[key] = z
+    #     return z
+    
+    # def _triple_prod_linearise(self, a, b, c):
+    #     # This is always continuos - binary - binary
+    #     # TODO fix
+    #     # ids = {a: id(a), b: id(b), c: id(c)}
+    #     # max_id = max(ids, key=ids.get)
+    #     # min_id = max(ids, key=ids.get)
+    #     # middle_id = [key for key, value in ids.items() if value != max_id and value != min_id]
+    #     # u, v, w = (id(min_id), id(middle_id[0]), id(max_id))
+    #     # key = (id(u), id(v), id(w))
+    #     # if key in self.bilinear_term_cache:
+    #     #     return self.bilinear_term_cache[key]
+    #     u, v, w = a, b, c
+    #     z = pmo.variable()
+    #     r = pmo.variable()
+    #     self.bilinear_term_variable_list.append(z)
+    #     self.bilinear_term_variable_list.append(r)
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(z <= v * self.upper_bound))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(v * -self.upper_bound <= z))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(u - z <= self.upper_bound * (1-v)))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-v) <= u - z))
+
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(r <= w * self.upper_bound))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(w * -self.upper_bound <= r))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(z - r <= self.upper_bound * (1-w)))
+    #     self.bilinear_term_constraint_list.append(pmo.constraint(-self.upper_bound * (1-w) <= z - r))
+    #     # self.bilinear_term_cache[key] = z
+    #     return r
 
     def _prod_linearise(self, a, b):
         u, v = (a, b) if id(a) < id(b) else (b, a)
