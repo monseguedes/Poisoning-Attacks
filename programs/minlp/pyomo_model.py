@@ -143,7 +143,7 @@ class PyomoModel(pmo.block):
 
         # TODO Fix bounds.
         # upper_bound = bnd.find_bounds(instance_data, self)
-        upper_bound = 10
+        upper_bound = 10000
         lower_bound = -upper_bound
         print(f"Upper bound is: {upper_bound:.2f}")
         print(f"Lower bound is: {lower_bound:.2f}")
@@ -532,7 +532,7 @@ def train_error(instance_data, model, function: str):
         return sum_square_errors
 
 
-def loss_function_derivative_num_weights(instance_data, model, j, function):
+def loss_function_derivative_num_weights(instance_data, model, m, function):
     """
     Finds the derivetive of the loss function (follower's objective) with
     respect to the weights of the linear regression model, and sets it to 0
@@ -541,33 +541,33 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
 
     train_samples_component = sum(
         (linear_regression_function(instance_data, model, i) - model.y_train[i])
-        * model.x_train_num[i, j]
+        * model.x_train_num[i, m]
         for i in range(instance_data.no_train_samples)
     )  # Component involving the sum of training samples errors
 
     poison_samples_component = sum(
         (
             sum(
-                model.prod(model.x_poison_num[q, j], model.weights_num[j])
+                model.prod(model.prod(model.weights_num[j], model.x_poison_num[q, j]), model.x_poison_num[q, m])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
+                    model.prod(model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z]), model.x_poison_num[q, m])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
             )
-            + model.bias
-            - model.y_poison[q]
+            + model.prod(model.bias, model.x_poison_num[q, m])
+            - model.y_poison[q] * model.x_poison_num[q, m]
         )
-        * model.x_poison_num[q, j]
+        #* model.x_poison_num[q, j]
         * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )
 
     regularization_component = (
-        2 * instance_data.regularization * model.weights_num[j]
+        2 * instance_data.regularization * model.weights_num[m]
     )  # Component involving the regularization
 
     n_train_and_poison_samples = (
@@ -591,7 +591,7 @@ def loss_function_derivative_num_weights(instance_data, model, j, function):
     return final
 
 
-def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
+def loss_function_derivative_cat_weights(instance_data, model, m, w, function):
     """
     Finds the derivative of the loss function (follower's objective) with
     respect to the weights of the linear regression model, and sets it to 0
@@ -600,32 +600,32 @@ def loss_function_derivative_cat_weights(instance_data, model, j, w, function):
 
     train_samples_component = sum(
         (linear_regression_function(instance_data, model, i) - model.y_train[i])
-        * model.x_train_cat[i, j, w]
+        * model.x_train_cat[i, m, w]
         for i in range(instance_data.no_train_samples)
     )  # Component involving the sum of training samples errors
     poison_samples_component = sum(
         (
             sum(
-                model.prod(model.x_poison_num[q, j], model.weights_num[j])
+                model.prod(model.prod(model.weights_num[j], model.x_poison_num[q, j]), model.x_poison_cat[q, m, w])
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
+                    model.prod(model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z]), model.x_poison_cat[q, m, w])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names
             )
-            + model.bias
-            - model.y_poison[q]
+            + model.prod(model.bias, model.x_poison_cat[q, m, w])
+            - model.y_poison[q] * model.x_poison_cat[q, m, w]
         )
-        * model.x_poison_cat[q, j, w]
+        #* model.x_poison_cat[q, j, w]
         * (1 - model.poison_data_is_removed[q])
         for q in range(instance_data.no_poison_samples)
     )  # Component involving the sum of poison samples errors
 
     regularization_component = (
-        2 * instance_data.regularization * model.weights_cat[j, w]
+        2 * instance_data.regularization * model.weights_cat[m, w]
     )  # Component involving the regularization
 
     n_train_and_poison_samples = (
@@ -659,12 +659,12 @@ def loss_function_derivative_bias(instance_data, model, function):
     poison_samples_component = sum(
         (
             sum(
-                model.x_poison_num[q, j] * model.weights_num[j]
+                model.prod(model.weights_num[j], model.x_poison_num[q, j]) 
                 for j in instance_data.numerical_feature_names
             )
             + sum(
                 sum(
-                    model.weights_cat[j, z] * model.x_poison_cat[q, j, z]
+                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names

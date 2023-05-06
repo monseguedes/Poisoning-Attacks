@@ -16,14 +16,15 @@ import testing
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat",
+    "dataset_name": "10num10cat",
     "training_samples": 100,
     "poison_rate": 20,
     "seed": 3,
     # Problem
     "function": "MSE",
+    "binary": False, 
     "regularization": 0.6612244897959183,
-    "solver_name": "gurobi",
+    "solver_name": "ipopt",
     # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
@@ -77,6 +78,14 @@ numerical_model, instance_data, regression_parameters = numerical_attack.run(
     config, instance_data, numerical_model
 )
 
+# Project numerical features
+projected_data = instance_data.copy()
+projected_data.poison_dataframe = projected_data.poison_dataframe.round(decimals=0)
+best_sol = ridge_regression.run(config, projected_data)
+print(projected_data.poison_dataframe)
+print(f"mse of projected data is {best_sol['mse']}")
+# print(best_sol['weights_num'])
+# print(best_sol['weights_cat'])
 
 
 # Run the utitlity to check the results with scikitlearn.
