@@ -169,7 +169,7 @@ class PyomoModel(pmo.block):
         if a.is_binary() + b.is_binary() + c.is_binary() != 2:
             raise ValueError("two variables must be binary")
 
-        # One binary, one continuous.
+        # Two binaries, one continuous.
         if u.is_binary() and w.is_binary():
             binary_1 = u
             binary_2 = w
