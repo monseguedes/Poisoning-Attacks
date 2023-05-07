@@ -73,7 +73,7 @@ _, flipping_data, regression_parameters = full_flipping_attack.run(
     config, instance_data
 )
 
-# _, flipping_data, regression_parameters = flipping_attack.run(
+# _, instance_data, regression_parameters = flipping_attack.run(
 #     config, instance_data, numerical_model
 # )
 
@@ -92,15 +92,6 @@ _, flipping_data, regression_parameters = full_flipping_attack.run(
 # numerical_model, instance_data, regression_parameters = binary_attack.run(
 #     config, instance_data, numerical_model
 # )
-
-# Project numerical features
-projected_data = instance_data.copy()
-projected_data.poison_dataframe = projected_data.poison_dataframe.round(decimals=0)
-best_sol = ridge_regression.run(config, projected_data)
-print(projected_data.poison_dataframe)
-print(f"mse of projected data is {best_sol['mse']}")
-# print(best_sol['weights_num'])
-# print(best_sol['weights_cat'])
 
 
 # Run the utitlity to check the results with scikitlearn.

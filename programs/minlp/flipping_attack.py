@@ -194,10 +194,9 @@ def run(config, instance_data, model=None):
         )
         it += 1
         # Project numerical features
-        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.round(
-            decimals=0
-        )
-        best_sol = ridge_regression.run(config, instance_data)
+        # round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
+        # best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
+        # best_sol = ridge_regression.run(config, instance_data)
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
