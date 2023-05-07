@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """Flipping heuristic attack which poisons both numerical and categorical data"""
 
@@ -38,25 +37,12 @@ def run(config, instance_data, model=None):
     instance_data = instance_data.copy()
 
     print("\n" + "*" * long_space)
-    print("FLIPPING ATTACK HEURISTIC")
+    print("FULL FLIPPING ATTACK HEURISTIC")
     print("*" * long_space)
-
-    # TODO we use both solvers. but ipopts first.
-    if not config.get("solver_name"):
-        config["solver_name"] = "ipopt"
-    # np.testing.assert_equal(config["solver_name"], "ipopt")
 
     n_epochs = config["flipping_attack_n_epochs"]
 
     no_poison_samples = instance_data.no_poison_samples
-
-    it = 0
-    instance_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-            config["dataset_name"], it
-        )
-    )
-    it += 1
 
     # Solve benchmark
     config["iterative_attack_incremental"] = True
@@ -64,58 +50,27 @@ def run(config, instance_data, model=None):
     config["iterative_attack_incremental"] = False
     numerical_model = None
 
-    benchmark_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-            config["dataset_name"], it
-        )
-    )
-    it += 1
     for epoch in range(n_epochs):
-        (
-            numerical_model,
-            numerical_attack_instance_data,
-            solution,
-        ) = numerical_attack.run(config, instance_data, numerical_model)
+        sol = ridge_regression.run(config, instance_data)
         # Save poisoning samples after numerical attack
-        numerical_attack_instance_data.poison_dataframe.to_csv(
-            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                config["dataset_name"], it
-            )
-        )
-        it += 1
-        if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
+        if (epoch == 0):
             # Store the best solution found so far.
-            best_sol = solution
-            # And the instance data to achieve this best solution.
-            best_instance_data = numerical_attack_instance_data
-            instance_data = numerical_attack_instance_data
-            best_model = numerical_model
-        else:
-            instance_data = best_instance_data.copy()
+            best_sol = sol
+            best_instance_data = instance_data
 
         for poison_sample_index in range(no_poison_samples):
+            print(poison_sample_index)
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
             num_weights = best_sol["weights_num"].to_dict()
 
-            num_features = {
-                k: v
-                for k, v in best_sol["x_poison_num"].items()
-                if k[0] == poison_sample_index
-            }
-            num_y = (
-                np.array(list(num_weights.values()))
-                @ np.array(list(num_features.values()))
-                + best_sol["bias"]
-            )
             target_y = instance_data.get_y_poison_dataframe().iloc[poison_sample_index]
-            difference = num_y - target_y
 
             # We consider two case: Make prediction as large as possible and make prediction
             # as small as possible. We then take the best one.
+            # categories_up/down[feature] is the category to push prediction up/down.
 
             # categories_up/down[feature] is the category to push prediction up/down.
-            # cat_features = instance_data.categorical_feature_category_tuples
             cat_features = set([cat_feature[0] for cat_feature in cat_weights.keys()])
             categories_up = dict()
             categories_down = dict()
@@ -126,21 +81,45 @@ def run(config, instance_data, model=None):
                 categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
 
             # Let's compute the prediction of each case.
-            pred_up = num_y + sum(
+            pred_up_numerical = sum(
+                num_weights[feature]
+                for feature in cat_features if num_weights[feature] > 0
+            )
+            pred_up_categorical = sum(
                 cat_weights[(feature, categories_up[feature])]
                 for feature in cat_features
             )
-            pred_down = num_y + sum(
+            pred_up = pred_up_numerical + pred_up_categorical
+
+            pred_down_numerical = sum(
+                num_weights[feature]
+                for feature in cat_features if num_weights[feature] < 0
+            )
+            pred_down_categorical = sum(
                 cat_weights[(feature, categories_down[feature])]
                 for feature in cat_features
             )
+            pred_down = pred_down_numerical + pred_down_categorical
 
+            negative_num_weights = [key for key, value in num_weights.items() if value < 0]
+            positive_num_weights = [key for key, value in num_weights.items() if value > 0]
+
+            print(instance_data.poison_dataframe)
+            for f in num_weights.keys():
+                instance_data.num_poison[poison_sample_index, f] = 0
+            print(instance_data.poison_dataframe)
             if np.abs(pred_up - target_y) < np.abs(pred_down - target_y):
                 # Pushing down is more effective.
                 categories_chosen = categories_down
+                for k in negative_num_weights:
+                    instance_data.num_poison[poison_sample_index, k] = 1
             else:
                 # Pushing up is more effective.
                 categories_chosen = categories_up
+                for k in positive_num_weights:
+                    instance_data.num_poison[poison_sample_index, k] = 1
+            
+            print(instance_data.poison_dataframe)
 
             # Update the dataframe.
             for feat, cat in categories_chosen.items():
@@ -165,39 +144,6 @@ def run(config, instance_data, model=None):
                 best_sol = sol
                 best_instance_data = instance_data.copy()
 
-            # Save poisoning samples
-            best_instance_data.poison_dataframe.to_csv(
-                "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                    config["dataset_name"], it
-                )
-            )
-            it += 1
-
-        config["numerical_attack_mini_batch_size"] = 0.5
-        (
-            numerical_model,
-            numerical_attack_instance_data,
-            solution,
-        ) = numerical_attack.run(config, instance_data, numerical_model)
-        if best_sol["mse"] <= solution["mse"]:
-            # Store the best solution found so far.
-            best_sol = solution
-            # And the instance data to achieve this best solution.
-            best_instance_data = numerical_attack_instance_data
-            instance_data = numerical_attack_instance_data
-        else:
-            instance_data = best_instance_data.copy()
-        best_instance_data.poison_dataframe.to_csv(
-            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                config["dataset_name"], it
-            )
-        )
-        it += 1
-        # Project numerical features
-        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.round(
-            decimals=0
-        )
-        best_sol = ridge_regression.run(config, instance_data)
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
@@ -206,7 +152,7 @@ def run(config, instance_data, model=None):
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
 
-    return best_model, best_instance_data, best_sol
+    return model, best_instance_data, best_sol
 
 
 def print_diff(instance_data_a, instance_data_b):

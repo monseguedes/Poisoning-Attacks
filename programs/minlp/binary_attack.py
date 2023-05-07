@@ -14,7 +14,7 @@ short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model=None):
+def run(config, instance_data, warmstart_data=None, model=None):
     """Run iterative attack which which poison training data row by row
 
     This is a hueristic to optimize numerical features row by row using IPOPT.
@@ -61,6 +61,7 @@ def run(config, instance_data, model=None):
         config, instance_data, model
     )
 
+
     # Poison everything
     config["binary"] = True
     config["solver_name"] = "gurobi"
@@ -70,6 +71,9 @@ def run(config, instance_data, model=None):
     shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
     cat_feature_flag = np.full(shape, O)
     model.set_poison_data_status(instance_data, num_feature_flag, cat_feature_flag)
+    if warmstart_data is not None:
+        pass
+        #model.warmstart(warmstart_data)
     model.solve()
     solution = model.get_solution()
     model.update_data(instance_data)

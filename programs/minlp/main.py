@@ -7,6 +7,7 @@ Main script for the paper of poisoning attacks of categorical variables.
 
 import categorical_attack
 import flipping_attack
+import full_flipping_attack
 import instance_data_class
 import iterative_attack
 import numerical_attack
@@ -27,7 +28,7 @@ config = {
     "regularization": 0.6612244897959183,
     "solver_name": "ipopt",
     # Solvers
-    "solver_output": True,
+    "solver_output": False,
     "feasibility": 0.00001,
     "time_limit": 600,
     # Numerical attack
@@ -67,7 +68,12 @@ instance_data = instance_data_class.InstanceData(config)
 
 numerical_model = None
 
-# _, instance_data, regression_parameters = flipping_attack.run(
+
+_, flipping_data, regression_parameters = full_flipping_attack.run(
+    config, instance_data
+)
+
+# _, flipping_data, regression_parameters = flipping_attack.run(
 #     config, instance_data, numerical_model
 # )
 
@@ -82,9 +88,10 @@ numerical_model = None
 #     config, instance_data, numerical_model
 # )
 
-numerical_model, instance_data, regression_parameters = binary_attack.run(
-    config, instance_data, numerical_model
-)
+
+# numerical_model, instance_data, regression_parameters = binary_attack.run(
+#     config, instance_data, numerical_model
+# )
 
 # Project numerical features
 projected_data = instance_data.copy()
