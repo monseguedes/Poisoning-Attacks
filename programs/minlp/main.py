@@ -75,15 +75,16 @@ numerical_model = None
 #     config, instance_data, numerical_model
 # )
 
-config["binary"] = True
-config["solver_name"] = "gurobi"
-numerical_model, instance_data, regression_parameters = numerical_attack.run(
-    config, instance_data, numerical_model
-)
-
-# numerical_model, instance_data, regression_parameters = binary_attack.run(
+# config["binary"] = True
+# config["solver_name"] = "gurobi"
+# instance_data.poison_dataframe = instance_data.poison_dataframe.round(decimals=0)
+# numerical_model, instance_data, regression_parameters = numerical_attack.run(
 #     config, instance_data, numerical_model
 # )
+
+numerical_model, instance_data, regression_parameters = binary_attack.run(
+    config, instance_data, numerical_model
+)
 
 # Project numerical features
 projected_data = instance_data.copy()

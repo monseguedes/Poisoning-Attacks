@@ -439,6 +439,8 @@ class PyomoModel(pmo.block):
             else:
                 self.x_poison_num[k].fix(v)
                 self.x_poison_num[k].domain = pyo.PercentFraction
+                if self.binary:
+                    self.x_poison_num[k].domain = pyo.Binary
 
         for k, v in instance_data.get_cat_x_poison_dataframe().items():
             if cat_feature_flag[k[:2]] == self.POISON_DATA_OPTIMIZED:
