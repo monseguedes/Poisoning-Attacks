@@ -23,12 +23,16 @@ cat_training = reshape(cat_training_data, (2,4))
 cat_poison_data = [0,1,1,0]
 cat_poison = reshape(cat_poison_data, (1,4))
 
+no_categorical_features = 4
+no_numerical_features = 2
+no_training_samples = 2
+no_poison_samples = 1
+
 # Model
 model = Model(optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0))
 @variable(model, 0 <= num_poison[1:2] <= 1)
 @variable(model, num_weights[1:2])
 @variable(model, cat_weights[1:4])
-# @variable(model, cat_poison[1:4])
 @variable(model, bias)
 @variable(model, t)
 
@@ -62,15 +66,21 @@ solution_summary(model)
 # Polynomial Optimization
 no_variables = no_categorical_features + no_numerical_features + 1 + (no_categorical_features + no_numerical_features) * no_poison_samples + no_poison_samples
 println("Number is variables is $(no_variables)")
+println("Number of training samples is $(no_training_samples)")
+println("Number of poison samples is $(no_poison_samples)")
+println("Number of numerical features is $(no_numerical_features)")
+println("Number of categorical features is $(no_categorical_columns)")
 
 @polyvar num_weights[1:2] cat_weights[1:4] num_poison[1:2] bias t cat_poison[1:4]
+
 p = -((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1])^2 
     + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2])^2)
 
 S = @set num_poison[1]*(1-num_poison[1]) >= 0 && 
-         num_poison[2]*(1-num_poison[2]) >= 0 && 
-         sum(cat_poison[i] for i in 1:2) == 1 &&
-         sum(cat_poison[i] for i in 2:4) == 1 
+         num_poison[2]*(1-num_poison[2]) >= 0 
+          
+S = S ∩ @set(sum(cat_poison[i] for i in 1:2) == 1)
+S = S ∩ @set(sum(cat_poison[i] for i in 2:4) == 1) 
 
 for j in 1:4    # Binary constraints
    global S = S ∩ @set(cat_poison[j] * (cat_poison[j] - 1) == 0)
@@ -92,15 +102,18 @@ S = S ∩ @set(2/3 * ((sum(num_weights[i] * num_training[1,i] for i in 1:2) + su
 # t constraint
 S = S ∩ @set(t - (sum(num_weights[i] * num_poison[i] for i in 1:2) + sum(cat_weights[i] * cat_poison[i] for i in 1:4) + bias - y[3]) == 0)
 
+# S = S ∩ @set(cat_poison[1] * cat_poison[2] == 0)
+# S = S ∩ @set(cat_poison[3] * cat_poison[4] == 0)
+
 import CSDP
 using MosekTools
 
-solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => true)
+solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => false)
 
 model = SOSModel(solver)
 @variable(model, α)
 @objective(model, Max, α)
-@constraint(model, p >= α, domain = S, maxdegree=4)
+@constraint(model, p >= α, domain = S)
 optimize!(model)
 @show termination_status(model)
 @show objective_value(model)
