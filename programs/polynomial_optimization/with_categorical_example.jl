@@ -31,6 +31,7 @@ model = Model(optimizer_with_attributes(Ipopt.Optimizer, "print_level" => 0))
 # @variable(model, cat_poison[1:4])
 @variable(model, bias)
 @variable(model, t)
+
 @objective(model, Min, -((dot(num_weights, num_training[1, :]) + dot(cat_weights, cat_training[1, :]) + bias - y[1])^2 
                        + (dot(num_weights, num_training[2, :]) + dot(cat_weights, cat_training[2, :]) + bias - y[2])^2))
 
@@ -57,9 +58,14 @@ optimize!(model)
 solution_summary(model)
 @show objective_value(model)
 
+
+# Polynomial Optimization
+no_variables = no_categorical_features + no_numerical_features + 1 + (no_categorical_features + no_numerical_features) * no_poison_samples + no_poison_samples
+println("Number is variables is $(no_variables)")
+
 @polyvar num_weights[1:2] cat_weights[1:4] num_poison[1:2] bias t cat_poison[1:4]
-p = -((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1]) 
-    + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2]))
+p = -((sum(num_weights[i] * num_training[1, i] for i in 1:2) + sum(cat_weights[i] * cat_training[1, i] for i in 1:4) + bias - y[1])^2 
+    + (sum(num_weights[i] * num_training[2, i] for i in 1:2) + sum(cat_weights[i] * cat_training[2, i] for i in 1:4) + bias - y[2])^2)
 
 S = @set num_poison[1]*(1-num_poison[1]) >= 0 && 
          num_poison[2]*(1-num_poison[2]) >= 0 && 
