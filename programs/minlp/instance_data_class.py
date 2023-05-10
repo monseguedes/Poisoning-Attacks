@@ -53,6 +53,7 @@ class InstanceData:
         self.poison_dataframe = self.train_dataframe.sample(
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
+        # self.poison_dataframe["target"] = 1 - self.poison_dataframe["target"].round(0)
 
         self.no_numfeatures = len(
             get_numerical_feature_column_names(self.train_dataframe)

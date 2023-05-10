@@ -10,6 +10,7 @@ using Gurobi
 using Random
 using LinearAlgebra
 using CSV
+using DataFrames
 
 config = Dict("no_training_samples" => 5,
               "poison_rate" => 20,
@@ -79,6 +80,7 @@ println(categories_dict)
 ### NLP model-------------------------------------------------------------------------------
 
 # Parameters--------------------------------------------------
+lambda = 0.661224489
 # Training data
 num_training = get_numerical_array(training_dataframe, config)
 cat_training = get_categorical_array(training_dataframe, config)
@@ -138,7 +140,7 @@ solution_summary(model)
 
 
 ### Polynomial model---------------------------------------------------------------------------
-no_variables = no_categorical_columns + no_numerical_features + 1 + (no_categorical_columns + no_numerical_features) * no_poison_samples + no_poison_samples
+no_variables = no_categorical_columns + no_numerical_features + 1 + (no_categorical_columns + no_categorical_columns) * no_poison_samples + no_poison_samples
 
 println("Number is variables is $(no_variables)")
 println("Number of training samples is $(no_training_samples)")

@@ -18,8 +18,8 @@ import testing
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat",
-    "training_samples": 100,
+    "dataset_name": "10num10cat",
+    "training_samples": 300,
     "poison_rate": 20,
     "seed": 3,
     # Problem
@@ -69,21 +69,23 @@ instance_data = instance_data_class.InstanceData(config)
 numerical_model = None
 
 
-_, flipping_data, regression_parameters = full_flipping_attack.run(
-    config, instance_data
-)
-
-# _, instance_data, regression_parameters = flipping_attack.run(
-#     config, instance_data, numerical_model
+# _, flipping_data, regression_parameters = full_flipping_attack.run(
+#     config, instance_data
 # )
+
+_, flipping_data, _ = flipping_attack.run(
+    config, instance_data, numerical_model
+)
+print(flipping_data.poison_dataframe)
 
 # _, instance_data, regression_parameters = iterative_attack.run(
 #     config, instance_data, numerical_model
 # )
 
+numerical_model = None
+
 # config["binary"] = True
 # config["solver_name"] = "gurobi"
-# instance_data.poison_dataframe = instance_data.poison_dataframe.round(decimals=0)
 # numerical_model, instance_data, regression_parameters = numerical_attack.run(
 #     config, instance_data, numerical_model
 # )

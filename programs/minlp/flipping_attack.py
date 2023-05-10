@@ -193,7 +193,7 @@ def run(config, instance_data, model=None):
             )
         )
         it += 1
-        # Project numerical features
+        # # Project numerical features
         # round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
         # best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
         # best_sol = ridge_regression.run(config, instance_data)
