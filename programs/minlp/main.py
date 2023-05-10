@@ -15,11 +15,12 @@ import numpy as np
 import ridge_regression
 import binary_attack
 import testing
+import os
 
 config = {
     # Dataset
     "dataset_name": "10num10cat",
-    "training_samples": 300,
+    "training_samples": 100,
     "poison_rate": 20,
     "seed": 3,
     # Problem
@@ -73,10 +74,14 @@ numerical_model = None
 #     config, instance_data
 # )
 
-_, flipping_data, _ = flipping_attack.run(
+for file in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}"):
+    os.remove(f"programs/minlp/attacks/{config['dataset_name']}/{file}")
+
+scikit_learn_regression_parameters = ridge_regression.run_just_training(config, instance_data)
+_, instance_data, regression_parameters = flipping_attack.run(
     config, instance_data, numerical_model
 )
-print(flipping_data.poison_dataframe)
+
 
 # _, instance_data, regression_parameters = iterative_attack.run(
 #     config, instance_data, numerical_model
@@ -96,7 +101,7 @@ numerical_model = None
 # )
 
 
-# Run the utitlity to check the results with scikitlearn.
+# Run the utitlity to check the results with scikitlearn
 scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
 

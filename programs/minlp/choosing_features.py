@@ -247,5 +247,5 @@ class LASSOdataframe:
 if __name__ == "__main__":
     dataframe = create_dataframe("house")
     model = LASSOdataframe(dataframe)
-    model.get_features_lists(10, 10)
+    model.get_features_lists(20, 20)
     model.save_new_dataframe()

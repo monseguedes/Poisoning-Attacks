@@ -12,16 +12,16 @@ using LinearAlgebra
 using CSV
 using DataFrames
 
-config = Dict("no_training_samples" => 5,
-              "poison_rate" => 20,
-              "no_numerical_features" => 2,
-              "no_categorical_features" => 2,
+config = Dict("no_training_samples" => 20,
+              "poison_rate" => 10,
+              "no_numerical_features" => 4,
+              "no_categorical_features" => 3,
               "poison_start" => 1,
               "regularization" => 0.1)
 
 ### Data-------------------------------------------------------------------------------------
 # Read a CSV file
-data = CSV.read("../../data/fake/data-binary.csv", DataFrame)
+data = CSV.read("../../data/10num10cat4/data-binary.csv", DataFrame)
 
 function get_training_dataframe(df, config)
    # Select columns
@@ -162,8 +162,8 @@ for j in 1:no_numerical_features
    end
 end      
 
-start = 1
 for j in 1:no_poison_samples
+   global start = 1
    for k in 1:no_categorical_features
       println(@set(sum(cat_poison[j, i] for i in start: start - 1 + categories_dict[string(k)]) == 1))
       global S = S ∩ @set(sum(cat_poison[j, i] for i in start: start - 1 + categories_dict[string(k)]) == 1)
@@ -205,10 +205,13 @@ using MosekTools
 
 solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => false)
 
+elapsed_time = @elapsed begin
 model = SOSModel(solver)
 @variable(model, α)
 @objective(model, Max, α)
 @constraint(model, p >= α, domain = S)
 optimize!(model)
+end
 @show termination_status(model)
 @show objective_value(model)
+println("elapsed time is $(elapsed_time)")

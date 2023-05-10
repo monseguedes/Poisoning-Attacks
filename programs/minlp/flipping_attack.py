@@ -51,6 +51,7 @@ def run(config, instance_data, model=None):
     no_poison_samples = instance_data.no_poison_samples
 
     it = 0
+    
     instance_data.poison_dataframe.to_csv(
         "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
             config["dataset_name"], it
@@ -65,11 +66,11 @@ def run(config, instance_data, model=None):
     numerical_model = None
 
     benchmark_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-            config["dataset_name"], it
+        "programs/minlp/attacks/{}/benchmark_attack.csv".format(
+            config["dataset_name"]
         )
     )
-    it += 1
+
     for epoch in range(n_epochs):
         (
             numerical_model,
@@ -77,11 +78,7 @@ def run(config, instance_data, model=None):
             solution,
         ) = numerical_attack.run(config, instance_data, numerical_model)
         # Save poisoning samples after numerical attack
-        numerical_attack_instance_data.poison_dataframe.to_csv(
-            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                config["dataset_name"], it
-            )
-        )
+        save_dataframes(numerical_attack_instance_data, solution, config, it)
         it += 1
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
@@ -166,11 +163,7 @@ def run(config, instance_data, model=None):
                 best_instance_data = instance_data.copy()
 
             # Save poisoning samples
-            best_instance_data.poison_dataframe.to_csv(
-                "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                    config["dataset_name"], it
-                )
-            )
+            save_dataframes(best_instance_data, best_sol, config, it)
             it += 1
 
         config["numerical_attack_mini_batch_size"] = 0.5
@@ -207,6 +200,23 @@ def run(config, instance_data, model=None):
 
     return best_model, best_instance_data, best_sol
 
+def save_dataframes(instance, solution, config, it):
+    # Save poisoning samples after numerical attack
+        instance.poison_dataframe.to_csv(
+            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
+                config["dataset_name"], it
+            )
+        )
+        solution["weights_num"].to_csv(
+            "programs/minlp/attacks/{}/numerical_weights{}.csv".format(
+                config["dataset_name"], it
+            )
+        )
+        solution["weights_cat"].to_csv(
+            "programs/minlp/attacks/{}/categorical_weights{}.csv".format(
+                config["dataset_name"], it
+            )
+        )
 
 def print_diff(instance_data_a, instance_data_b):
     print(
