@@ -46,4 +46,4 @@ def choose_data(max_num_categories : int, dataset_name: str):
     df.to_csv("data/" + dataset_name + str(max_num_categories) + "/data-binary.csv", index=False)
         
 
-print(choose_data(4, "10num10cat"))
+print(choose_data(4, "5num5cat"))
