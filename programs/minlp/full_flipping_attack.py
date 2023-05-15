@@ -1,4 +1,3 @@
-
 """Flipping heuristic attack which poisons both numerical and categorical data"""
 
 import copy
@@ -52,7 +51,7 @@ def run(config, instance_data, model=None):
 
     for epoch in range(n_epochs):
         # Save poisoning samples after numerical attack
-        if (epoch == 0):
+        if epoch == 0:
             sol = ridge_regression.run(config, instance_data)
             # Store the best solution found so far.
             best_sol = sol
@@ -82,7 +81,8 @@ def run(config, instance_data, model=None):
             # Let's compute the prediction of each case.
             pred_up_numerical = sum(
                 num_weights[feature]
-                for feature in cat_features if num_weights[feature] > 0
+                for feature in cat_features
+                if num_weights[feature] > 0
             )
             pred_up_categorical = sum(
                 cat_weights[(feature, categories_up[feature])]
@@ -92,7 +92,8 @@ def run(config, instance_data, model=None):
 
             pred_down_numerical = sum(
                 num_weights[feature]
-                for feature in cat_features if num_weights[feature] < 0
+                for feature in cat_features
+                if num_weights[feature] < 0
             )
             pred_down_categorical = sum(
                 cat_weights[(feature, categories_down[feature])]
@@ -100,8 +101,12 @@ def run(config, instance_data, model=None):
             )
             pred_down = pred_down_numerical + pred_down_categorical
 
-            negative_num_weights = [key for key, value in num_weights.items() if value < 0]
-            positive_num_weights = [key for key, value in num_weights.items() if value > 0]
+            negative_num_weights = [
+                key for key, value in num_weights.items() if value < 0
+            ]
+            positive_num_weights = [
+                key for key, value in num_weights.items() if value > 0
+            ]
 
             for f in num_weights.keys():
                 instance_data.num_poison[poison_sample_index, f] = 0
@@ -119,7 +124,7 @@ def run(config, instance_data, model=None):
                     instance_data.num_poison[poison_sample_index, k] = 0.999
                 for k in negative_num_weights:
                     instance_data.num_poison[poison_sample_index, k] = 0.001
-            
+
             # Update the dataframe.
             for feat, cat in categories_chosen.items():
                 instance_data.cat_poison[poison_sample_index, feat] = cat
@@ -137,7 +142,7 @@ def run(config, instance_data, model=None):
             if best_sol["mse"] > sol["mse"]:
                 # The current data is actually worse than the current best.
                 # Revert the change.
-                
+
                 instance_data = best_instance_data.copy()
             else:
                 # We found a better one than the current best.
@@ -147,7 +152,6 @@ def run(config, instance_data, model=None):
         # round_except_last = lambda x: round(x, 0) if x.name != instance_data.poison_dataframe.columns[-1] else x
         # instance_data.poison_dataframe = instance_data.poison_dataframe.apply(round_except_last)
         # best_sol = ridge_regression.run(config, instance_data)
-
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')

@@ -19,7 +19,7 @@ import os
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat4",
+    "dataset_name": "5num5cat",
     "training_samples": 100,
     "poison_rate": 20,
     "seed": 3,
@@ -75,12 +75,17 @@ numerical_model = None
 # )
 
 try:
-    os.mkdir("programs/minlp/attacks/" + config['dataset_name'])
+    os.mkdir("programs/minlp/attacks/" + config["dataset_name"])
 except:
     pass
 for file in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}"):
     os.remove(f"programs/minlp/attacks/{config['dataset_name']}/{file}")
-scikit_learn_regression_parameters = ridge_regression.run_just_training(config, instance_data)
+instance_data.train_dataframe.to_csv(
+    f"programs/minlp/attacks/{config['dataset_name']}/training_data.csv"
+)
+scikit_learn_regression_parameters = ridge_regression.run_just_training(
+    config, instance_data
+)
 _, instance_data, regression_parameters = flipping_attack.run(
     config, instance_data, numerical_model
 )

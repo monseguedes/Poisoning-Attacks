@@ -85,10 +85,22 @@ def run(config, instance_data, model=None):
 
     # Project numerical features
     if config["binary"]:
-        round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
-        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
-        round_except_last = lambda x: round(x, 0) if x.name != instance_data.poison_dataframe.columns[-1] else x
-        instance_data.poison_dataframe = instance_data.poison_dataframe.apply(round_except_last)
+        round_except_last = (
+            lambda x: round(x, 0)
+            if x.name != best_instance_data.poison_dataframe.columns[-1]
+            else x
+        )
+        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(
+            round_except_last
+        )
+        round_except_last = (
+            lambda x: round(x, 0)
+            if x.name != instance_data.poison_dataframe.columns[-1]
+            else x
+        )
+        instance_data.poison_dataframe = instance_data.poison_dataframe.apply(
+            round_except_last
+        )
 
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):

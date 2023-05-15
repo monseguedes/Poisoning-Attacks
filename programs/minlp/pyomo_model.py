@@ -435,10 +435,14 @@ class PyomoModel(pmo.block):
 
     def assert_optimal(self):
         results = self.results
-        if (results.solver.status == pyomo.opt.SolverStatus.ok) and (results.solver.termination_condition == pyomo.opt.TerminationCondition.optimal):
+        if (results.solver.status == pyomo.opt.SolverStatus.ok) and (
+            results.solver.termination_condition
+            == pyomo.opt.TerminationCondition.optimal
+        ):
             return
         raise ValueError(
-            f"status={results.solver.status}   termination_condition={results.solver.termination_condition}")
+            f"status={results.solver.status}   termination_condition={results.solver.termination_condition}"
+        )
 
     def get_mse(self):
         """Get the MSE on the training data after poisoning
@@ -618,7 +622,7 @@ class PyomoModel(pmo.block):
         if categorical:
             out.update_categorical_features(solution["x_poison_cat"])
         return out
-    
+
     def warmstart(self, warmstart_data):
         # TODO add documentation
         pass

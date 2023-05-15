@@ -64,8 +64,14 @@ def run(config, instance_data, warmstart_data=None, model=None):
     # Poison everything
     config["binary"] = True
     config["solver_name"] = "gurobi"
-    round_except_last = lambda x: round(x, 0) if x.name != instance_data.poison_dataframe.columns[-1] else x
-    instance_data.poison_dataframe = instance_data.poison_dataframe.apply(round_except_last)
+    round_except_last = (
+        lambda x: round(x, 0)
+        if x.name != instance_data.poison_dataframe.columns[-1]
+        else x
+    )
+    instance_data.poison_dataframe = instance_data.poison_dataframe.apply(
+        round_except_last
+    )
     model = pyomo_model.PyomoModel(instance_data, config)
     num_feature_flag = O
     shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
@@ -73,7 +79,7 @@ def run(config, instance_data, warmstart_data=None, model=None):
     model.set_poison_data_status(instance_data, num_feature_flag, cat_feature_flag)
     if warmstart_data is not None:
         pass
-        #model.warmstart(warmstart_data)
+        # model.warmstart(warmstart_data)
     model.solve()
     solution = model.get_solution()
     model.update_data(instance_data)

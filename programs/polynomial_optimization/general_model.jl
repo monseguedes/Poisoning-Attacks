@@ -11,6 +11,7 @@ using Random
 using LinearAlgebra
 using CSV
 using DataFrames
+using Mosek
 
 config = Dict("no_training_samples" => 20,
               "poison_rate" => 10,
@@ -203,7 +204,7 @@ end
 
 using MosekTools
 
-solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => false)
+solver = optimizer_with_attributes(Mosek.Optimizer, MOI.Silent() => false, "LOG" => 4)
 
 elapsed_time = @elapsed begin
 model = SOSModel(solver)

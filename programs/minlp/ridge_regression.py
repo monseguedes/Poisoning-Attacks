@@ -71,6 +71,7 @@ def run(config, instance_data, wide=False):
         "x_poison_cat": instance_data.get_cat_x_poison_dataframe(),
     }
 
+
 def run_just_training(config, instance_data, wide=False):
     """Run ridge regression without poisoning"""
     num_dataframe = instance_data.get_num_x_train_dataframe(wide=True)
@@ -129,5 +130,5 @@ def run_just_training(config, instance_data, wide=False):
         "weights_num": _weights_num,
         "weights_cat": _weights_cat,
         "bias": bias,
-        "mse": mse
+        "mse": mse,
     }
