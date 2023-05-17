@@ -3,7 +3,6 @@
 """Testing routines"""
 
 import numpy as np
-
 import ridge_regression
 
 

@@ -17,8 +17,8 @@ def improve_points(points):
     return new_points
 
 
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 
 plt.style.use("seaborn")
 

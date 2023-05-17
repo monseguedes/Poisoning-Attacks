@@ -5,6 +5,9 @@
 Main script for the paper of poisoning attacks of categorical variables.
 """
 
+import os
+
+import binary_attack
 import categorical_attack
 import flipping_attack
 import full_flipping_attack
@@ -13,9 +16,8 @@ import iterative_attack
 import numerical_attack
 import numpy as np
 import ridge_regression
-import binary_attack
 import testing
-import os
+import computational_experiments
 
 config = {
     # Dataset
@@ -45,15 +47,14 @@ config = {
     "iterative_attack_n_epochs": 1,
     # Flipping attack
     "flipping_attack_n_epochs": 1,
+    "return_benchmark": False,
     # Solutions
     "datatype": "test",
 }
 
-instance_data = instance_data_class.InstanceData(config)
+# computational_experiments.run(1, config)
 
-# import random_categorical_attack
-# random_categorical_attack.run(config, instance_data)
-# raise SystemExit
+instance_data = instance_data_class.InstanceData(config)
 
 
 # shape = (config["training_samples"], 5)
@@ -68,11 +69,6 @@ instance_data = instance_data_class.InstanceData(config)
 # np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
 
 numerical_model = None
-
-
-# _, flipping_data, regression_parameters = full_flipping_attack.run(
-#     config, instance_data
-# )
 
 try:
     os.mkdir("programs/minlp/attacks/" + config["dataset_name"])
@@ -90,30 +86,16 @@ _, instance_data, regression_parameters = flipping_attack.run(
     config, instance_data, numerical_model
 )
 
-
-# _, instance_data, regression_parameters = iterative_attack.run(
-#     config, instance_data, numerical_model
-# )
-
-numerical_model = None
-
-# config["binary"] = True
-# config["solver_name"] = "gurobi"
-# numerical_model, instance_data, regression_parameters = numerical_attack.run(
-#     config, instance_data, numerical_model
-# )
-
-
 # numerical_model, instance_data, regression_parameters = binary_attack.run(
 #     config, instance_data, numerical_model
 # )
 
 
-# Run the utitlity to check the results with scikitlearn
-scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
+# # Run the utitlity to check the results with scikitlearn
+# scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
 
 
-testing.assert_solutions_are_close(
-    regression_parameters, scikit_learn_regression_parameters
-)
-print("test passed")
+# testing.assert_solutions_are_close(
+#     regression_parameters, scikit_learn_regression_parameters
+# )
+# print("test passed")

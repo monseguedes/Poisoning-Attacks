@@ -2,12 +2,12 @@
 
 import copy
 
+import numerical_attack
 import numpy as np
 import pandas as pd
 import pyomo_model
 import ridge_regression
 import testing
-import numerical_attack
 
 long_space = 80
 short_space = 60

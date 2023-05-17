@@ -196,7 +196,10 @@ def run(config, instance_data, model=None):
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
 
-    return best_model, best_instance_data, best_sol
+    if config["return_benchmark"]:
+        return best_model, best_instance_data, best_sol, benchmark_solution
+    else:
+        return best_model, best_instance_data, best_sol
 
 
 def save_dataframes(instance, solution, config, it):
