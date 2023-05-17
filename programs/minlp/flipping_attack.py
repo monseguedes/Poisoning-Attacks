@@ -3,6 +3,7 @@
 """Flipping heuristic attack which poisons both numerical and categorical data"""
 
 import copy
+import timeit
 
 import categorical_attack
 import numerical_attack
@@ -69,6 +70,7 @@ def run(config, instance_data, model=None):
         "programs/minlp/attacks/{}/benchmark_attack.csv".format(config["dataset_name"])
     )
 
+    start = timeit.timeit()
     for epoch in range(n_epochs):
         (
             numerical_model,
@@ -88,6 +90,8 @@ def run(config, instance_data, model=None):
         else:
             instance_data = best_instance_data.copy()
 
+        mse_iteration_array = []
+        time_iteration_array = []
         for poison_sample_index in range(no_poison_samples):
             # Make (just num) prediction
             cat_weights = best_sol["weights_cat"].to_dict()
@@ -184,10 +188,15 @@ def run(config, instance_data, model=None):
             )
         )
         it += 1
+
+        mse_iteration_array.append(best_sol["mse"])
+
         # # Project numerical features
         # round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
         # best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
         # best_sol = ridge_regression.run(config, instance_data)
+
+    end = time.time()
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
@@ -195,6 +204,15 @@ def run(config, instance_data, model=None):
     print(
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
+
+    # TODO: should I add new items to best_sol or should I return new dictionary?
+    best_sol["mse_per_iteration"] = mse_iteration_array
+    best_sol["mse_final"] = best_sol["mse"]
+    best_sol["computational_time_per_iteration"] = None
+    best_sol["computational_time_final"] = end - start
+    best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
+    best_sol["benchmark_computational_time"] = None
+
 
     if config["return_benchmark"]:
         return best_model, best_instance_data, best_sol, benchmark_solution
