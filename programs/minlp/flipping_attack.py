@@ -61,10 +61,12 @@ def run(config, instance_data, model=None):
     it += 1
 
     # Solve benchmark
+    benchmark_start = timeit.timeit()
     config["iterative_attack_incremental"] = True
     _, benchmark_data, benchmark_solution = numerical_attack.run(config, instance_data)
     config["iterative_attack_incremental"] = False
     numerical_model = None
+    benchmark_end = timeit.timeit()
 
     benchmark_data.poison_dataframe.to_csv(
         "programs/minlp/attacks/{}/benchmark_attack.csv".format(config["dataset_name"])
@@ -196,7 +198,7 @@ def run(config, instance_data, model=None):
         # best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
         # best_sol = ridge_regression.run(config, instance_data)
 
-    end = time.time()
+    end = timeit.timeit()
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
@@ -211,8 +213,7 @@ def run(config, instance_data, model=None):
     best_sol["computational_time_per_iteration"] = None
     best_sol["computational_time_final"] = end - start
     best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
-    best_sol["benchmark_computational_time"] = None
-
+    best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
 
     if config["return_benchmark"]:
         return best_model, best_instance_data, best_sol, benchmark_solution
