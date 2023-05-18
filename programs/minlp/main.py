@@ -52,7 +52,9 @@ config = {
     "datatype": "test",
 }
 
-computational_experiments.run(5, config)
+for poisoning_rate in [4,8,12,16,20]:
+    config["poison_rate"] = poisoning_rate
+    computational_experiments.run(5, config)
 
 
 instance_data = instance_data_class.InstanceData(config)

@@ -32,6 +32,7 @@ def run(runs, config):
     # Create dictionary to store results
     flipping_results = {}
     benchmark_results = {}
+    unpoisoned_results = {}
 
     flipping_results["mse_per_iteration"] = []
     flipping_results["mse_final"] = []
@@ -41,6 +42,7 @@ def run(runs, config):
     flipping_results["ridge_improvement"] = []
     benchmark_results["mse_final"] = []
     benchmark_results["computational_time_final"] = []
+    unpoisoned_results["mse_final"] = []
 
     for run in range(runs):
         config["seed"] = run
@@ -49,6 +51,7 @@ def run(runs, config):
             config, instance_data
         )
         model = None
+        unpoisoned_results["mse_final"].append(regression_parameters["mse"])
 
         # Run flipping attack
         (
