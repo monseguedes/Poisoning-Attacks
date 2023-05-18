@@ -166,6 +166,8 @@ def run(config, instance_data, model=None):
                 best_sol = sol
                 best_instance_data = instance_data.copy()
 
+            mse_iteration_array.append(best_sol["mse"])
+
             # Save poisoning samples
             save_dataframes(best_instance_data, best_sol, config, it)
             it += 1
@@ -190,8 +192,6 @@ def run(config, instance_data, model=None):
             )
         )
         it += 1
-
-        mse_iteration_array.append(best_sol["mse"])
 
         # # Project numerical features
         # round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
