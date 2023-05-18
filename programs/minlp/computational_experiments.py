@@ -45,6 +45,7 @@ def run(runs, config):
     unpoisoned_results["mse_final"] = []
 
     for run in range(runs):
+        print(f"Run {run+1} of {runs}")
         config["seed"] = run
         instance_data = instance_data_class.InstanceData(config)
         regression_parameters = ridge_regression.run_just_training(
