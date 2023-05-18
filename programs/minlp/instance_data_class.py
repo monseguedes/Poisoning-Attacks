@@ -115,6 +115,9 @@ class InstanceData:
     
     def get_cat_x_test_dataframe(self, wide=False):
         return get_categorical_features(df=self.test_dataframe, wide=wide)
+    
+    def get_y_test_dataframe(self):
+        return get_targets(df=self.test_dataframe)
 
     @property
     def no_samples(self):
