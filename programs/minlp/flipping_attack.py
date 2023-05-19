@@ -65,7 +65,7 @@ def run(config, instance_data, model=None):
     config["iterative_attack_incremental"] = True
     _, benchmark_data, benchmark_solution = numerical_attack.run(config, instance_data)
     config["iterative_attack_incremental"] = False
-    numerical_model = None
+    numerical_model = model
     benchmark_end = timeit.timeit()
 
     benchmark_data.poison_dataframe.to_csv(

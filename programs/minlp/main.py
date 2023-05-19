@@ -21,8 +21,8 @@ import computational_experiments
 
 config = {
     # Dataset
-    "dataset_name": "5num5cat",
-    "training_samples": 100,
+    "dataset_name": "10num10cat",
+    "training_samples": 300,
     "poison_rate": 20,
     "seed": 3,
     # Problem
@@ -52,9 +52,9 @@ config = {
     "datatype": "test",
 }
 
-for poisoning_rate in [4, 8, 12, 16, 20]:
+for poisoning_rate in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
     config["poison_rate"] = poisoning_rate
-    computational_experiments.run(40, config)
+    computational_experiments.run(50, config)
 
 
 instance_data = instance_data_class.InstanceData(config)

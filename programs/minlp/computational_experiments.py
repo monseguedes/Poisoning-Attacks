@@ -6,6 +6,7 @@ import instance_data_class
 import numpy as np
 import ridge_regression
 import binary_attack
+import pyomo_model
 
 
 def run(runs, config):
@@ -33,6 +34,7 @@ def run(runs, config):
     flipping_results = {}
     benchmark_results = {}
     unpoisoned_results = {}
+    binary_results = {}
 
     flipping_results["mse_per_iteration"] = []
     flipping_results["mse_final"] = []
@@ -43,21 +45,24 @@ def run(runs, config):
     benchmark_results["mse_final"] = []
     benchmark_results["computational_time_final"] = []
     unpoisoned_results["mse_final"] = []
+    binary_results["mse_final"] = []
+    binary_results["computational_time_final"] = []
+
+    instance_data = instance_data_class.InstanceData(config)
+    model = pyomo_model.PyomoModel(instance_data, config)
 
     for run in range(runs):
         print(f"Run {run+1} of {runs}")
         config["seed"] = run
-        instance_data = instance_data_class.InstanceData(config)
         regression_parameters = ridge_regression.run_just_training(
             config, instance_data
         )
-        model = None
         unpoisoned_results["mse_final"].append(regression_parameters["mse"])
 
         # Run flipping attack
         (
             _,
-            instance_data,
+            _,
             solutions,
         ) = flipping_attack.run(config, instance_data, model)
 
@@ -90,7 +95,11 @@ def run(runs, config):
         )
 
         # Run binary attack
-        # TODO: Add binary attack
+        (
+            _,
+            _,
+            binery_solutions,
+        ) = binary_attack.run(config, instance_data, model)
 
     # Add average MSE to results
     flipping_results["average_mse"] = np.mean(flipping_results["mse_final"])
@@ -114,6 +123,11 @@ def run(runs, config):
         f"results/{config['dataset_name']}/{folder_name}/benchmark_results.npz",
         **benchmark_results,
     )
+    np.savez(
+        f"results/{config['dataset_name']}/{folder_name}/unpoisoned_results.npz",
+        **unpoisoned_results,
+    )
+
 
 
 folder_name = f"{5}_BS{0.5}_TS{100}_PR{20}"

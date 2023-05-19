@@ -8,6 +8,7 @@ import pandas as pd
 import pyomo_model
 import ridge_regression
 import testing
+import timeit
 
 long_space = 80
 short_space = 60
@@ -80,9 +81,14 @@ def run(config, instance_data, warmstart_data=None, model=None):
     if warmstart_data is not None:
         pass
         # model.warmstart(warmstart_data)
+    start = timeit.timeit()
     model.solve()
+    end = timeit.timeit()
     solution = model.get_solution()
     model.update_data(instance_data)
+
+    solution["mse_final"] = solution["mse"]
+    solution["computational_time_final"] = end - start
 
     print("RESULTS")
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
