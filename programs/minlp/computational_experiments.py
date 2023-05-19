@@ -48,12 +48,13 @@ def run(runs, config):
     binary_results["mse_final"] = []
     binary_results["computational_time_final"] = []
 
-    instance_data = instance_data_class.InstanceData(config)
-    model = pyomo_model.PyomoModel(instance_data, config)
+    # TODO fix not build model for each run
 
     for run in range(runs):
         print(f"Run {run+1} of {runs}")
         config["seed"] = run
+        instance_data = instance_data_class.InstanceData(config)
+        model = pyomo_model.PyomoModel(instance_data, config)
         regression_parameters = ridge_regression.run_just_training(
             config, instance_data
         )
@@ -94,12 +95,12 @@ def run(runs, config):
             solutions["benchmark_computational_time"]
         )
 
-        # Run binary attack
-        (
-            _,
-            _,
-            binery_solutions,
-        ) = binary_attack.run(config, instance_data, model)
+        # # Run binary attack
+        # (
+        #     _,
+        #     _,
+        #     binery_solutions,
+        # ) = binary_attack.run(config, instance_data, model)
 
     # Add average MSE to results
     flipping_results["average_mse"] = np.mean(flipping_results["mse_final"])

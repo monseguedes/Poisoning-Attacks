@@ -39,7 +39,9 @@ def run(config, instance_data, warmstart_data=None, model=None):
 
     print("" * 2)
     print("*" * long_space)
-    print("EVERYTHING ATTACK STRATEGY")
+    print("*" * long_space)
+    print("BINARY ATTACK STRATEGY")
+    print("*" * long_space)
     print("*" * long_space)
 
     if not config.get("solver_name"):
@@ -65,6 +67,7 @@ def run(config, instance_data, warmstart_data=None, model=None):
     # Poison everything
     config["binary"] = True
     config["solver_name"] = "gurobi"
+    config["solver_output"] = True
     round_except_last = (
         lambda x: round(x, 0)
         if x.name != instance_data.poison_dataframe.columns[-1]

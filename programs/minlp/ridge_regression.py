@@ -72,10 +72,14 @@ def run(config, instance_data, wide=False):
     }
 
 
-def run_just_training(config, instance_data, wide=False):
+def run_not_poisoned(config, instance_data, data_type="train", wide=False):
     """Run ridge regression without poisoning"""
-    num_dataframe = instance_data.get_num_x_train_dataframe(wide=True)
-    cat_dataframe = instance_data.get_cat_x_train_dataframe(wide=True)
+    if data_type == "train":
+        num_dataframe = instance_data.get_num_x_train_dataframe(wide=True)
+        cat_dataframe = instance_data.get_cat_x_train_dataframe(wide=True)
+    elif data_type == "test":
+        num_dataframe = instance_data.get_num_x_test_dataframe(wide=True)
+        cat_dataframe = instance_data.get_cat_x_test_dataframe(wide=True)
     X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
     X = X_df.to_numpy()
     y_df = instance_data.get_y_train_dataframe()

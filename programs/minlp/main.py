@@ -33,7 +33,7 @@ config = {
     # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
-    "time_limit": 600,
+    "time_limit": 20,
     # Numerical attack
     "numerical_attack_n_epochs": 1,
     "numerical_attack_mini_batch_size": 0.5,
@@ -52,9 +52,9 @@ config = {
     "datatype": "test",
 }
 
-for poisoning_rate in [4, 6, 8, 10, 12, 14, 16, 18, 20]:
+for poisoning_rate in [4, 8, 12, 16, 20]:
     config["poison_rate"] = poisoning_rate
-    computational_experiments.run(50, config)
+    computational_experiments.run(1, config)
 
 
 instance_data = instance_data_class.InstanceData(config)

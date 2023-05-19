@@ -7,6 +7,7 @@ import pandas as pd
 import pyomo
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
+import copy
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
@@ -71,6 +72,10 @@ class PyomoModel(pmo.block):
         print("*" * short_space)
         self.build_objective(instance_data)
         print("*" * short_space)
+
+    def copy(self):
+        """Return a deepcopy of self"""
+        return copy.deepcopy(self)
 
     def prod(self, a, b):
         """Return the product of two expressions"""
