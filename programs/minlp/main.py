@@ -28,7 +28,8 @@ config = {
     # Problem
     "function": "MSE",
     "binary": False,
-    "regularization": 0.6612244897959183,
+    #"regularization": 0.6612244897959183,
+    "regularization": 0.0001,
     "solver_name": "ipopt",
     # Solvers
     "solver_output": False,
@@ -52,12 +53,20 @@ config = {
     "datatype": "test",
 }
 
-for poisoning_rate in [4, 8, 12, 16, 20]:
-    config["poison_rate"] = poisoning_rate
-    computational_experiments.run(1, config)
+# for poisoning_rate in [4, 8, 12, 16, 20]:
+#     config["poison_rate"] = poisoning_rate
+#     computational_experiments.run(5, config)
 
 
 instance_data = instance_data_class.InstanceData(config)
+
+regularization_results = []
+for regularization in [0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.5, 0.6]:
+    config["regularization"] = regularization
+    regression_parameters = ridge_regression.run_not_poisoned(config, instance_data)
+    regularization_results.append(regression_parameters["mse"])
+
+print(regularization_results)
 
 
 # shape = (config["training_samples"], 5)
