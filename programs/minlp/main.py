@@ -7,17 +7,18 @@ Main script for the paper of poisoning attacks of categorical variables.
 
 import os
 
+import numpy as np
+
 import binary_attack
 import categorical_attack
+import computational_experiments
 import flipping_attack
 import full_flipping_attack
 import instance_data_class
 import iterative_attack
 import numerical_attack
-import numpy as np
 import ridge_regression
 import testing
-import computational_experiments
 
 config = {
     # Dataset

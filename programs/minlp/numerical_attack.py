@@ -1,9 +1,11 @@
 """Run iterative attack which which poison training data row by row"""
 
 import copy
+import timeit
 
 import numpy as np
 import pandas as pd
+
 import pyomo_model
 import ridge_regression
 import testing

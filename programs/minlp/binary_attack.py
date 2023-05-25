@@ -1,14 +1,15 @@
 """Run binary attack """
 
 import copy
+import timeit
 
-import numerical_attack
 import numpy as np
 import pandas as pd
+
+import numerical_attack
 import pyomo_model
 import ridge_regression
 import testing
-import timeit
 
 long_space = 80
 short_space = 60

@@ -6,12 +6,13 @@ import copy
 import dataclasses
 import textwrap
 
-import flipping_attack
-import instance_data_class
 import numpy as np
 import pandas as pd
-import ridge_regression
 import torch
+
+import flipping_attack
+import instance_data_class
+import ridge_regression
 
 long_space = 80
 short_space = 60

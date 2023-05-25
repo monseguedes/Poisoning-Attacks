@@ -10,9 +10,10 @@ This script creates the class with all the data that is then given to the benckm
 import copy
 from os import path
 
-import choosing_features
 import numpy as np
 import pandas as pd
+
+import choosing_features
 
 
 class InstanceData:

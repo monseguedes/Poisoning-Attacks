@@ -2,9 +2,10 @@
 
 """Solve ridge regression by matrix inversion"""
 
-import instance_data_class
 import numpy as np
 import pandas as pd
+
+import instance_data_class
 import ridge_regression
 
 

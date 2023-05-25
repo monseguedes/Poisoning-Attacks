@@ -1,19 +1,17 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-
 import os
 
 import matplotlib
 import matplotlib.pyplot as plt
-import instance_data_class
 import numpy as np
 import pandas as pd
 import pyomo.environ as pyo
 import seaborn as sns
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
 import flipping_attack
+import instance_data_class
+import numerical_attack
 import ridge_regression
 
 sns.set_style("whitegrid")
