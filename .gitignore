@@ -15,5 +15,7 @@ vimquickrun.sh
 *.npz
 *.csv
 
+*.yaml
+
 # ignore DS_Store
 .DS_Store
