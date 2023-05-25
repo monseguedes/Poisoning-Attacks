@@ -1,7 +1,8 @@
+import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.animation import FuncAnimation, HTMLWriter
-import os
 
 dataframes_attacks = []
 percentage_attacks = []
