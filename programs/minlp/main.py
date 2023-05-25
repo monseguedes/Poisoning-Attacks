@@ -19,17 +19,18 @@ import iterative_attack
 import numerical_attack
 import ridge_regression
 import testing
+import plots
 
 config = {
     # Dataset
-    "dataset_name": "10num10cat",
-    "training_samples": 300,
-    "poison_rate": 20,
+    "dataset_name": "5num5cat",
+    "training_samples": 100,
+    "poison_rate": 600,
     "seed": 3,
     # Problem
     "function": "MSE",
     "binary": False,
-    #"regularization": 0.6612244897959183,
+    # "regularization": 0.6612244897959183,
     "regularization": 0.0001,
     "solver_name": "ipopt",
     # Solvers
@@ -52,34 +53,21 @@ config = {
     "return_benchmark": False,
     # Solutions
     "datatype": "test",
+    # Results
+    "runs": 1,
+    "poison_rates": [4, 8, 12, 16, 20],
+    "data_type": "train",
 }
 
-# for poisoning_rate in [4, 8, 12, 16, 20]:
+# for poisoning_rate in config["poisoning_rates"]:
 #     config["poison_rate"] = poisoning_rate
-#     computational_experiments.run(5, config)
+#     computational_experiments.run(config["runs"], config)
 
+plots.plot_mse(config)
 
 instance_data = instance_data_class.InstanceData(config)
 
-regularization_results = []
-for regularization in [0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.5, 0.6]:
-    config["regularization"] = regularization
-    regression_parameters = ridge_regression.run_not_poisoned(config, instance_data)
-    regularization_results.append(regression_parameters["mse"])
 
-print(regularization_results)
-
-
-# shape = (config["training_samples"], 5)
-# np.testing.assert_equal(
-#     instance_data.get_num_x_train_dataframe(wide=False).shape, (np.prod(shape),)
-# )
-# np.testing.assert_equal(instance_data.get_num_x_train_dataframe(wide=True).shape, shape)
-# shape = (config["training_samples"], 24)
-# np.testing.assert_equal(
-#     instance_data.get_cat_x_train_dataframe(wide=False).shape, (np.prod(shape),)
-# )
-# np.testing.assert_equal(instance_data.get_cat_x_train_dataframe(wide=True).shape, shape)
 
 # numerical_model = None
 
