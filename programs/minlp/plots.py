@@ -19,16 +19,6 @@ sns.set_style("whitegrid")
 matplotlib.rcParams["mathtext.fontset"] = "stix"
 matplotlib.rcParams["font.family"] = "STIXGeneral"
 
-plot_config = {
-    "runs": 5,
-    "numerical_attack_mini_batch_size": 0.5,
-    "training_samples": 100,
-    "poisoning_rate": 20,
-    "poison_rates": [4, 8, 12, 16, 20],
-    "dataset_name": "5num5cat",
-    "datatype": "train",
-}
-
 
 def plot_mse(config, just_average=True):
     """Plot MSE for each computational experiment and average.
