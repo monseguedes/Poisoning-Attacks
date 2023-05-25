@@ -99,8 +99,8 @@ class ComparisonModel:
 
         if self.datatype == "train":
             self.y = list(self.bilevel_model.y_train)
-            self.bilevel_dataframe = self.bilevel_instance.x_train_dataframe.copy(
-                deep=True
+            self.bilevel_dataframe = (
+                self.bilevel_instance.x_train_dataframe.copy(deep=True)
             )
 
         elif self.datatype == "test":
@@ -132,7 +132,9 @@ class ComparisonModel:
                 )
 
         self.bilevel_dataframe["actual_y_train"] = self.y
-        self.bilevel_dataframe["pred_bilevel_y_train"] = self.pred_bilevel_y_train
+        self.bilevel_dataframe[
+            "pred_bilevel_y_train"
+        ] = self.pred_bilevel_y_train
 
         return self.pred_bilevel_y_train
 
@@ -151,14 +153,14 @@ class ComparisonModel:
 
         if self.datatype == "train":
             self.y = list(self.benchmark_model.y_train.values())
-            self.benchmark_dataframe = self.benchmark_intance.x_train_dataframe.copy(
-                deep=True
+            self.benchmark_dataframe = (
+                self.benchmark_intance.x_train_dataframe.copy(deep=True)
             )
 
         elif self.datatype == "test":
             self.y = list(self.benchmark_intance.test_y)
-            self.benchmark_dataframe = self.benchmark_intance.test_dataframe.copy(
-                deep=True
+            self.benchmark_dataframe = (
+                self.benchmark_intance.test_dataframe.copy(deep=True)
             )
 
         # Define vector of size rows of data_dataframe, and with bias in all terms.
@@ -184,7 +186,9 @@ class ComparisonModel:
                 )
 
         self.benchmark_dataframe["actual_y_train"] = self.y
-        self.benchmark_dataframe["pred_benchmark_y_train"] = self.pred_benchmark_y_train
+        self.benchmark_dataframe[
+            "pred_benchmark_y_train"
+        ] = self.pred_benchmark_y_train
 
         return self.pred_benchmark_y_train
 
@@ -202,9 +206,11 @@ class ComparisonModel:
 
         if self.datatype == "train":
             self.y = list(self.ridge_model.y_train.values())
-            self.ridge_dataframe = self.ridge_instance.ridge_x_train_dataframe.copy(
-                deep=True
-            ).unstack()
+            self.ridge_dataframe = (
+                self.ridge_instance.ridge_x_train_dataframe.copy(
+                    deep=True
+                ).unstack()
+            )
 
         elif self.datatype == "test":
             self.y = list(self.ridge_instance.test_y)
@@ -223,7 +229,8 @@ class ComparisonModel:
         for column in self.ridge_dataframe.columns:
             column_index = int(column)
             self.pred_ridge_y_train += (
-                self.ridge_dataframe[column] * self.ridge_model.weights[column_index].X
+                self.ridge_dataframe[column]
+                * self.ridge_model.weights[column_index].X
             )
 
         self.ridge_dataframe["actual_y_train"] = self.y
@@ -381,8 +388,12 @@ class ComparisonModel:
             {
                 "metric": ["MSE", "RMSE", "MAE"],
                 "nonpoisoned": [
-                    mean_squared_error(self.y, self.pred_ridge_y_train, squared=False),
-                    mean_squared_error(self.y, self.pred_ridge_y_train, squared=True),
+                    mean_squared_error(
+                        self.y, self.pred_ridge_y_train, squared=False
+                    ),
+                    mean_squared_error(
+                        self.y, self.pred_ridge_y_train, squared=True
+                    ),
                     mean_absolute_error(self.y, self.pred_ridge_y_train),
                 ],
                 "benchmark": [
@@ -398,7 +409,9 @@ class ComparisonModel:
                     mean_squared_error(
                         self.y, self.pred_bilevel_y_train, squared=False
                     ),
-                    mean_squared_error(self.y, self.pred_bilevel_y_train, squared=True),
+                    mean_squared_error(
+                        self.y, self.pred_bilevel_y_train, squared=True
+                    ),
                     mean_absolute_error(self.y, self.pred_bilevel_y_train),
                 ],
             }
@@ -414,12 +427,18 @@ class ComparisonModel:
             * 100
         )
         self.metrics_dataframe["non-MINLP increase"] = (
-            (self.metrics_dataframe["poisoned"] - self.metrics_dataframe["nonpoisoned"])
+            (
+                self.metrics_dataframe["poisoned"]
+                - self.metrics_dataframe["nonpoisoned"]
+            )
             / self.metrics_dataframe["nonpoisoned"]
             * 100
         )
         self.metrics_dataframe["benchmark-MINLP increase"] = (
-            (self.metrics_dataframe["poisoned"] - self.metrics_dataframe["benchmark"])
+            (
+                self.metrics_dataframe["poisoned"]
+                - self.metrics_dataframe["benchmark"]
+            )
             / self.metrics_dataframe["benchmark"]
             * 100
         )

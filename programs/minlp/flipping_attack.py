@@ -64,13 +64,17 @@ def run(config, instance_data, model=None):
     # Solve benchmark
     benchmark_start = timeit.timeit()
     config["iterative_attack_incremental"] = True
-    _, benchmark_data, benchmark_solution = numerical_attack.run(config, instance_data)
+    _, benchmark_data, benchmark_solution = numerical_attack.run(
+        config, instance_data
+    )
     config["iterative_attack_incremental"] = False
     numerical_model = model
     benchmark_end = timeit.timeit()
 
     benchmark_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/benchmark_attack.csv".format(config["dataset_name"])
+        "programs/minlp/attacks/{}/benchmark_attack.csv".format(
+            config["dataset_name"]
+        )
     )
 
     start = timeit.timeit()
@@ -110,7 +114,9 @@ def run(config, instance_data, model=None):
                 @ np.array(list(num_features.values()))
                 + best_sol["bias"]
             )
-            target_y = instance_data.get_y_poison_dataframe().iloc[poison_sample_index]
+            target_y = instance_data.get_y_poison_dataframe().iloc[
+                poison_sample_index
+            ]
             difference = num_y - target_y
 
             # We consider two case: Make prediction as large as possible and make prediction
@@ -118,14 +124,22 @@ def run(config, instance_data, model=None):
 
             # categories_up/down[feature] is the category to push prediction up/down.
             # cat_features = instance_data.categorical_feature_category_tuples
-            cat_features = set([cat_feature[0] for cat_feature in cat_weights.keys()])
+            cat_features = set(
+                [cat_feature[0] for cat_feature in cat_weights.keys()]
+            )
             categories_up = dict()
             categories_down = dict()
             for feature in cat_features:
                 # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
-                categories_up[feature] = max(filtered_keys, key=cat_weights.get)[1]
-                categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
+                filtered_keys = [
+                    k for k in cat_weights.keys() if k[0] == feature
+                ]
+                categories_up[feature] = max(
+                    filtered_keys, key=cat_weights.get
+                )[1]
+                categories_down[feature] = min(
+                    filtered_keys, key=cat_weights.get
+                )[1]
 
             # Let's compute the prediction of each case.
             pred_up = num_y + sum(
@@ -270,7 +284,9 @@ def print_diff(instance_data_a, instance_data_b):
 
 # Run the utitlity to check the results with scikitlearn.
 def run_test(config, instance_data, solution):
-    scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
+    scikit_learn_regression_parameters = ridge_regression.run(
+        config, instance_data
+    )
 
     def assert_solutions_are_close(sol1, sol2):
         def flatten(x):

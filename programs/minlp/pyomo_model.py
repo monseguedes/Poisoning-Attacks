@@ -157,10 +157,18 @@ class PyomoModel(pmo.block):
 
         z = pmo.variable(lb=min(0, lb), ub=max(0, ub))
         self.bilinear_term_variable_list.append(z)
-        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary_1))
-        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary_1 <= z))
-        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary_2))
-        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary_2 <= z))
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(z <= ub * binary_1)
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(lb * binary_1 <= z)
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(z <= ub * binary_2)
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(lb * binary_2 <= z)
+        )
         self.bilinear_term_constraint_list.append(
             pmo.constraint(continuous - z <= ub * (2 - binary_1 - binary_2))
         )
@@ -186,7 +194,9 @@ class PyomoModel(pmo.block):
             self.bilinear_term_variable_list.append(z)
             self.bilinear_term_constraint_list.append(pmo.constraint(z <= u))
             self.bilinear_term_constraint_list.append(pmo.constraint(z <= v))
-            self.bilinear_term_constraint_list.append(pmo.constraint(z >= u + v - 1))
+            self.bilinear_term_constraint_list.append(
+                pmo.constraint(z >= u + v - 1)
+            )
             self.bilinear_term_cache[key] = z
             return z
         # One binary, one continuous.
@@ -197,8 +207,12 @@ class PyomoModel(pmo.block):
 
         z = pmo.variable(lb=min(0, lb), ub=max(0, ub))
         self.bilinear_term_variable_list.append(z)
-        self.bilinear_term_constraint_list.append(pmo.constraint(z <= ub * binary))
-        self.bilinear_term_constraint_list.append(pmo.constraint(lb * binary <= z))
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(z <= ub * binary)
+        )
+        self.bilinear_term_constraint_list.append(
+            pmo.constraint(lb * binary <= z)
+        )
         self.bilinear_term_constraint_list.append(
             pmo.constraint(continuous - z <= ub * (1 - binary))
         )
@@ -220,7 +234,8 @@ class PyomoModel(pmo.block):
 
             # 1 if the corresponding row is removed and 0 otherwise.
             self.poison_data_is_removed = {
-                k: pmo.parameter() for k in range(instance_data.no_poison_samples)
+                k: pmo.parameter()
+                for k in range(instance_data.no_poison_samples)
             }
             self.no_poison_samples_in_model = pmo.parameter(
                 instance_data.no_poison_samples
@@ -257,12 +272,16 @@ class PyomoModel(pmo.block):
         self.x_poison_num = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
             for numfeature in instance_data.numerical_feature_names:
-                self.x_poison_num[psample, numfeature] = pmo.variable(domain=domain)
+                self.x_poison_num[psample, numfeature] = pmo.variable(
+                    domain=domain
+                )
 
         # Categorical feature vector of poisoned samples
         self.x_poison_cat = pmo.variable_dict()
         for psample in range(instance_data.no_poison_samples):
-            for catfeature in instance_data.categorical_feature_category_tuples:
+            for (
+                catfeature
+            ) in instance_data.categorical_feature_category_tuples:
                 self.x_poison_cat[(psample,) + catfeature] = pmo.variable(
                     domain=pmo.Binary
                 )
@@ -282,13 +301,17 @@ class PyomoModel(pmo.block):
 
         self.weights_cat = pmo.variable_dict()
         for cat_feature in instance_data.categorical_feature_names:
-            categories = instance_data.categories_in_categorical_feature[cat_feature]
+            categories = instance_data.categories_in_categorical_feature[
+                cat_feature
+            ]
             for category in categories:
                 self.weights_cat[cat_feature, category] = pmo.variable(
                     domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0
                 )
 
-        self.bias = pmo.variable(domain=pmo.Reals, lb=lower_bound, ub=upper_bound)
+        self.bias = pmo.variable(
+            domain=pmo.Reals, lb=lower_bound, ub=upper_bound
+        )
 
     def build_constraints(self, instance_data):
         """
@@ -314,7 +337,9 @@ class PyomoModel(pmo.block):
 
         print("Building num weights contraints")
         # There is one constraint per feature
-        self.cons_first_order_optimality_conditions_num_weights = pmo.constraint_dict()
+        self.cons_first_order_optimality_conditions_num_weights = (
+            pmo.constraint_dict()
+        )
         for numfeature in instance_data.numerical_feature_names:
             constraint = pmo.constraint(
                 body=loss_function_derivative_num_weights(
@@ -326,14 +351,20 @@ class PyomoModel(pmo.block):
                 numfeature
             ] = constraint
         print("Building cat weights contraints")
-        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
+        self.cons_first_order_optimality_conditions_cat_weights = (
+            pmo.constraint_dict()
+        )
         for cat_feature in instance_data.categorical_feature_names:
             for category in instance_data.categories_in_categorical_feature[
                 cat_feature
             ]:
                 constraint = pmo.constraint(
                     body=loss_function_derivative_cat_weights(
-                        instance_data, self, cat_feature, category, self.function
+                        instance_data,
+                        self,
+                        cat_feature,
+                        category,
+                        self.function,
                     ),
                     rhs=0,
                 )
@@ -343,7 +374,9 @@ class PyomoModel(pmo.block):
 
         print("Building bias constraints")
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(
-            body=loss_function_derivative_bias(instance_data, self, self.function),
+            body=loss_function_derivative_bias(
+                instance_data, self, self.function
+            ),
             rhs=0,
         )
 
@@ -361,7 +394,9 @@ class PyomoModel(pmo.block):
 
         print("Objective has been built")
 
-    def set_poison_data_status(self, instance_data, num_feature_flag, cat_feature_flag):
+    def set_poison_data_status(
+        self, instance_data, num_feature_flag, cat_feature_flag
+    ):
         """Set status of the variables corresponding to the features in poisoned data
 
         This sets status of the variables corresponding to the features in poisoned data.
@@ -668,7 +703,11 @@ def train_error(instance_data, model, function: str):
 
     # Get sum of squared error of regression prediction and target
     sum_square_errors = sum(
-        (linear_regression_function(instance_data, model, i) - model.y_train[i]) ** 2
+        (
+            linear_regression_function(instance_data, model, i)
+            - model.y_train[i]
+        )
+        ** 2
         for i in range(instance_data.no_train_samples)
     )
 
@@ -687,7 +726,10 @@ def loss_function_derivative_num_weights(instance_data, model, m, function):
     """
 
     train_samples_component = sum(
-        (linear_regression_function(instance_data, model, i) - model.y_train[i])
+        (
+            linear_regression_function(instance_data, model, i)
+            - model.y_train[i]
+        )
         * model.x_train_num[i, m]
         for i in range(instance_data.no_train_samples)
     )  # Component involving the sum of training samples errors
@@ -754,7 +796,10 @@ def loss_function_derivative_cat_weights(instance_data, model, m, w, function):
     """
 
     train_samples_component = sum(
-        (linear_regression_function(instance_data, model, i) - model.y_train[i])
+        (
+            linear_regression_function(instance_data, model, i)
+            - model.y_train[i]
+        )
         * model.x_train_cat[i, m, w]
         for i in range(instance_data.no_train_samples)
     )  # Component involving the sum of training samples errors
@@ -816,7 +861,10 @@ def loss_function_derivative_bias(instance_data, model, function):
     """
 
     train_samples_component = sum(
-        (linear_regression_function(instance_data, model, i) - model.y_train[i])
+        (
+            linear_regression_function(instance_data, model, i)
+            - model.y_train[i]
+        )
         for i in range(instance_data.no_train_samples)
     )
 
@@ -828,7 +876,9 @@ def loss_function_derivative_bias(instance_data, model, function):
             )
             + sum(
                 sum(
-                    model.prod(model.weights_cat[j, z], model.x_poison_cat[q, j, z])
+                    model.prod(
+                        model.weights_cat[j, z], model.x_poison_cat[q, j, z]
+                    )
                     for z in instance_data.categories_in_categorical_feature[j]
                 )
                 for j in instance_data.categorical_feature_names

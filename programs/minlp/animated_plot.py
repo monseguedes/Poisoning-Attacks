@@ -19,7 +19,9 @@ def get_dataframes_attacks(config):
     no_iterations = len(
         [
             name
-            for name in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}")
+            for name in os.listdir(
+                f"programs/minlp/attacks/{config['dataset_name']}"
+            )
             if os.path.isfile(name) and "poison_dataframe" in name
         ]
     )
@@ -36,7 +38,9 @@ def get_poison_percentage_attacks(config):
     no_iterations = len(
         [
             name
-            for name in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}")
+            for name in os.listdir(
+                f"programs/minlp/attacks/{config['dataset_name']}"
+            )
             if os.path.isfile(name) and "poison_dataframe" in name
         ]
     )
@@ -56,7 +60,9 @@ def get_training_percentage_attacks(config):
     training_percentage = pd.read_csv(
         f"programs/minlp/attacks/{config['dataset_name']}/training_data.csv"
     )
-    training_percentage = training_percentage[training_percentage.columns[1:-1]]
+    training_percentage = training_percentage[
+        training_percentage.columns[1:-1]
+    ]
     training_percentage = training_percentage.round(0)
     training_percentage.loc["sum"] = training_percentage.sum()
     training_percentage.loc["percentage"] = (
@@ -70,7 +76,9 @@ def get_dataframes_numerical_weights(config):
     no_iterations = len(
         [
             name
-            for name in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}")
+            for name in os.listdir(
+                f"programs/minlp/attacks/{config['dataset_name']}"
+            )
             if os.path.isfile(name) and "numerical_weights" in name
         ]
     )
@@ -110,7 +118,9 @@ def get_dataframes_categorical_weights(config):
     no_iterations = len(
         [
             name
-            for name in os.listdir(f"programs/minlp/attacks/{config['dataset_name']}")
+            for name in os.listdir(
+                f"programs/minlp/attacks/{config['dataset_name']}"
+            )
             if os.path.isfile(name) and "categorical_weights" in name
         ]
     )
@@ -147,7 +157,9 @@ def plot_attacks(dataframes_attacks):
         ax.set_ylim(-0.1, 1.1)  # set the y-axis limit to a fixed range
         ax.set_title(f"Dataframe {frame}")
 
-    anim = FuncAnimation(fig, update, frames=len(dataframes_attacks), interval=300)
+    anim = FuncAnimation(
+        fig, update, frames=len(dataframes_attacks), interval=300
+    )
     writer = HTMLWriter(fps=2)
     anim.save("attacks.html", writer=writer)
     plt.show()
@@ -165,20 +177,25 @@ def plot_percentage_attacks(percentage_attacks, training_percentage):
             ax.bar(list(df.columns), list(df.iloc[-1]))
         for i in range(len(df)):
             ax.scatter(
-                list(training_percentage.columns), list(training_percentage.iloc[-1])
+                list(training_percentage.columns),
+                list(training_percentage.iloc[-1]),
             )
         ax.set_ylim(-0.005, 105)  # set the y-axis limit to a fixed range
         plt.xticks(fontsize=5, rotation=45)
         ax.set_title(f"Percentage of 1s at iteration {frame}")
 
-    anim = FuncAnimation(fig, update, frames=len(percentage_attacks), interval=500)
+    anim = FuncAnimation(
+        fig, update, frames=len(percentage_attacks), interval=500
+    )
     writer = HTMLWriter(fps=3)
     anim.save("percentage_ones.html", writer=writer)
     plt.show()
     plt.close()
 
 
-def plot_numerical_weights(dataframes_numerical_weights, initial_numerical_weights):
+def plot_numerical_weights(
+    dataframes_numerical_weights, initial_numerical_weights
+):
     fig, ax = plt.subplots()
 
     def update(frame):

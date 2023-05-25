@@ -32,7 +32,9 @@ feature_matrix = (
 # Grid search with CV
 grid_space = {"alpha": possible_paramaters}
 ridge = Ridge()
-grid_search = GridSearchCV(ridge, grid_space, scoring="neg_mean_squared_error", cv=10)
+grid_search = GridSearchCV(
+    ridge, grid_space, scoring="neg_mean_squared_error", cv=10
+)
 grid_search.fit(feature_matrix, target)
 
 # Print results
@@ -41,7 +43,9 @@ print(
     "\n The best estimator across ALL searched params:\n",
     grid_search.best_estimator_,
 )
-print("\n The best score across ALL searched params:\n", grid_search.best_score_)
+print(
+    "\n The best score across ALL searched params:\n", grid_search.best_score_
+)
 print(
     "\n The best parameters across ALL searched params:\n",
     grid_search.best_params_,

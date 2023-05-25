@@ -71,7 +71,11 @@ def run(config, instance_data, model=None):
 
             # Run categorical attack TODO improve categorical attack
             config["solver_name"] = "gurobi"
-            categorical_model, instance_data, solution = categorical_attack.run(
+            (
+                categorical_model,
+                instance_data,
+                solution,
+            ) = categorical_attack.run(
                 config, instance_data, categorical_model, features=feature
             )
 

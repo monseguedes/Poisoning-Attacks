@@ -78,11 +78,16 @@ def run(config, instance_data, model=None, features=None):
         # for poison_sample_index in range(no_poison_samples):
         for categorical_feature_name in features:  # TODO change this to first
             num_feature_flag = F
-            shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
+            shape = (
+                instance_data.no_poison_samples,
+                instance_data.no_catfeatures,
+            )
             cat_feature_flag = np.full(shape, F)
             # TODO fix this to be flexible
             for poison_sample_index in range(no_poison_samples):
-                cat_feature_flag[poison_sample_index, categorical_feature_name] = O
+                cat_feature_flag[
+                    poison_sample_index, categorical_feature_name
+                ] = O
             model.set_poison_data_status(
                 instance_data, num_feature_flag, cat_feature_flag
             )

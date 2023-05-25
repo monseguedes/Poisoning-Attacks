@@ -56,7 +56,9 @@ def run(config, instance_data, model=None):
     incremental = config["numerical_attack_incremental"]
 
     if incremental and (n_epochs > 1):
-        raise ValueError(f"n_epochs should be 1 when incremental but got {n_epochs}")
+        raise ValueError(
+            f"n_epochs should be 1 when incremental but got {n_epochs}"
+        )
 
     no_poison_samples = instance_data.no_poison_samples
 
@@ -92,8 +94,8 @@ def run(config, instance_data, model=None):
             if x.name != best_instance_data.poison_dataframe.columns[-1]
             else x
         )
-        best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(
-            round_except_last
+        best_instance_data.poison_dataframe = (
+            best_instance_data.poison_dataframe.apply(round_except_last)
         )
         round_except_last = (
             lambda x: round(x, 0)
@@ -113,7 +115,10 @@ def run(config, instance_data, model=None):
             # model.fix: 1
             # model.remove: 2
             num_feature_flag = np.full(instance_data.no_poison_samples, -1)
-            start, stop = breaks[mini_batch_index], breaks[mini_batch_index + 1]
+            start, stop = (
+                breaks[mini_batch_index],
+                breaks[mini_batch_index + 1],
+            )
             num_feature_flag[:start] = F
             num_feature_flag[start:stop] = O
             if incremental:
@@ -121,7 +126,9 @@ def run(config, instance_data, model=None):
             else:
                 num_feature_flag[stop:] = F
             model.set_poison_data_status(
-                instance_data, num_feature_flag[:, None], model.POISON_DATA_FIXED
+                instance_data,
+                num_feature_flag[:, None],
+                model.POISON_DATA_FIXED,
             )
 
             model.solve()
@@ -137,7 +144,9 @@ def run(config, instance_data, model=None):
 
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
-                print(f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}")
+                print(
+                    f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}"
+                )
             print(
                 f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
             )

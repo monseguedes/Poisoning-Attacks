@@ -135,7 +135,9 @@ def solve_benchmark(config: dict, checking_bilevel=False):
     print("*" * long_space)
 
     print("Building data class")
-    instance_data = benchmark_data.InstanceData(dataset_name=config["dataset_name"])
+    instance_data = benchmark_data.InstanceData(
+        dataset_name=config["dataset_name"]
+    )
     instance_data.prepare_instance(
         poison_rate=config["poison_rate"],
         training_samples=config["training_samples"],
@@ -147,7 +149,9 @@ def solve_benchmark(config: dict, checking_bilevel=False):
         benchmark_model,
         benchmark_instance,
         benchmark_solution,
-    ) = iterative_attack_strategy(opt=opt, instance_data=instance_data, config=config)
+    ) = iterative_attack_strategy(
+        opt=opt, instance_data=instance_data, config=config
+    )
     print("*" * middle_space)
 
     return benchmark_model, benchmark_instance, benchmark_solution
@@ -189,8 +193,12 @@ def solve_gurobi(config: dict, instance_data):
     solutions_dict = {
         "x_poison_num": num_poison_solution.to_dict(),
         "x_poison_cat": cat_poison_solution.to_dict(),
-        "weights_num": [element.X for element in my_model.weights_num.values()],
-        "weights_cat": [element.X for element in my_model.weights_cat.values()],
+        "weights_num": [
+            element.X for element in my_model.weights_num.values()
+        ],
+        "weights_cat": [
+            element.X for element in my_model.weights_cat.values()
+        ],
         "bias": my_model.bias.X,
         "objective": m.ObjVal,
     }
@@ -199,7 +207,9 @@ def solve_gurobi(config: dict, instance_data):
 
 
 def solve_pyomo(opt, config: dict, instance_data):
-    new_model = BenchmarkPoisonAttackModel(instance_data, function=config["function"])
+    new_model = BenchmarkPoisonAttackModel(
+        instance_data, function=config["function"]
+    )
 
     # Initialise solutions
     for psample, numfeature in itertools.product(
@@ -207,7 +217,9 @@ def solve_pyomo(opt, config: dict, instance_data):
     ):
         new_model.x_poison_num[
             psample, numfeature
-        ].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
+        ].value = instance_data.num_x_poison_dataframe.to_dict()[
+            psample, numfeature
+        ]
 
     # Solve model
     results = opt.solve(new_model, load_solutions=True, tee=True)
@@ -281,7 +293,9 @@ def solving_MINLP(
 
     # Create model
     gurobi_model = gp.Model("Poisoning_Attack")
-    my_model = PoisonAttackModel(gurobi_model, instance_data, function=function)
+    my_model = PoisonAttackModel(
+        gurobi_model, instance_data, function=function
+    )
     m = my_model.model
 
     # Callback function for bounds
@@ -398,8 +412,12 @@ def solving_MINLP(
     solutions_dict = {
         "x_poison_num": num_poison_solution.to_dict(),
         "x_poison_cat": cat_poison_solution.to_dict(),
-        "weights_num": [element.X for element in my_model.weights_num.values()],
-        "weights_cat": [element.X for element in my_model.weights_cat.values()],
+        "weights_num": [
+            element.X for element in my_model.weights_num.values()
+        ],
+        "weights_cat": [
+            element.X for element in my_model.weights_cat.values()
+        ],
         "bias": my_model.bias.X,
     }
 
@@ -435,7 +453,9 @@ def ridge_regression(
 
     # Initialise data (ready for building first instance)
     instance_data = data.InstanceData(dataset_name=dataset_name)
-    instance_data.create_dataframes(training_samples=training_samples, seed=seed)
+    instance_data.create_dataframes(
+        training_samples=training_samples, seed=seed
+    )
     instance_data.split_dataframe()
     instance_data.regularization_parameter()
 
@@ -483,7 +503,9 @@ def single_attack_strategy(
     """
 
     # Initialise data (ready for building first instance)
-    instance_data = benchmark_data.InstanceData(dataset_name=dataset_name, seed=seed)
+    instance_data = benchmark_data.InstanceData(
+        dataset_name=dataset_name, seed=seed
+    )
     instance_data.prepare_instance(poison_rate=poison_rate, N=1)
 
     # Create abstract model
@@ -546,7 +568,9 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     ):
         model.x_poison_num[
             psample, numfeature
-        ].value = instance_data.num_x_poison_dataframe.to_dict()[psample, numfeature]
+        ].value = instance_data.num_x_poison_dataframe.to_dict()[
+            psample, numfeature
+        ]
 
     while (
         iteration <= instance_data.no_psubsets
@@ -567,7 +591,8 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
         solutions_dict = {
             "x_poison_num": poison_solution.to_dict(),
             "weights_num": {
-                index: model.weights_num[index].value for index in model.numfeatures_set
+                index: model.weights_num[index].value
+                for index in model.numfeatures_set
             },
             "weights_cat": {
                 (cat_feature, category): model.weights_cat[
@@ -588,13 +613,19 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
         for k, v in instance_data.num_x_poison_dataframe.to_dict().items():
             model.x_poison_num_data[k].value = v
         for k, v in (
-            instance_data.get_cat_poison_dataframe().to_dict()["x_poison_cat"].items()
+            instance_data.get_cat_poison_dataframe()
+            .to_dict()["x_poison_cat"]
+            .items()
         ):
             model.x_poison_cat[k].value = v
-        for k, v in instance_data.y_poison_dataframe.to_dict()["y_poison"].items():
+        for k, v in instance_data.y_poison_dataframe.to_dict()[
+            "y_poison"
+        ].items():
             model.y_poison[k].value = v
 
-        next_iteration = 0 if iteration == instance_data.no_psubsets else iteration
+        next_iteration = (
+            0 if iteration == instance_data.no_psubsets else iteration
+        )
 
         dataframe = instance_data.num_x_poison_dataframe.copy().iloc[
             next_iteration
@@ -605,7 +636,9 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
         ]
 
         dataframe.index = dataframe.index.set_levels(
-            dataframe.index.levels[0] - dataframe.index.get_level_values(0)[0] + 1,
+            dataframe.index.levels[0]
+            - dataframe.index.get_level_values(0)[0]
+            + 1,
             level=0,
         )
         for psample in model.psamples_per_subset_set:
@@ -629,10 +662,13 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
     final_solutions = {
         "x_poison_num": instance_data.num_x_poison_dataframe.to_dict(),
         "weights_num": {
-            index: model.weights_num[index].value for index in model.numfeatures_set
+            index: model.weights_num[index].value
+            for index in model.numfeatures_set
         },
         "weights_cat": {
-            (cat_feature, category): model.weights_cat[(cat_feature, category)].value
+            (cat_feature, category): model.weights_cat[
+                (cat_feature, category)
+            ].value
             for cat_feature in model.catfeatures_set
             for category in model.categories_sets[cat_feature]
         },
@@ -640,7 +676,15 @@ def iterative_attack_strategy(opt: pyo.SolverFactory, instance_data, config):
         "objective": pyo.value(model.objective_function),
     }
 
-    print("" + "\n" + "*" * middle_space + "\n" + "RESULTS" + "\n" + "*" * middle_space)
+    print(
+        ""
+        + "\n"
+        + "*" * middle_space
+        + "\n"
+        + "RESULTS"
+        + "\n"
+        + "*" * middle_space
+    )
     # print('Numerical weights are ', final_solutions['weights_cat'])
     # print('Categorical weights are ', final_solutions['weights_num'])
     # print('Bias is ', final_solutions['bias'])
@@ -683,7 +727,9 @@ def benchmark_plus_optimising_heuristic(config: dict):
     print("-" * long_space + "\n" + "-" * long_space)
 
     # Optimise numerical features locally
-    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(config)
+    benchmark_model, benchmark_instance, benchmark_solution = solve_benchmark(
+        config
+    )
     print("Benchmark has been solved, now adding this solution to data")
 
     # Get poisoning samples as data
@@ -700,7 +746,9 @@ def benchmark_plus_optimising_heuristic(config: dict):
         no_poison_subsets=config["no_psubsets"],
         seed=config["seed"],
     )
-    print("And then change old columns for solution from continuous nonlinear model")
+    print(
+        "And then change old columns for solution from continuous nonlinear model"
+    )
     instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
 
     print("Now select new features to be optimised using Gurobi")
@@ -747,8 +795,14 @@ def benchmark_plus_optimising_heuristic(config: dict):
         # instance_data.x_poison_dataframe[instance_data.numerical_columns] = matrix
         instance_data.poison_samples(only_num=True)
 
-    print("Heuristic objective value is     {:.5f}".format(solutions_dict["objective"]))
-    print("New benchmark objective value is {:.5f}".format(solution["objective"]))
+    print(
+        "Heuristic objective value is     {:.5f}".format(
+            solutions_dict["objective"]
+        )
+    )
+    print(
+        "New benchmark objective value is {:.5f}".format(solution["objective"])
+    )
     print(
         "Benchmark objective value is     {:.5f}".format(
             benchmark_solution["objective"]
@@ -859,7 +913,9 @@ def benchmark_plus_optimising_chopping_heuristic(config: dict):
         cat_poison_solution.name = "x_train_cat"
         solutions_dict = {"x_poison_cat": cat_poison_solution.to_dict()}
         for sample in range(1, instance_data.no_psamples + 1):
-            for category in range(1, instance_data.no_categories_dict[feature] + 1):
+            for category in range(
+                1, instance_data.no_categories_dict[feature] + 1
+            ):
                 print(
                     "Old value: ",
                     instance_data.cat_x_poison_dataframe.loc[
@@ -868,7 +924,9 @@ def benchmark_plus_optimising_chopping_heuristic(config: dict):
                 )
                 instance_data.cat_x_poison_dataframe.loc[
                     (sample, feature, category)
-                ] = int(solutions_dict["x_poison_cat"][(sample, feature, category)])
+                ] = int(
+                    solutions_dict["x_poison_cat"][(sample, feature, category)]
+                )
                 print(
                     "New value: ",
                     instance_data.cat_x_poison_dataframe.loc[
@@ -935,7 +993,9 @@ def flipping_heuristic(config: dict, instance, solution):
             cat_weights = solution["weights_cat"]
             num_weights = solution["weights_num"]
             num_features = {
-                k: v for k, v in solution["x_poison_num"].items() if k[0] == psample
+                k: v
+                for k, v in solution["x_poison_num"].items()
+                if k[0] == psample
             }
             num_y = (
                 np.array(list(num_weights.values()))
@@ -954,9 +1014,15 @@ def flipping_heuristic(config: dict, instance, solution):
             categories_down = dict()
             for feature in cat_features:
                 # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
-                categories_up[feature] = max(filtered_keys, key=cat_weights.get)[1]
-                categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
+                filtered_keys = [
+                    k for k in cat_weights.keys() if k[0] == feature
+                ]
+                categories_up[feature] = max(
+                    filtered_keys, key=cat_weights.get
+                )[1]
+                categories_down[feature] = min(
+                    filtered_keys, key=cat_weights.get
+                )[1]
 
             # Let's compute the prediction of each case.
             pred_up = num_y + sum(
@@ -989,7 +1055,9 @@ def flipping_heuristic(config: dict, instance, solution):
                 instance.update_cat_poison_dataframe()
 
         opt = pyo.SolverFactory("ipopt")
-        _, instance, solution = iterative_attack_strategy(opt, instance, config)
+        _, instance, solution = iterative_attack_strategy(
+            opt, instance, config
+        )
 
         if original_solution["objective"] > solution["objective"]:
             # The flipping actually made the poisoning attack worse.

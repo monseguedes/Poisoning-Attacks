@@ -100,7 +100,9 @@ class LASSOdataframe:
         coeffs = self.model.coef_
         bool_coeff = [False if coef == 0 else True for coef in coeffs]
         self.used_features = [
-            name for name, nonzero in zip(self.name_features, bool_coeff) if nonzero
+            name
+            for name, nonzero in zip(self.name_features, bool_coeff)
+            if nonzero
         ]
         self.coeffs_used_features = {
             name: coeff
@@ -173,9 +175,9 @@ class LASSOdataframe:
                         max_dict[key_type] = value
                 alpha -= 0.001
 
-            chosen_categorical = sorted(max_dict, key=max_dict.get, reverse=True)[
-                :no_categorical
-            ]
+            chosen_categorical = sorted(
+                max_dict, key=max_dict.get, reverse=True
+            )[:no_categorical]
             self.chosen_categorical = list(chosen_categorical)
 
         return self.chosen_numerical, self.chosen_categorical
@@ -187,7 +189,9 @@ class LASSOdataframe:
         numerical_dataframe = self.dataframe[
             [str(column) for column in self.chosen_numerical]
         ]
-        new_numerical_cols = [str(i) for i in range(len(numerical_dataframe.columns))]
+        new_numerical_cols = [
+            str(i) for i in range(len(numerical_dataframe.columns))
+        ]
         numerical_dataframe = numerical_dataframe.rename(
             columns=dict(zip(numerical_dataframe.columns, new_numerical_cols))
         )
@@ -210,7 +214,9 @@ class LASSOdataframe:
                     old_substring,
                     new_substring,
                 ) in new_categorical_columns_dict.items():
-                    columns[i] = re.sub("^" + old_substring, new_substring, columns[i])
+                    columns[i] = re.sub(
+                        "^" + old_substring, new_substring, columns[i]
+                    )
             columns = [x.replace("_", ":") for x in columns]
 
             # Currently, the categories are 1-based. We are updating them to be 0-based.
@@ -235,7 +241,9 @@ class LASSOdataframe:
                 [numerical_dataframe, self.dataframe["target"]], axis=1
             )
 
-        dataset_name = str(self.no_numerical) + "num" + str(self.no_categorical) + "cat"
+        dataset_name = (
+            str(self.no_numerical) + "num" + str(self.no_categorical) + "cat"
+        )
         directory = os.path.join("data", dataset_name)
 
         if not os.path.exists(directory):

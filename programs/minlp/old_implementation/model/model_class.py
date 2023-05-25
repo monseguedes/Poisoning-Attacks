@@ -84,7 +84,9 @@ class PoisonAttackModel:
     def __repr__(self) -> str:
         return super().__repr__()
 
-    def build_parameters(self, instance_data: model.instance_class.InstanceData):
+    def build_parameters(
+        self, instance_data: model.instance_class.InstanceData
+    ):
         """
         Parameters of the single level model:
         - number of training samples.
@@ -102,9 +104,13 @@ class PoisonAttackModel:
         print("Defining parameters")
 
         # Order of sets
-        self.no_samples = instance_data.no_samples  # No. of non-poisoned samples
+        self.no_samples = (
+            instance_data.no_samples
+        )  # No. of non-poisoned samples
         self.no_psamples = instance_data.no_psamples  # No. of poisoned samples
-        self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
+        self.no_numfeatures = (
+            instance_data.no_numfeatures
+        )  # No. of numerical features
         self.no_catfeatures = (
             instance_data.no_catfeatures
         )  # No. of categorical features
@@ -118,8 +124,12 @@ class PoisonAttackModel:
         print("No. poisoning samples is:", self.no_psamples)
 
         # Sets
-        self.samples_set = range(1, self.no_samples + 1)  # Set of non-poisoned samples
-        self.psamples_set = range(1, self.no_psamples + 1)  # Set of poisoned samples
+        self.samples_set = range(
+            1, self.no_samples + 1
+        )  # Set of non-poisoned samples
+        self.psamples_set = range(
+            1, self.no_psamples + 1
+        )  # Set of poisoned samples
         # self.numfeatures_set = range(1, self.no_numfeatures + 1)   # Set of numerical features
         if instance_data.numerical_columns == []:
             self.numfeatures_set = []
@@ -144,16 +154,20 @@ class PoisonAttackModel:
 
         # Parameters
         self.x_train_num = instance_data.num_x_train_dataframe.to_dict()
-        self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()["x_train_cat"]
-        self.x_data_poison_num = instance_data.num_x_poison_dataframe.to_dict()
-        self.x_data_poison_cat = instance_data.cat_x_poison_dataframe.to_dict()[
-            "x_data_poison_cat"
+        self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()[
+            "x_train_cat"
         ]
+        self.x_data_poison_num = instance_data.num_x_poison_dataframe.to_dict()
+        self.x_data_poison_cat = (
+            instance_data.cat_x_poison_dataframe.to_dict()["x_data_poison_cat"]
+        )
         self.y_train = instance_data.y_train_dataframe.to_dict()["y_train"]
         self.y_poison = instance_data.y_poison_dataframe.to_dict()["y_poison"]
         self.regularization = instance_data.regularization
 
-    def build_variables(self, instance_data: model.instance_class.InstanceData):
+    def build_variables(
+        self, instance_data: model.instance_class.InstanceData
+    ):
         """
         Decision variables of single level model:
         - poisoning samples for numerical features.
@@ -265,7 +279,9 @@ class PoisonAttackModel:
             for cat_feature in self.catfeatures_set
             for category in range(1, self.no_categories[cat_feature] + 1)
             for catconstraint in self.catfeatures_set
-            for categorycontraint in range(1, self.no_categories[catconstraint] + 1)
+            for categorycontraint in range(
+                1, self.no_categories[catconstraint] + 1
+            )
         ]
         # Trilinear terms
         self.tnn_ln_times_numsamples = self.model.addVars(
@@ -485,7 +501,8 @@ class PoisonAttackModel:
             for j in cat_gen:  # Not poisoning, just data
                 for z in range(1, self.no_categories[j] + 1):
                     self.model.addConstr(
-                        self.weights_cat[j, z] * self.x_data_poison_cat[k, j, z]
+                        self.weights_cat[j, z]
+                        * self.x_data_poison_cat[k, j, z]
                         == self.lc_catweight_times_catsample[k, j, z],
                         name="cons_lc",
                     )
@@ -540,7 +557,8 @@ class PoisonAttackModel:
                         )
                         self.model.addConstr(
                             self.tnn_ln_times_numsamples[k, r, s]
-                            >= 1 / 2 * self.weights_num[r] + 1 / 2 * self.lower_bound,
+                            >= 1 / 2 * self.weights_num[r]
+                            + 1 / 2 * self.lower_bound,
                             name="convex_envelope_4",
                         )
                         # Concave
@@ -564,7 +582,8 @@ class PoisonAttackModel:
                         )
                         self.model.addConstr(
                             self.tnn_ln_times_numsamples[k, r, s]
-                            <= 1 / 2 * self.weights_num[r] + 1 / 2 * self.upper_bound,
+                            <= 1 / 2 * self.weights_num[r]
+                            + 1 / 2 * self.upper_bound,
                             name="concave_envelope_4",
                         )
 
@@ -615,7 +634,9 @@ class RegressionModel:
     def __repr__(self) -> str:
         return super().__repr__()
 
-    def build_parameters(self, instance_data: model.instance_class.InstanceData):
+    def build_parameters(
+        self, instance_data: model.instance_class.InstanceData
+    ):
         """
         Parameters of the single level model:
         - number of training samples.
@@ -629,14 +650,22 @@ class RegressionModel:
         print("Defining parameters")
 
         # Order of sets
-        self.no_samples = instance_data.no_samples  # No. of non-poisoned samples
-        self.no_features = instance_data.no_features  # No. of numerical features
+        self.no_samples = (
+            instance_data.no_samples
+        )  # No. of non-poisoned samples
+        self.no_features = (
+            instance_data.no_features
+        )  # No. of numerical features
 
         print("No. training samples is:", self.no_samples)
 
         # Sets
-        self.samples_set = range(1, self.no_samples + 1)  # Set of non-poisoned samples
-        self.features_set = range(1, self.no_features + 1)  # Set of numerical features
+        self.samples_set = range(
+            1, self.no_samples + 1
+        )  # Set of non-poisoned samples
+        self.features_set = range(
+            1, self.no_features + 1
+        )  # Set of numerical features
 
         # Parameters
         self.x_train = instance_data.ridge_x_train_dataframe.to_dict()
@@ -645,7 +674,9 @@ class RegressionModel:
 
         print("Parameters have been defined")
 
-    def build_variables(self, instance_data: model.instance_class.InstanceData):
+    def build_variables(
+        self, instance_data: model.instance_class.InstanceData
+    ):
         """
         Decision variables of single level model:
         - weights.
@@ -718,7 +749,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
     def __repr__(self) -> str:
         return super().__repr__()
 
-    def build_parameters(self, instance_data: model.pyomo_instance_class.InstanceData):
+    def build_parameters(
+        self, instance_data: model.pyomo_instance_class.InstanceData
+    ):
         """
         PYOMO
         Parameters of the single level model: sets and no. elements in sets for
@@ -729,10 +762,14 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print("Defining parameters")
 
         # Order of sets
-        self.no_samples = instance_data.no_samples  # No. of non-poisoned samples
+        self.no_samples = (
+            instance_data.no_samples
+        )  # No. of non-poisoned samples
         self.no_psamples = instance_data.no_psamples  # No. of poisoned samples
         self.no_psamples_per_subset = instance_data.no_psamples_per_subset
-        self.no_numfeatures = instance_data.no_numfeatures  # No. of numerical features
+        self.no_numfeatures = (
+            instance_data.no_numfeatures
+        )  # No. of numerical features
         self.no_catfeatures = (
             instance_data.no_catfeatures
         )  # No. of categorical features
@@ -741,9 +778,15 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print("No. poisoning samples is:", self.no_psamples)
 
         # Sets
-        self.samples_set = range(1, self.no_samples + 1)  # Set of non-poisoned samples
-        self.psamples_set = range(1, self.no_psamples + 1)  # Set of poisoned samples
-        self.psamples_per_subset_set = range(1, self.no_psamples_per_subset + 1)
+        self.samples_set = range(
+            1, self.no_samples + 1
+        )  # Set of non-poisoned samples
+        self.psamples_set = range(
+            1, self.no_psamples + 1
+        )  # Set of poisoned samples
+        self.psamples_per_subset_set = range(
+            1, self.no_psamples_per_subset + 1
+        )
         self.numfeatures_set = range(
             1, self.no_numfeatures + 1
         )  # Set of numerical features
@@ -756,24 +799,31 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         # Parameters
         self.flag_array = {
-            k + 1: pmo.parameter(v) for k, v in enumerate(instance_data.flag_array)
+            k + 1: pmo.parameter(v)
+            for k, v in enumerate(instance_data.flag_array)
         }
         self.x_train_num = {
             k: pmo.parameter(v)
-            for k, v in instance_data.get_num_x_train_dataframe().to_dict().items()
+            for k, v in instance_data.get_num_x_train_dataframe()
+            .to_dict()
+            .items()
         }
-        self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()["x_train_cat"]
+        self.x_train_cat = instance_data.cat_x_train_dataframe.to_dict()[
+            "x_train_cat"
+        ]
         self.y_train = instance_data.y_train_dataframe.to_dict()["y_train"]
         self.x_poison_num_data = {
             k: pmo.parameter(v)
-            for k, v in instance_data.get_num_x_poison_dataframe().to_dict().items()
+            for k, v in instance_data.get_num_x_poison_dataframe()
+            .to_dict()
+            .items()
         }
-        self.x_poison_cat_data = instance_data.cat_poison_dataframe_data.to_dict()[
-            "x_poison_cat"
-        ]
-        self.y_poison_data = instance_data.complete_y_poison_dataframe.to_dict()[
-            "y_poison"
-        ]
+        self.x_poison_cat_data = (
+            instance_data.cat_poison_dataframe_data.to_dict()["x_poison_cat"]
+        )
+        self.y_poison_data = (
+            instance_data.complete_y_poison_dataframe.to_dict()["y_poison"]
+        )
         self.x_poison_cat = {
             k: pmo.parameter(v)
             for k, v in instance_data.get_cat_poison_dataframe()
@@ -782,12 +832,16 @@ class BenchmarkPoisonAttackModel(pmo.block):
         }
         self.y_poison = {
             k: pmo.parameter(v)
-            for k, v in instance_data.y_poison_dataframe.to_dict()["y_poison"].items()
+            for k, v in instance_data.y_poison_dataframe.to_dict()[
+                "y_poison"
+            ].items()
         }
 
         self.regularization = instance_data.regularization
 
-    def build_variables(self, instance_data: model.pyomo_instance_class.InstanceData):
+    def build_variables(
+        self, instance_data: model.pyomo_instance_class.InstanceData
+    ):
         """
         PYOMO
         Decision variables of single level model: features of poisoned samples,
@@ -811,7 +865,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
         print(f"Upper bound is: {upper_bound:.2f}")
         print(f"Lower bound is: {lower_bound:.2f}")
 
-        self.weights_num = pmo.variable_dict()  # Weights for numerical features
+        self.weights_num = (
+            pmo.variable_dict()
+        )  # Weights for numerical features
         for numfeature in self.numfeatures_set:
             self.weights_num[numfeature] = pmo.variable(
                 domain=pmo.Reals, lb=lower_bound, ub=upper_bound, value=0
@@ -854,7 +910,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
                 rhs=0,
             )
         print("Building cat weights contraints")
-        self.cons_first_order_optimality_conditions_cat_weights = pmo.constraint_dict()
+        self.cons_first_order_optimality_conditions_cat_weights = (
+            pmo.constraint_dict()
+        )
         for cat_feature in self.catfeatures_set:
             for category in self.categories_sets[cat_feature]:
                 self.cons_first_order_optimality_conditions_cat_weights[
@@ -885,7 +943,9 @@ class BenchmarkPoisonAttackModel(pmo.block):
 
         print("Objective has been built")
 
-    def build_instance(self, instance_data: model.pyomo_instance_class.InstanceData):
+    def build_instance(
+        self, instance_data: model.pyomo_instance_class.InstanceData
+    ):
         """
         Builds a specific instance to be used when solving the model.
 
@@ -907,6 +967,8 @@ class BenchmarkPoisonAttackModel(pmo.block):
         }
 
         # Create Data Instance
-        instance = self.create_instance(data_input, name=instance_data.iteration_count)
+        instance = self.create_instance(
+            data_input, name=instance_data.iteration_count
+        )
 
         return instance

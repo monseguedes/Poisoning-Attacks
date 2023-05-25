@@ -17,9 +17,9 @@ import full_flipping_attack
 import instance_data_class
 import iterative_attack
 import numerical_attack
+import plots
 import ridge_regression
 import testing
-import plots
 
 config = {
     # Dataset
@@ -66,7 +66,6 @@ config = {
 plots.plot_mse(config)
 
 instance_data = instance_data_class.InstanceData(config)
-
 
 
 # numerical_model = None

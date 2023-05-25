@@ -57,7 +57,8 @@ def SOS_constraints(model, k, j):
     categories within a categorical feature and making the sum equal to 1.
     """
     sum_of_categories = sum(
-        model.x_poison_cat[k, j, i] for i in range(1, model.no_categories[j] + 1)
+        model.x_poison_cat[k, j, i]
+        for i in range(1, model.no_categories[j] + 1)
     )
 
     return sum_of_categories
@@ -97,7 +98,8 @@ def loss_function_derivative_num_weights(model, poisoned, function, s):
     # Component involving the sum of poison samples errors
     poison_samples_component = gp.quicksum(
         gp.quicksum(
-            model.tnn_ln_times_numsamples[k, r, s] for r in model.numfeatures_set
+            model.tnn_ln_times_numsamples[k, r, s]
+            for r in model.numfeatures_set
         )
         + gp.quicksum(
             gp.quicksum(
@@ -115,7 +117,9 @@ def loss_function_derivative_num_weights(model, poisoned, function, s):
     regularization_component = 2 * model.regularization * model.weights_num[s]
 
     if function == "MSE":
-        derivative_num_weights = (2 / (model.no_samples + model.no_psamples)) * (
+        derivative_num_weights = (
+            2 / (model.no_samples + model.no_psamples)
+        ) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
 
@@ -162,7 +166,8 @@ def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
     # Component involving the sum of poison samples errors
     poison_samples_component = gp.quicksum(
         gp.quicksum(
-            model.tnc_ln_times_catsamples[k, r, l, h] for r in model.numfeatures_set
+            model.tnc_ln_times_catsamples[k, r, l, h]
+            for r in model.numfeatures_set
         )
         + gp.quicksum(
             gp.quicksum(
@@ -177,10 +182,14 @@ def loss_function_derivative_cat_weights(model, poisoned, function, l, h):
     )
 
     # Component involving regularization
-    regularization_component = 2 * model.regularization * model.weights_cat[l, h]
+    regularization_component = (
+        2 * model.regularization * model.weights_cat[l, h]
+    )
 
     if function == "MSE":
-        derivative_num_weights = (2 / (model.no_samples + model.no_psamples)) * (
+        derivative_num_weights = (
+            2 / (model.no_samples + model.no_psamples)
+        ) * (
             train_samples_component + poison_samples_component
         ) + regularization_component
 
@@ -218,7 +227,8 @@ def loss_function_derivative_bias(model, function):
 
     poison_samples_component = gp.quicksum(
         gp.quicksum(
-            model.ln_numweight_times_numsample[k, r] for r in model.numfeatures_set
+            model.ln_numweight_times_numsample[k, r]
+            for r in model.numfeatures_set
         )
         + gp.quicksum(
             gp.quicksum(
@@ -237,7 +247,9 @@ def loss_function_derivative_bias(model, function):
             train_samples_component + poison_samples_component
         )
     elif function == "SLS":
-        derivative_bias = 2 * (train_samples_component + poison_samples_component)
+        derivative_bias = 2 * (
+            train_samples_component + poison_samples_component
+        )
 
     return derivative_bias
 
@@ -251,7 +263,8 @@ def ridge_objective_function(model, function):
     sum_square_errors = gp.quicksum(
         (
             gp.quicksum(
-                model.weights[r] * model.x_train[k, r] for r in model.features_set
+                model.weights[r] * model.x_train[k, r]
+                for r in model.features_set
             )
             + model.bias
             - model.y_train[k]
@@ -268,7 +281,9 @@ def ridge_objective_function(model, function):
     )
 
     if function == "MSE":
-        obj = ((1 / model.no_samples) * sum_square_errors) + regularization_component
+        obj = (
+            (1 / model.no_samples) * sum_square_errors
+        ) + regularization_component
 
     elif function == "SLS":
         obj = sum_square_errors + regularization_component

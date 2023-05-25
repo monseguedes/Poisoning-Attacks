@@ -52,16 +52,24 @@ def run(runs, config):
         instance_data = instance_data_class.InstanceData(config)
         model = pyomo_model.PyomoModel(instance_data, config)
 
-        ## Unpoisoned model
-        regression_parameters = ridge_regression.run_not_poisoned(config, instance_data)
+        ## Unpoisoned model------------------------------------------------------
+        regression_parameters = ridge_regression.run_not_poisoned(
+            config, instance_data
+        )
         # Save results to dictionary
         unpoisoned_results["mse_final"].append(regression_parameters["mse"])
-        unpoisoned_results["weights_num"].append(regression_parameters["weights_num"])
-        unpoisoned_results["weights_cat"].append(regression_parameters["weights_cat"])
+        unpoisoned_results["weights_num"].append(
+            regression_parameters["weights_num"]
+        )
+        unpoisoned_results["weights_cat"].append(
+            regression_parameters["weights_cat"]
+        )
         unpoisoned_results["bias"].append(regression_parameters["bias"])
 
-        ## Flipping attack
-        _, _, flipping_solutions = flipping_attack.run(config, instance_data, model)
+        ## Flipping attack-------------------------------------------------------
+        _, _, flipping_solutions = flipping_attack.run(
+            config, instance_data, model
+        )
         # Save results to dictionary
         flipping_results["mse_per_iteration"].append(
             flipping_solutions["mse_per_iteration"]
@@ -70,11 +78,15 @@ def run(runs, config):
         flipping_results["computational_time_final"].append(
             flipping_solutions["computational_time_final"]
         )
-        flipping_results["weights_num"].append(flipping_solutions["weights_num"])
-        flipping_results["weights_cat"].append(flipping_solutions["weights_cat"])
+        flipping_results["weights_num"].append(
+            flipping_solutions["weights_num"]
+        )
+        flipping_results["weights_cat"].append(
+            flipping_solutions["weights_cat"]
+        )
         flipping_results["bias"].append(flipping_solutions["bias"])
 
-        ## Benchmark attack
+        ## Benchmark attack------------------------------------------------------
         config["iterative_attack_incremental"] = True
         _, _, benchmark_solution = numerical_attack.run(config, instance_data)
         config["iterative_attack_incremental"] = False
@@ -83,11 +95,15 @@ def run(runs, config):
         benchmark_results["computational_time_final"].append(
             benchmark_solution["computational_time"]
         )
-        benchmark_results["weights_num"].append(benchmark_solution["weights_num"])
-        benchmark_results["weights_cat"].append(benchmark_solution["weights_cat"])
+        benchmark_results["weights_num"].append(
+            benchmark_solution["weights_num"]
+        )
+        benchmark_results["weights_cat"].append(
+            benchmark_solution["weights_cat"]
+        )
         benchmark_results["bias"].append(benchmark_solution["bias"])
 
-        # # # Run binary attack
+        # # # Run binary attack---------------------------------------------------
         # _, _, binary_solutions = binary_attack.run(config, instance_data, model)
         # # Save results to dictionary
         # binary_results["mse_final"].append(binary_solutions["mse_final"])
@@ -122,6 +138,7 @@ def run(runs, config):
     ) as file:
         documents = yaml.dump(config, file)
 
+
 def choose_regularization(config, instance_data, possible_values):
     """Function to choose regularization parameter
     for ridge regression.
@@ -132,7 +149,7 @@ def choose_regularization(config, instance_data, possible_values):
         Dictionary containing configuration parameters.
     instance_data : InstanceData
         InstanceData object.
-    possible_values : list  
+    possible_values : list
         List of possible regularization parameters.
 
     Returns
@@ -144,9 +161,10 @@ def choose_regularization(config, instance_data, possible_values):
     regularization_results = []
     for regularization in possible_values:
         config["regularization"] = regularization
-        regression_parameters = ridge_regression.run_not_poisoned(config, instance_data)
+        regression_parameters = ridge_regression.run_not_poisoned(
+            config, instance_data
+        )
         regularization_results.append(regression_parameters["mse"])
 
     print(regularization_results)
     return max(regularization_results)
-

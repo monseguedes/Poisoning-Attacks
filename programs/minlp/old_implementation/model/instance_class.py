@@ -105,7 +105,9 @@ class InstanceData:
 
         self.test_dataframe = self.test_validation_dataframe.sample(
             frac=None,
-            n=min(5 * training_samples, len(self.test_validation_dataframe.index)),
+            n=min(
+                5 * training_samples, len(self.test_validation_dataframe.index)
+            ),
             random_state=seed,
         )  # The indexes are not reset, but randomly shuffled
 
@@ -120,7 +122,8 @@ class InstanceData:
         # Change dataframe column names to create dataframe for ridge model.
         self.test_ridge_x_train_dataframe = self.test_dataframe.copy()
         self.test_ridge_x_train_dataframe.columns = [
-            count + 1 for count, value in enumerate(self.test_dataframe.columns)
+            count + 1
+            for count, value in enumerate(self.test_dataframe.columns)
         ]
         self.test_ridge_x_train_dataframe = (
             self.test_ridge_x_train_dataframe.stack().rename_axis(
@@ -162,9 +165,13 @@ class InstanceData:
             self.no_total_psamples / self.no_poison_subsets
         )
         # Now multiplies the no. samples per subset and no. of subset to get total poisoned samples
-        self.no_total_psamples = self.no_psamples_per_subset * self.no_poison_subsets
+        self.no_total_psamples = (
+            self.no_psamples_per_subset * self.no_poison_subsets
+        )
         # If the initial poison data had a non divisible number of samples, update it to be divisible
-        self.poison_dataframe = self.poison_dataframe.iloc[: self.no_total_psamples]
+        self.poison_dataframe = self.poison_dataframe.iloc[
+            : self.no_total_psamples
+        ]
         self.x_poison_dataframe = self.poison_dataframe.drop(
             columns=["target"], inplace=False
         ).reset_index(drop=True)
@@ -180,15 +187,20 @@ class InstanceData:
         # Change dataframe column names to create dataframe for ridge model.
         self.ridge_x_train_dataframe = self.x_train_dataframe.copy()
         self.ridge_x_train_dataframe.columns = [
-            count + 1 for count, value in enumerate(self.x_train_dataframe.columns)
+            count + 1
+            for count, value in enumerate(self.x_train_dataframe.columns)
         ]
-        self.ridge_x_train_dataframe = self.ridge_x_train_dataframe.stack().rename_axis(
-            index={None: "feature"}
+        self.ridge_x_train_dataframe = (
+            self.ridge_x_train_dataframe.stack().rename_axis(
+                index={None: "feature"}
+            )
         )
 
         ### TARGET (y_train)
         # Get only target column
-        self.y_train_dataframe = self.train_dataframe[["target"]].reset_index(drop=True)
+        self.y_train_dataframe = self.train_dataframe[["target"]].reset_index(
+            drop=True
+        )
         self.y_train_dataframe.rename(
             columns={"target": "y_train"}, inplace=True
         )  # Rename as y_train, which is the name of the pyomo parameter
@@ -208,15 +220,19 @@ class InstanceData:
         self.numerical_columns = [
             name for name in self.x_train_dataframe.columns if ":" not in name
         ]
-        self.num_x_train_dataframe = self.x_train_dataframe[self.numerical_columns]
-        self.num_x_train_dataframe.columns = self.num_x_train_dataframe.columns.astype(
-            int
+        self.num_x_train_dataframe = self.x_train_dataframe[
+            self.numerical_columns
+        ]
+        self.num_x_train_dataframe.columns = (
+            self.num_x_train_dataframe.columns.astype(int)
         )  # Make column names integers so that
         # they can later be used as pyomo indices
         # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
         # to dictionary and used as data since matched gurobi's format.
-        self.num_x_train_dataframe = self.num_x_train_dataframe.stack().rename_axis(
-            index={None: "feature"}
+        self.num_x_train_dataframe = (
+            self.num_x_train_dataframe.stack().rename_axis(
+                index={None: "feature"}
+            )
         )
         self.num_x_train_dataframe.name = "x_train_num"
 
@@ -227,10 +243,14 @@ class InstanceData:
             for name in self.x_train_dataframe.columns
             if name not in self.numerical_columns
         ]
-        self.cat_x_train_dataframe = self.x_train_dataframe[self.categorical_columns]
+        self.cat_x_train_dataframe = self.x_train_dataframe[
+            self.categorical_columns
+        ]
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
-        self.cat_x_train_dataframe = self.cat_x_train_dataframe.stack().rename_axis(
-            index={None: "column"}
+        self.cat_x_train_dataframe = (
+            self.cat_x_train_dataframe.stack().rename_axis(
+                index={None: "column"}
+            )
         )
         self.cat_x_train_dataframe.name = "x_train_cat"
         self.cat_x_train_dataframe = (
@@ -243,7 +263,9 @@ class InstanceData:
         else:
             self.cat_x_train_dataframe[
                 ["feature", "category"]
-            ] = self.cat_x_train_dataframe.column.str.split(":", expand=True).astype(
+            ] = self.cat_x_train_dataframe.column.str.split(
+                ":", expand=True
+            ).astype(
                 int
             )
         self.cat_x_train_dataframe = self.cat_x_train_dataframe.drop(
@@ -272,7 +294,9 @@ class InstanceData:
         """
 
         ### NUMERICAL FEATURES (x_data_poison_num)------------------------------------
-        self.num_x_poison_dataframe = self.x_poison_dataframe[self.numerical_columns]
+        self.num_x_poison_dataframe = self.x_poison_dataframe[
+            self.numerical_columns
+        ]
 
         # Initialise those to be poisoned to be opposite
         def flip_nearest(x):
@@ -295,8 +319,10 @@ class InstanceData:
         # they can later be used as pyomo indices
         # Stack dataframe to get multiindex, indexed by sample and feature, this is nice when converted
         # to dictionary and used as data since matched gurobi's format.
-        self.num_x_poison_dataframe = self.num_x_poison_dataframe.stack().rename_axis(
-            index={None: "feature"}
+        self.num_x_poison_dataframe = (
+            self.num_x_poison_dataframe.stack().rename_axis(
+                index={None: "feature"}
+            )
         )
         self.num_x_poison_dataframe.name = "x_data_poison_num"
 
@@ -305,10 +331,14 @@ class InstanceData:
 
         ### CATEGORICAL FEATURES (x_data_poison_num)----------------------------------
         # Get only categorical columns (those that include ':' in name)
-        self.cat_x_poison_dataframe = self.x_poison_dataframe[self.categorical_columns]
+        self.cat_x_poison_dataframe = self.x_poison_dataframe[
+            self.categorical_columns
+        ]
         # Stack dataframe to get multiindex, indexed by sample and feature, useful for pyomo format.
-        self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.stack().rename_axis(
-            index={None: "column"}
+        self.cat_x_poison_dataframe = (
+            self.cat_x_poison_dataframe.stack().rename_axis(
+                index={None: "column"}
+            )
         )
         self.cat_x_poison_dataframe.name = "x_data_poison_cat"
         self.cat_x_poison_dataframe = (
@@ -321,7 +351,9 @@ class InstanceData:
         else:
             self.cat_x_poison_dataframe[
                 ["feature", "category"]
-            ] = self.cat_x_poison_dataframe.column.str.split(":", expand=True).astype(
+            ] = self.cat_x_poison_dataframe.column.str.split(
+                ":", expand=True
+            ).astype(
                 int
             )
         self.cat_x_poison_dataframe = self.cat_x_poison_dataframe.drop(
@@ -333,9 +365,9 @@ class InstanceData:
 
         ### TARGET (y_poison)---------------------------------------------------------
         # Get only target column from poison dataframe
-        self.y_poison_dataframe = self.poison_dataframe[["target"]].reset_index(
-            drop=True
-        )
+        self.y_poison_dataframe = self.poison_dataframe[
+            ["target"]
+        ].reset_index(drop=True)
         self.y_poison_dataframe.rename(
             columns={"target": "y_poison"}, inplace=True
         )  # y_poison is the name of the pyomo parameter
@@ -431,7 +463,9 @@ class InstanceData:
         ]
         self.no_features = len(self.whole_df.columns)
         self.no_samples = len(self.whole_df.index)
-        self.whole_df = self.whole_df.stack().rename_axis(index={None: "feature"})
+        self.whole_df = self.whole_df.stack().rename_axis(
+            index={None: "feature"}
+        )
 
         # Add poisoning y to training y
         y_train = self.y_train_dataframe.copy(deep=True)

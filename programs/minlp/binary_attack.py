@@ -81,7 +81,9 @@ def run(config, instance_data, warmstart_data=None, model=None):
     num_feature_flag = O
     shape = (instance_data.no_poison_samples, instance_data.no_catfeatures)
     cat_feature_flag = np.full(shape, O)
-    model.set_poison_data_status(instance_data, num_feature_flag, cat_feature_flag)
+    model.set_poison_data_status(
+        instance_data, num_feature_flag, cat_feature_flag
+    )
     if warmstart_data is not None:
         pass
         # model.warmstart(warmstart_data)

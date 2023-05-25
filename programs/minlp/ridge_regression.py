@@ -24,11 +24,16 @@ def run(config, instance_data, wide=False):
     X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
     X = X_df.to_numpy()
     y_df = pd.concat(
-        [instance_data.get_y_train_dataframe(), instance_data.get_y_poison_dataframe()]
+        [
+            instance_data.get_y_train_dataframe(),
+            instance_data.get_y_poison_dataframe(),
+        ]
     )
     y = y_df.to_numpy()
     model = Ridge(
-        alpha=len(X) * config["regularization"], fit_intercept=True, solver="svd"
+        alpha=len(X) * config["regularization"],
+        fit_intercept=True,
+        solver="svd",
     )
     model.fit(X, y)
 
@@ -45,7 +50,9 @@ def run(config, instance_data, wide=False):
             levels=[[], []], codes=[[], []], names=["feature", "category"]
         )
         _weights_cat = pd.Series(index=index)
-        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        iter = zip(
+            instance_data.categorical_feature_category_tuples, weights_cat
+        )
         for k, v in iter:
             _weights_cat.loc[k] = v
     else:
@@ -54,7 +61,9 @@ def run(config, instance_data, wide=False):
         for k, v in zip(instance_data.numerical_feature_names, weights_num):
             _weights_num[k] = [v]
         _weights_cat = pd.DataFrame()
-        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        iter = zip(
+            instance_data.categorical_feature_category_tuples, weights_cat
+        )
         for k, v in iter:
             column = f"{k[0]}:{k[1]}"
             _weights_cat[column] = [v]
@@ -85,7 +94,9 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
     y_df = instance_data.get_y_train_dataframe()
     y = y_df.to_numpy()
     model = Ridge(
-        alpha=len(X) * config["regularization"], fit_intercept=True, solver="svd"
+        alpha=len(X) * config["regularization"],
+        fit_intercept=True,
+        solver="svd",
     )
     model.fit(X, y)
 
@@ -102,7 +113,9 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
             levels=[[], []], codes=[[], []], names=["feature", "category"]
         )
         _weights_cat = pd.Series(index=index)
-        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        iter = zip(
+            instance_data.categorical_feature_category_tuples, weights_cat
+        )
         for k, v in iter:
             _weights_cat.loc[k] = v
     else:
@@ -111,7 +124,9 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         for k, v in zip(instance_data.numerical_feature_names, weights_num):
             _weights_num[k] = [v]
         _weights_cat = pd.DataFrame()
-        iter = zip(instance_data.categorical_feature_category_tuples, weights_cat)
+        iter = zip(
+            instance_data.categorical_feature_category_tuples, weights_cat
+        )
         for k, v in iter:
             column = f"{k[0]}:{k[1]}"
             _weights_cat[column] = [v]

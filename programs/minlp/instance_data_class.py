@@ -62,8 +62,12 @@ class InstanceData:
         self.no_catfeatures = len(
             get_categorical_feature_column_names(self.train_dataframe)
         )
-        self.no_chosen_numerical_features = config["categorical_attack_no_nfeatures"]
-        self.no_chosen_categorical_features = config["categorical_attack_no_cfeatures"]
+        self.no_chosen_numerical_features = config[
+            "categorical_attack_no_nfeatures"
+        ]
+        self.no_chosen_categorical_features = config[
+            "categorical_attack_no_cfeatures"
+        ]
 
         # These attributes allows us to access the categorical features easily.
         # For example:
@@ -77,7 +81,9 @@ class InstanceData:
         self.cat_poison_one_hot = CatFeatureAccessor(
             self.poison_dataframe, one_hot=True
         )
-        self.cat_poison = CatFeatureAccessor(self.poison_dataframe, one_hot=False)
+        self.cat_poison = CatFeatureAccessor(
+            self.poison_dataframe, one_hot=False
+        )
 
     def copy(self):
         """Return a deepcopy of self"""
@@ -124,14 +130,18 @@ class InstanceData:
     def no_samples(self):
         import warnings
 
-        warnings.warn("no_samples is deprecated. Use no_train_samples", stacklevel=2)
+        warnings.warn(
+            "no_samples is deprecated. Use no_train_samples", stacklevel=2
+        )
         return self.no_train_samples
 
     @property
     def no_psamples(self):
         import warnings
 
-        warnings.warn("no_psamples is deprecated. Use no_poison_samples", stacklevel=2)
+        warnings.warn(
+            "no_psamples is deprecated. Use no_poison_samples", stacklevel=2
+        )
         return self.no_poison_samples
 
     @property
@@ -197,7 +207,9 @@ class InstanceData:
         if isinstance(df, pd.Series):
             for index, row in df.items():
                 # TODO Avoid making string as a column name.
-                self.poison_dataframe.loc[index[0], f"{index[1]}:{index[2]}"] = row
+                self.poison_dataframe.loc[
+                    index[0], f"{index[1]}:{index[2]}"
+                ] = row
         else:
             raise NotImplementedError
 
@@ -331,10 +343,18 @@ class CatFeatureAccessor:
                 continue
             # column is something like '2:5'
             categorical_feature, category = map(int, column.split(":"))
-            self.column_indices_from_feature.setdefault(categorical_feature, [])
-            self.column_indices_from_feature[categorical_feature].append(column_index)
-            categories_from_categorical_feature.setdefault(categorical_feature, [])
-            categories_from_categorical_feature[categorical_feature].append(category)
+            self.column_indices_from_feature.setdefault(
+                categorical_feature, []
+            )
+            self.column_indices_from_feature[categorical_feature].append(
+                column_index
+            )
+            categories_from_categorical_feature.setdefault(
+                categorical_feature, []
+            )
+            categories_from_categorical_feature[categorical_feature].append(
+                category
+            )
 
         for tpl in categories_from_categorical_feature.items():
             categorical_feature = tpl[0]
@@ -445,7 +465,8 @@ def get_categorical_feature_category_tuples(df):
     names : list[str]
     """
     return [
-        tuple(map(int, x.split(":"))) for x in get_categorical_feature_column_names(df)
+        tuple(map(int, x.split(":")))
+        for x in get_categorical_feature_column_names(df)
     ]
 
 
@@ -477,7 +498,12 @@ def get_categorical_feature_names(df):
     """
     df = _cast_column_names_to_int(df)
     return sorted(
-        set([int(x.split(":")[0]) for x in get_categorical_feature_column_names(df)])
+        set(
+            [
+                int(x.split(":")[0])
+                for x in get_categorical_feature_column_names(df)
+            ]
+        )
     )
 
 
@@ -797,7 +823,9 @@ def make_vertical_categorical_dataframe(df):
     df.index.name = "sample"
     df = df.unstack()
     df = df.reset_index()
-    df[["feature", "category"]] = df.iloc[:, 0].str.split(":", expand=True).astype(int)
+    df[["feature", "category"]] = (
+        df.iloc[:, 0].str.split(":", expand=True).astype(int)
+    )
     df["sample"] = df["sample"].astype(int)
     df["feature"] = df["feature"].astype(int)
     df["category"] = df["category"].astype(int)
@@ -866,9 +894,9 @@ def get_chosen_categorical_feature_names(df, no_chosen_categorical_features):
     -------
     names : list[int]
     """
-    chosen_categorical = choosing_features.LASSOdataframe(df).get_features_lists(
-        0, no_chosen_categorical_features
-    )[1]
+    chosen_categorical = choosing_features.LASSOdataframe(
+        df
+    ).get_features_lists(0, no_chosen_categorical_features)[1]
 
     return chosen_categorical
 

@@ -47,7 +47,9 @@ class GradModel:
         """
         pass
 
-    def set_poison_data_status(self, instance_data, num_feature_flag, cat_feature_flag):
+    def set_poison_data_status(
+        self, instance_data, num_feature_flag, cat_feature_flag
+    ):
         """Set status of the variables corresponding to the features in poisoned data
 
         This sets status of the variables corresponding to the features in poisoned data.
@@ -86,7 +88,9 @@ class GradModel:
             (instance_data.no_poison_samples,),
         )
         if np.any(self.poison_data_is_removed):
-            raise NotImplementedError("removing poisoning data is not yet supported")
+            raise NotImplementedError(
+                "removing poisoning data is not yet supported"
+            )
         self.instance_data = instance_data
 
     def continuous_relaxation(self, mode=True):
@@ -104,12 +108,16 @@ class GradModel:
         """Run gradient descent method with pytorch"""
         instance_data = self.instance_data
 
-        X_num_train = instance_data.get_num_x_train_dataframe(wide=True).to_numpy()
+        X_num_train = instance_data.get_num_x_train_dataframe(
+            wide=True
+        ).to_numpy()
         X_cat_train_one_hot = instance_data.get_cat_x_train_dataframe(
             wide=True
         ).to_numpy()
         y_train = instance_data.get_y_train_dataframe().to_numpy()
-        X_num_poison = instance_data.get_num_x_poison_dataframe(wide=True).to_numpy()
+        X_num_poison = instance_data.get_num_x_poison_dataframe(
+            wide=True
+        ).to_numpy()
         X_cat_poison_one_hot = instance_data.get_cat_x_poison_dataframe(
             wide=True
         ).to_numpy()
@@ -157,15 +165,21 @@ class GradModel:
 
         include_bias = True
 
-        no_samples = instance_data.no_train_samples + instance_data.no_poison_samples
+        no_samples = (
+            instance_data.no_train_samples + instance_data.no_poison_samples
+        )
         if include_bias:
             regularisation_parameter_matrix = (
-                no_samples * regularisation_parameter * torch.eye(X_train.shape[1] + 1)
+                no_samples
+                * regularisation_parameter
+                * torch.eye(X_train.shape[1] + 1)
             )
             regularisation_parameter_matrix[-1, -1] = 0
         else:
             regularisation_parameter_matrix = (
-                no_samples * regularisation_parameter * torch.eye(X_train.shape[1])
+                no_samples
+                * regularisation_parameter
+                * torch.eye(X_train.shape[1])
             )
 
         for iteration in range(iteration_limit):
@@ -175,9 +189,12 @@ class GradModel:
             )
             _X_cat_poison_one_hot = (
                 cat_feature_is_optimized * X_cat_poison_one_hot
-                + (1 - cat_feature_is_optimized) * X_cat_poison_one_hot.detach()
+                + (1 - cat_feature_is_optimized)
+                * X_cat_poison_one_hot.detach()
             )
-            X_poison = torch.cat([_X_num_poison, _X_cat_poison_one_hot], axis=1)
+            X_poison = torch.cat(
+                [_X_num_poison, _X_cat_poison_one_hot], axis=1
+            )
             X = torch.cat([X_train, X_poison], axis=0)
             y = torch.cat([y_train, y_poison])
             # Add a column of ones to include bias.
@@ -198,7 +215,9 @@ class GradModel:
             if iteration == 0:
                 best_loss_updated = True
             else:
-                best_loss_updated = best_loss + np.abs(best_loss) * tol < loss.item()
+                best_loss_updated = (
+                    best_loss + np.abs(best_loss) * tol < loss.item()
+                )
 
             if best_loss_updated:
                 best_loss = loss.item()
@@ -230,7 +249,9 @@ class GradModel:
             if should_log:
                 if iteration % (20 * log_every) == 0:
                     print(f"{'iter':>4s}  {'mse':>9s}")
-                print(f"{iteration:4d}  {loss.item():9.6f}{best_loss_updated_flag:1s}")
+                print(
+                    f"{iteration:4d}  {loss.item():9.6f}{best_loss_updated_flag:1s}"
+                )
 
             if best_loss_no_update_count > patience:
                 break
@@ -320,11 +341,15 @@ class GradModel:
                 levels=[[], []], codes=[[], []], names=["sample", "feature"]
             )
             _x_poison_num = pd.Series(index=index)
-            index = self.instance_data.get_num_x_poison_dataframe(wide=wide).index
+            index = self.instance_data.get_num_x_poison_dataframe(
+                wide=wide
+            ).index
             flag = self.num_feature_flag.ravel()
             solution = self.solutions.X_num_poison.ravel()
             for i, k in enumerate(index):
-                if (not only_optimized) or (flag[i] == self.POISON_DATA_OPTIMIZED):
+                if (not only_optimized) or (
+                    flag[i] == self.POISON_DATA_OPTIMIZED
+                ):
                     _x_poison_num.loc[k] = solution[i]
             index = pd.MultiIndex(
                 levels=[[], [], []],
@@ -332,13 +357,17 @@ class GradModel:
                 names=["sample", "feature", "category"],
             )
             _x_poison_cat = pd.Series(index=index)
-            index = self.instance_data.get_cat_x_poison_dataframe(wide=wide).index
+            index = self.instance_data.get_cat_x_poison_dataframe(
+                wide=wide
+            ).index
             flag = self.cat_feature_flag.ravel()
             solution = self.solutions.X_cat_poison_one_hot.ravel()
             np.testing.assert_equal(flag.shape, index.shape)
             np.testing.assert_equal(solution.shape, index.shape)
             for i, k in enumerate(index):
-                if (not only_optimized) or (flag[i] == self.POISON_DATA_OPTIMIZED):
+                if (not only_optimized) or (
+                    flag[i] == self.POISON_DATA_OPTIMIZED
+                ):
                     _x_poison_cat.loc[k] = solution[i]
         else:
             raise NotImplementedError
@@ -387,7 +416,9 @@ class GradModel:
             # To make long format dataframes.
             _weights_num = pd.Series()
 
-            index = self.instance_data.get_num_x_poison_dataframe(wide=True).columns
+            index = self.instance_data.get_num_x_poison_dataframe(
+                wide=True
+            ).columns
             solution = self.solutions.weights[: len(index)]
             np.testing.assert_equal(index.shape, solution.shape)
 
@@ -488,11 +519,15 @@ def run(config, instance_data):
         )
         num_feature_flag[row] = solver.POISON_DATA_OPTIMIZED
 
-        solver.set_poison_data_status(instance_data, num_feature_flag, cat_feature_flag)
+        solver.set_poison_data_status(
+            instance_data, num_feature_flag, cat_feature_flag
+        )
         solver.solve()
         solver.update_data(instance_data)
 
-    scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
+    scikit_learn_regression_parameters = ridge_regression.run(
+        config, instance_data
+    )
 
     def assert_solutions_are_close(sol1, sol2):
         def flatten(x):
@@ -595,7 +630,9 @@ def flipping_without_numerical(config, instance_data, model=None):
                 @ np.array(list(num_features.values()))
                 + best_sol["bias"]
             )
-            target_y = instance_data.get_y_poison_dataframe().iloc[poison_sample_index]
+            target_y = instance_data.get_y_poison_dataframe().iloc[
+                poison_sample_index
+            ]
             difference = num_y - target_y
 
             # We consider two case: Make prediction as large as possible and make prediction
@@ -603,14 +640,22 @@ def flipping_without_numerical(config, instance_data, model=None):
 
             # categories_up/down[feature] is the category to push prediction up/down.
             # cat_features = instance_data.categorical_feature_category_tuples
-            cat_features = set([cat_feature[0] for cat_feature in cat_weights.keys()])
+            cat_features = set(
+                [cat_feature[0] for cat_feature in cat_weights.keys()]
+            )
             categories_up = dict()
             categories_down = dict()
             for feature in cat_features:
                 # Filter the keys based on given values for first two elements
-                filtered_keys = [k for k in cat_weights.keys() if k[0] == feature]
-                categories_up[feature] = max(filtered_keys, key=cat_weights.get)[1]
-                categories_down[feature] = min(filtered_keys, key=cat_weights.get)[1]
+                filtered_keys = [
+                    k for k in cat_weights.keys() if k[0] == feature
+                ]
+                categories_up[feature] = max(
+                    filtered_keys, key=cat_weights.get
+                )[1]
+                categories_down[feature] = min(
+                    filtered_keys, key=cat_weights.get
+                )[1]
 
             # Let's compute the prediction of each case.
             # TODO Why do we get key error when key exists? type?
