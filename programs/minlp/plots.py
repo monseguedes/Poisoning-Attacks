@@ -19,6 +19,9 @@ sns.set_style("whitegrid")
 matplotlib.rcParams["mathtext.fontset"] = "stix"
 matplotlib.rcParams["font.family"] = "STIXGeneral"
 
+# matplotlib.rcParams["mathtext.fontset"] = "Arial"
+matplotlib.rcParams["font.family"] = "Tahoma"
+
 
 def plot_mse(config, data_type="train", just_average=True):
     """Plot MSE for each computational experiment and average.
@@ -31,7 +34,7 @@ def plot_mse(config, data_type="train", just_average=True):
     # Add labels
     ax.set_xlabel("Poisoning rate (%)")
     ax.set_ylabel("MSE")
-    plt.title("MSE Comparison for Different Poisoning Rates")
+    plt.title("Average MSE Comparison for Different Poisoning Rates")
 
     # Create directory to store results
     isExist = os.path.exists(f"results/{config['dataset_name']}/plots")
@@ -121,8 +124,8 @@ def plot_mse(config, data_type="train", just_average=True):
             )
             file_name = "mse_all.pdf"
         else:
-            ax.legend(["Flipping attack", "Just numerical", "Unpoisoned"])
-            file_name = "mse_average.pdf"
+            ax.legend(["Flipping attack", " Şuvak et al.", "Unpoisoned"])
+            file_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_lambda{config['regularization']}_mse_average.pdf"
 
     
     plt.ylim(0, max(averages) * 1.1)
