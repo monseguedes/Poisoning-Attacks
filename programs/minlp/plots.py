@@ -20,7 +20,7 @@ matplotlib.rcParams["mathtext.fontset"] = "stix"
 matplotlib.rcParams["font.family"] = "STIXGeneral"
 
 
-def plot_mse(config, just_average=True):
+def plot_mse(config, data_type="train", just_average=True):
     """Plot MSE for each computational experiment and average.
     We want poisoning rates as horizontal axis, and MSE as vertical axis.
     """
@@ -39,6 +39,7 @@ def plot_mse(config, just_average=True):
         os.makedirs(f"results/{config['dataset_name']}/plots")
 
     # Add data for each poisoning rate
+    averages = []
     for i, poisoning_rate in enumerate(config["poison_rates"]):
         folder_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_PR{str(poisoning_rate)}_lambda{config['regularization']}"
         directory = f"results/{config['dataset_name']}/{folder_name}"
@@ -46,21 +47,47 @@ def plot_mse(config, just_average=True):
         benchmark_results = np.load(f"{directory}/benchmark_results.npz")
         unposioned_results = np.load(f"{directory}/unpoisoned_results.npz")
 
+        if data_type == "train":
+            flipping_average = np.mean(flipping_results["mse_train"])
+            benchmark_average = np.mean(benchmark_results["mse_train"])
+            unpoisoned_average = np.mean(unposioned_results["mse_train"])
+        elif data_type == "test":
+            instance_data = instance_data_class.InstanceData(config)
+            flipping_average = np.mean(
+                [
+                    get_test_mse(instance_data, flipping_results, run)
+                    for run in range(config["runs"])
+                ]
+            )
+            benchmark_average = np.mean(
+                [
+                    get_test_mse(instance_data, benchmark_results, run)
+                    for run in range(config["runs"])
+                ]
+            )
+            unpoisoned_average = np.mean(
+                [
+                    get_test_mse(instance_data, unposioned_results, run)
+                    for run in range(config["runs"])
+                ]
+            )
+        averages.extend((flipping_average, benchmark_average, unpoisoned_average))
+
         ax.scatter(
             poisoning_rate,
-            np.mean(flipping_results["mse_final"]),
+            flipping_average,
             marker="o",
             color="firebrick",
         )
         ax.scatter(
             poisoning_rate,
-            np.mean(benchmark_results["mse_final"]),
+            benchmark_average,
             marker="o",
             color="steelblue",
         )
         ax.scatter(
             poisoning_rate,
-            np.mean(unposioned_results["mse_final"]),
+            unpoisoned_average,
             marker="o",
             color="darkolivegreen",
         )
@@ -97,7 +124,8 @@ def plot_mse(config, just_average=True):
             ax.legend(["Flipping attack", "Just numerical", "Unpoisoned"])
             file_name = "mse_average.pdf"
 
-        plt.ylim(0, flipping_results["mse_final"] * 1.1)
+    
+    plt.ylim(0, max(averages) * 1.1)
 
     # Save plot
     fig.savefig(
@@ -112,7 +140,9 @@ def plot_mse(config, just_average=True):
 def make_predictions(
     data_type: str,
     instance_data: instance_data_class.InstanceData,
-    solution_dict,
+    numerical_weights: np.ndarray,
+    categorical_weights: np.ndarray,
+    bias: float,
 ):
     """
     Take the regression coefficents given by solving the nonpoisoned model
@@ -129,14 +159,28 @@ def make_predictions(
         X_num = instance_data.get_num_x_train_dataframe(wide=True).to_numpy()
         X = np.concatenate((X_num, X_cat), axis=1)
 
-    numerical_weights = solution_dict["weights_num"]
-    categorical_weights = solution_dict["weights_cat"]
     weights = np.concatenate((numerical_weights, categorical_weights))
 
     # Make predictions
-    predictions = np.dot(X, weights) + solution_dict["bias"]
+    predictions = np.dot(X, weights) + bias
 
     return predictions
+
+
+def get_test_mse(instance_data, results, run):
+    """
+    Get the MSE for a given run.
+    """
+    y = instance_data.get_y_test_dataframe().to_numpy()
+    predictions = make_predictions(
+        "test",
+        instance_data,
+        results["weights_num"][run],
+        results["weights_cat"][run],
+        results["bias"][run],
+    )
+    mse = mean_squared_error(y, predictions)
+    return mse
 
 
 def plot_actual_vs_predicted(config, plot_config, data_type: str):
