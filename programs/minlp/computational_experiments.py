@@ -15,14 +15,12 @@ import pyomo_model
 import ridge_regression
 
 
-def run(runs, config):
+def run(config):
     """Function to run computational experiment
     and save results to csv files.
 
     Parameters
     ----------
-    runs : int
-        Number of runs to perform.
     config : dict
         Dictionary containing configuration parameters.
 
@@ -33,7 +31,7 @@ def run(runs, config):
     """
 
     # Create directory to store results
-    folder_name = f"{runs}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_PR{config['poison_rate']}_lambda{config['regularization']}"
+    folder_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_PR{config['poison_rate']}_lambda{config['regularization']}"
     isExist = os.path.exists(f"results/{config['dataset_name']}/{folder_name}")
     if not isExist:
         os.makedirs(f"results/{config['dataset_name']}/{folder_name}")
@@ -46,8 +44,8 @@ def run(runs, config):
 
     # TODO fix not build model for each run
 
-    for run in range(runs):
-        print(f"Run {run+1} of {runs}")
+    for run in range(config['runs']):
+        print(f"Run {run+1} of {config['runs']}")
         config["seed"] = run
         instance_data = instance_data_class.InstanceData(config)
         model = pyomo_model.PyomoModel(instance_data, config)
