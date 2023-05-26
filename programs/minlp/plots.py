@@ -31,7 +31,7 @@ def plot_mse(config, just_average=True):
     # Add labels
     ax.set_xlabel("Poisoning rate (%)")
     ax.set_ylabel("MSE")
-    plt.title("MSE for different poisoning rates")
+    plt.title("MSE Comparison for Different Poisoning Rates")
 
     # Create directory to store results
     isExist = os.path.exists(f"results/{config['dataset_name']}/plots")
@@ -40,20 +40,21 @@ def plot_mse(config, just_average=True):
 
     # Add data for each poisoning rate
     for i, poisoning_rate in enumerate(config["poison_rates"]):
-        folder_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_PR{str(poisoning_rate)}"
+        folder_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_PR{str(poisoning_rate)}_lambda{config['regularization']}"
         directory = f"results/{config['dataset_name']}/{folder_name}"
         flipping_results = np.load(f"{directory}/flipping_results.npz")
         benchmark_results = np.load(f"{directory}/benchmark_results.npz")
         unposioned_results = np.load(f"{directory}/unpoisoned_results.npz")
+
         ax.scatter(
             poisoning_rate,
-            flipping_results["average_mse"],
+            np.mean(flipping_results["mse_final"]),
             marker="o",
             color="firebrick",
         )
         ax.scatter(
             poisoning_rate,
-            benchmark_results["average_mse"],
+            np.mean(benchmark_results["mse_final"]),
             marker="o",
             color="steelblue",
         )
@@ -93,22 +94,25 @@ def plot_mse(config, just_average=True):
             )
             file_name = "mse_all.pdf"
         else:
-            ax.legend(["Average Flipping", "Average Benchmark", "Average Unpoisoned"])
+            ax.legend(["Flipping attack", "Just numerical", "Unpoisoned"])
             file_name = "mse_average.pdf"
 
-    plt.ylim(0, flipping_results["average_mse"] * 1.1)
+        plt.ylim(0, flipping_results["mse_final"] * 1.1)
 
     # Save plot
     fig.savefig(
         f"results/{config['dataset_name']}/plots/{file_name}",
         bbox_inches="tight",
         dpi=300,
+        transparent=True,
     )
     plt.show()
 
 
 def make_predictions(
-    data_type: str, instance_data: instance_data_class.InstanceData, solution_dict
+    data_type: str,
+    instance_data: instance_data_class.InstanceData,
+    solution_dict,
 ):
     """
     Take the regression coefficents given by solving the nonpoisoned model
@@ -125,13 +129,12 @@ def make_predictions(
         X_num = instance_data.get_num_x_train_dataframe(wide=True).to_numpy()
         X = np.concatenate((X_num, X_cat), axis=1)
 
-    print(solution_dict["weights_cat"])
     numerical_weights = solution_dict["weights_num"]
     categorical_weights = solution_dict["weights_cat"]
     weights = np.concatenate((numerical_weights, categorical_weights))
 
     # Make predictions
-    predictions = np.dot(X, weights)
+    predictions = np.dot(X, weights) + solution_dict["bias"]
 
     return predictions
 
@@ -140,17 +143,13 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
     """
     Plot actual vs predicted values for each instance in the training or test dataset.
     """
-    folder_name = f"{plot_config['runs']}_BS{plot_config['numerical_attack_mini_batch_size']}_TS{plot_config['training_samples']}_PR{plot_config['poisoning_rate']}"
+    folder_name = f"{plot_config['runs']}_BS{plot_config['numerical_attack_mini_batch_size']}_TS{plot_config['training_samples']}_PR{plot_config['poisoning_rate']}_lambda{plot_config['regularization']}"
     directory = f"results/{plot_config['dataset_name']}/{folder_name}"
     flipping_results = np.load(f"{directory}/flipping_results.npz")
     benchmark_results = np.load(f"{directory}/benchmark_results.npz")
     unposioned_results = np.load(f"{directory}/unpoisoned_results.npz")
 
     instance_data = instance_data_class.InstanceData(config)
-
-    print(list(flipping_results.keys()))
-    print(flipping_results["average_mse"])
-    print(flipping_results["mse_final"])
 
     # Make predictions
     flipping_predictions = make_predictions(
@@ -159,6 +158,7 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
     benchmark_predictions = make_predictions(
         data_type, instance_data, benchmark_results
     )
+
     unpoisoned_predictions = make_predictions(
         data_type, instance_data, unposioned_results
     )
@@ -168,6 +168,17 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
         y = instance_data.get_y_test_dataframe().to_numpy()
     if data_type == "train":
         y = instance_data.get_y_train_dataframe().to_numpy()
+
+    flipping_mse = mean_squared_error(y, flipping_predictions)
+    benchmark_mse = mean_squared_error(y, benchmark_predictions)
+    nonpoisoned_mse = mean_squared_error(y, unpoisoned_predictions)
+    print(
+        f"Avg Flipping MSE from model is:   {flipping_results['average_mse']}"
+    )
+    print(f"Flipping MSE from model is:       {flipping_results['mse_final']}")
+    print(f"Flipping MSE from prediction is:  {flipping_mse}")
+    print(f"Benchmark MSE from prediction is: {benchmark_mse}")
+    print(f"Unpoisoned MSE from prediction is:{nonpoisoned_mse}")
 
     # Create plot to fill later on
     fig, ax = plt.subplots()
