@@ -44,11 +44,12 @@ def run(config):
 
     # TODO fix not build model for each run
 
-    for run in range(config['runs']):
+    for run in range(config["runs"]):
         print(f"Run {run+1} of {config['runs']}")
+        print(f"Poisoning rate: {config['poison_rate']}")
         config["seed"] = run
         instance_data = instance_data_class.InstanceData(config)
-        model = pyomo_model.PyomoModel(instance_data, config)
+        # model = pyomo_model.PyomoModel(instance_data, config)
 
         ## Unpoisoned model------------------------------------------------------
         regression_parameters = ridge_regression.run_not_poisoned(
@@ -65,9 +66,7 @@ def run(config):
         unpoisoned_results["bias"].append(regression_parameters["bias"])
 
         ## Flipping attack-------------------------------------------------------
-        _, _, flipping_solutions = flipping_attack.run(
-            config, instance_data, model
-        )
+        _, _, flipping_solutions = flipping_attack.run(config, instance_data)
         # Save results to dictionary
         flipping_results["mse_per_iteration"].append(
             flipping_solutions["mse_per_iteration"]
