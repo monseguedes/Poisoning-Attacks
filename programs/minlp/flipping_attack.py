@@ -61,21 +61,21 @@ def run(config, instance_data, model=None):
     )
     it += 1
 
-    # Solve benchmark
-    benchmark_start = timeit.timeit()
-    config["iterative_attack_incremental"] = True
-    _, benchmark_data, benchmark_solution = numerical_attack.run(
-        config, instance_data
-    )
-    config["iterative_attack_incremental"] = False
+    # # Solve benchmark
+    # benchmark_start = timeit.timeit()
+    # config["iterative_attack_incremental"] = True
+    # _, benchmark_data, benchmark_solution = numerical_attack.run(
+    #     config, instance_data
+    # )
+    # config["iterative_attack_incremental"] = False
     numerical_model = model
-    benchmark_end = timeit.timeit()
+    # benchmark_end = timeit.timeit()
 
-    benchmark_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/benchmark_attack.csv".format(
-            config["dataset_name"]
-        )
-    )
+    # benchmark_data.poison_dataframe.to_csv(
+    #     "programs/minlp/attacks/{}/benchmark_attack.csv".format(
+    #         config["dataset_name"]
+    #     )
+    # )
 
     start = timeit.timeit()
     for epoch in range(n_epochs):
@@ -215,25 +215,21 @@ def run(config, instance_data, model=None):
 
     end = timeit.timeit()
 
-    print("RESULTS")
-    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
-    print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
-    print(
-        f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
-    )
+    # print("RESULTS")
+    # print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
+    # print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
+    # print(
+    #     f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
+    # )
 
     # TODO: should I add new items to best_sol or should I return new dictionary?
     best_sol["mse_per_iteration"] = mse_iteration_array
     best_sol["mse_final"] = best_sol["mse"]
-    best_sol["computational_time_per_iteration"] = None
     best_sol["computational_time_final"] = end - start
-    best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
-    best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
+    # best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
+    # best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
 
-    if config["return_benchmark"]:
-        return best_model, best_instance_data, best_sol, benchmark_solution
-    else:
-        return best_model, best_instance_data, best_sol
+    return best_model, best_instance_data, best_sol
 
 
 def save_dataframes(instance, solution, config, it):
