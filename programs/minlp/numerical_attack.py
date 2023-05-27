@@ -155,14 +155,14 @@ def run(config, instance_data, model=None):
 
     best_solution["computational_time"] = end - start
 
-    # This will break when solution_list is empty, but maybe it's unlikely
-    keys = solution_list[0].keys()
-    out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
+    # # This will break when solution_list is empty, but maybe it's unlikely
+    # keys = solution_list[0].keys()
+    # out = {key: np.stack([x[key] for x in solution_list]) for key in keys}
 
-    print("mse in each iteration:")
-    print(out["mse"])
-    print("improvement from the start (%):")
-    print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
+    # print("mse in each iteration:")
+    # print(out["mse"])
+    # print("improvement from the start (%):")
+    # print(((out["mse"] - out["mse"][0]) / out["mse"][0] * 100).round(2))
 
     return model, best_instance_data, best_solution
 
