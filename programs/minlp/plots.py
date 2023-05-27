@@ -34,7 +34,6 @@ def plot_mse(config, data_type="train", just_average=True):
     # Add labels
     ax.set_xlabel("Poisoning rate (%)")
     ax.set_ylabel("MSE")
-    plt.title("Average MSE Comparison for Different Poisoning Rates")
 
     # Create directory to store results
     isExist = os.path.exists(f"results/{config['dataset_name']}/plots")
@@ -51,9 +50,10 @@ def plot_mse(config, data_type="train", just_average=True):
         unposioned_results = np.load(f"{directory}/unpoisoned_results.npz")
 
         if data_type == "train":
-            flipping_average = np.mean(flipping_results["mse_train"])
-            benchmark_average = np.mean(benchmark_results["mse_train"])
-            unpoisoned_average = np.mean(unposioned_results["mse_train"])
+            flipping_average = np.mean(flipping_results["mse_final"])
+            benchmark_average = np.mean(benchmark_results["mse_final"])
+            unpoisoned_average = np.mean(unposioned_results["mse_final"])
+            plt.title("Average MSE Comparison (Training data)")
         elif data_type == "test":
             instance_data = instance_data_class.InstanceData(config)
             flipping_average = np.mean(
@@ -74,7 +74,12 @@ def plot_mse(config, data_type="train", just_average=True):
                     for run in range(config["runs"])
                 ]
             )
-        averages.extend((flipping_average, benchmark_average, unpoisoned_average))
+            plt.title(
+                "Average MSE Comparison for Different Poisoning Rates (Validation data)"
+            )
+        averages.extend(
+            (flipping_average, benchmark_average, unpoisoned_average)
+        )
 
         ax.scatter(
             poisoning_rate,
@@ -93,6 +98,22 @@ def plot_mse(config, data_type="train", just_average=True):
             unpoisoned_average,
             marker="o",
             color="darkolivegreen",
+        )
+        plt.vlines(
+            x=poisoning_rate,
+            ymin=benchmark_average,
+            ymax=flipping_average,
+            color="black",
+            linestyle="--",
+            linewidth=0.5,
+        )
+        min_value = np.min([benchmark_average, flipping_average])
+        max_value = np.max([benchmark_average, flipping_average])
+        ax.text(
+            poisoning_rate + 0.2,
+            min_value + (max_value - min_value) / 2,
+            f"{(flipping_average - benchmark_average) / benchmark_average * 100:.0f}%",
+            fontsize=8,
         )
 
         if not just_average:
@@ -124,11 +145,11 @@ def plot_mse(config, data_type="train", just_average=True):
             )
             file_name = "mse_all.pdf"
         else:
-            ax.legend(["Flipping attack", " Şuvak et al.", "Unpoisoned"])
-            file_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_lambda{config['regularization']}_mse_average.pdf"
+            ax.legend(["Flipping attack", "Şuvak et al.", "Unpoisoned"])
+            file_name = f"{data_type}_{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_lambda{config['regularization']}_mse_average.pdf"
 
-    
     plt.ylim(0, max(averages) * 1.1)
+    # plt.xlim(0, max(config["poison_rates"]) * 1.1)
 
     # Save plot
     fig.savefig(
