@@ -19,8 +19,20 @@ sns.set_style("whitegrid")
 matplotlib.rcParams["mathtext.fontset"] = "stix"
 matplotlib.rcParams["font.family"] = "STIXGeneral"
 
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 20
+
+plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
+plt.rc("axes", titlesize=BIGGER_SIZE)  # fontsize of the axes title
+plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
 # matplotlib.rcParams["mathtext.fontset"] = "Arial"
-matplotlib.rcParams["font.family"] = "Tahoma"
+# matplotlib.rcParams["font.family"] = "Tahoma"
 
 
 def plot_mse(config, data_type="train", just_average=True):
@@ -74,9 +86,7 @@ def plot_mse(config, data_type="train", just_average=True):
                     for run in range(config["runs"])
                 ]
             )
-            plt.title(
-                "Average MSE Comparison for Different Poisoning Rates (Validation data)"
-            )
+            plt.title("Average MSE Comparison (Validation data)")
         averages.extend(
             (flipping_average, benchmark_average, unpoisoned_average)
         )
@@ -271,3 +281,9 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
         dpi=300,
     )
     plt.show()
+
+
+if __name__ == "__main__":
+    from main import config
+
+    plot_mse(config, "test")
