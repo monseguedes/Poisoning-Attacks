@@ -33,6 +33,12 @@ class InstanceData:
             path.join(dataset_directory, "data-binary.csv"), index_col=[0]
         )
 
+        # ALTERNATIVE FROM BENCHMARK-----------------
+        whole_dataframe = pd.read_csv(
+            "programs/benchmark/manip-ml-master/datasets/house/whole_dataframe.csv",
+            index_col=[0],
+        )
+
         _cast_column_names_to_int(whole_dataframe, inplace=True)
 
         # Pick fixed number of trainig samples.
@@ -43,10 +49,24 @@ class InstanceData:
             frac=None, n=training_samples, random_state=seed
         )
 
+        # ALTERNATIVE FROM BENCHMARK-----------------
+        train_array = np.load("programs/benchmark/manip-ml-master/datasets/house/123_train_array.npy")
+        self.train_dataframe = pd.DataFrame(
+            train_array, columns=whole_dataframe.columns
+        )
+        _cast_column_names_to_int(self.train_dataframe, inplace=True)
+
         # Store rest of samples, which will be further divided into testing and
         # validating sets
         self.test_dataframe = whole_dataframe.drop(self.train_dataframe.index)
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
+
+        # ALTERNATIVE FROM BENCHMARK-----------------
+        test_array = np.load("programs/benchmark/manip-ml-master/datasets/house/123_test_array.npy")
+        self.test_dataframe = pd.DataFrame(
+            test_array, columns=whole_dataframe.columns
+        )
+        _cast_column_names_to_int(self.test_dataframe, inplace=True)
 
         self.train_dataframe.reset_index(drop=True, inplace=True)
 
@@ -55,6 +75,15 @@ class InstanceData:
             frac=poison_rate, random_state=seed
         ).reset_index(drop=True)
         # self.poison_dataframe["target"] = 1 - self.poison_dataframe["target"].round(0)
+
+        # ALTERNATIVE FROM BENCHMARK-----------------
+        poison_array = np.load("programs/benchmark/manip-ml-master/datasets/house/123_poison_array.npy")
+        self.poison_dataframe = pd.DataFrame(
+            poison_array, columns=whole_dataframe.columns
+        )
+        _cast_column_names_to_int(self.poison_dataframe, inplace=True)
+        self.poison_dataframe["target"] = 1 - self.poison_dataframe["target"].round(0)
+
 
         self.no_numfeatures = len(
             get_numerical_feature_column_names(self.train_dataframe)
