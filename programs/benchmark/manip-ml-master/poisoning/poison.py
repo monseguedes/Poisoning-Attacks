@@ -112,7 +112,7 @@ def save_new_dataframe(dataframe):
     Filter dataframe and save it
     """
     numerical_dataframe = dataframe[
-        [str(column) for column in dataframe.columns if ":" not in column]
+        [str(column) for column in dataframe.columns if ":" not in column and column != "target"]
     ]
     new_numerical_cols = [
         str(i) for i in range(len(numerical_dataframe.columns))
@@ -729,7 +729,7 @@ def main(args):
     print(testx)
     print(testy)
     print(testx.shape)
-    print(testy.shape)
+    print(len(testy))
 
     print()
     print("Unpoisoned")
