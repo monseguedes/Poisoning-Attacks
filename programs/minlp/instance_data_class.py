@@ -136,6 +136,9 @@ class InstanceData:
 
     def get_y_train_dataframe(self):
         return get_targets(df=self.train_dataframe)
+    
+    def get_y_test_dataframe(self):
+        return get_targets(df=self.test_dataframe)
 
     def get_num_x_poison_dataframe(self, wide=False):
         return get_numerical_features(df=self.poison_dataframe, wide=wide)
