@@ -89,86 +89,86 @@ def read_dataset_file(f):
             y.append(line[0])
             x.append(line[1:])
 
-        # # Convert to desired format and save to file
-        # # Add 'target' at the end of cols
-        # new_cols = cols[1:]
-        # new_cols.append("target")
-        # # Add y as last column of x
-        # new_x = x
-        # for i in range(len(new_x)):
-        #     new_x[i].append(y[i])
-        # # Convert to pandas dataframe
-        # dataframe = pd.DataFrame(new_x, columns=new_cols)
+        # Convert to desired format and save to file
+        # Add 'target' at the end of cols
+        new_cols = cols[1:]
+        new_cols.append("target")
+        # Add y as last column of x
+        new_x = x
+        for i in range(len(new_x)):
+            new_x[i].append(y[i])
+        # Convert to pandas dataframe
+        dataframe = pd.DataFrame(new_x, columns=new_cols)
 
-        # # Save dataframe
-        # save_new_dataframe(dataframe)
+        # Save dataframe
+        save_new_dataframe(dataframe)
 
         return np.matrix(x), y
         # return np.asarray(np.matrix(x)), y
 
 
-# def save_new_dataframe(dataframe):
-#     """
-#     Filter dataframe and save it
-#     """
-#     numerical_dataframe = dataframe[
-#         [str(column) for column in dataframe.columns if ":" not in column]
-#     ]
-#     new_numerical_cols = [
-#         str(i) for i in range(len(numerical_dataframe.columns))
-#     ]
-#     numerical_dataframe = numerical_dataframe.rename(
-#         columns=dict(zip(numerical_dataframe.columns, new_numerical_cols))
-#     )
+def save_new_dataframe(dataframe):
+    """
+    Filter dataframe and save it
+    """
+    numerical_dataframe = dataframe[
+        [str(column) for column in dataframe.columns if ":" not in column]
+    ]
+    new_numerical_cols = [
+        str(i) for i in range(len(numerical_dataframe.columns))
+    ]
+    numerical_dataframe = numerical_dataframe.rename(
+        columns=dict(zip(numerical_dataframe.columns, new_numerical_cols))
+    )
 
-#     categorical_columns = [
-#         str(column) for column in dataframe.columns if ":" in column
-#     ]
+    categorical_columns = [
+        str(column) for column in dataframe.columns if ":" in column
+    ]
 
-#     categorical_dataframe = dataframe[categorical_columns]
+    categorical_dataframe = dataframe[categorical_columns]
 
-#     # Get unique categories
-#     categories = []
-#     for col in categorical_dataframe.columns:
-#         category = col.split(":")[0]
-#         if category not in categories:
-#             categories.append(category)
+    # Get unique categories
+    categories = []
+    for col in categorical_dataframe.columns:
+        category = col.split(":")[0]
+        if category not in categories:
+            categories.append(category)
 
-#     subcategories_dict = {}
-#     for category in categories:
-#         subcategories_dict[category] = []
-#         for col in categorical_dataframe.columns:
-#             if col.split(":")[0] == category:
-#                 subcategories_dict[category].append(col.split(":")[1])
+    subcategories_dict = {}
+    for category in categories:
+        subcategories_dict[category] = []
+        for col in categorical_dataframe.columns:
+            if col.split(":")[0] == category:
+                subcategories_dict[category].append(col.split(":")[1])
 
-#     # Create a mapping from category to index
-#     category_to_index = {
-#         category: index for index, category in enumerate(categories)
-#     }
+    # Create a mapping from category to index
+    category_to_index = {
+        category: index for index, category in enumerate(categories)
+    }
 
-#     # Rename columns using the custom format
-#     new_columns = []
-#     for col in categorical_dataframe.columns:
-#         category, subcategory = col.split(":")
-#         new_col_name = f"{category_to_index[category]}:{subcategories_dict[category].index(subcategory)}"
-#         new_columns.append(new_col_name)
+    # Rename columns using the custom format
+    new_columns = []
+    for col in categorical_dataframe.columns:
+        category, subcategory = col.split(":")
+        new_col_name = f"{category_to_index[category]}:{subcategories_dict[category].index(subcategory)}"
+        new_columns.append(new_col_name)
 
-#     categorical_dataframe.columns = new_columns
-#     whole_dataframe = pd.concat(
-#         [
-#             numerical_dataframe,
-#             categorical_dataframe,
-#             dataframe["target"],
-#         ],
-#         axis=1,
-#     )
+    categorical_dataframe.columns = new_columns
+    whole_dataframe = pd.concat(
+        [
+            numerical_dataframe,
+            categorical_dataframe,
+            dataframe["target"],
+        ],
+        axis=1,
+    )
 
-#     whole_dataframe.index.name = "sample"
+    whole_dataframe.index.name = "sample"
 
-#     dataset_name = "whole_dataframe.csv"
-#     directory = "programs/benchmark/manip-ml-master/datasets/house"
+    dataset_name = "whole_dataframe.csv"
+    directory = "programs/benchmark/manip-ml-master/datasets/house"
 
-#     whole_dataframe.to_csv(os.path.join(directory, dataset_name))
+    whole_dataframe.to_csv(os.path.join(directory, dataset_name))
 
 
 # -------------------------------------------------------------------------------
@@ -205,40 +205,34 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     samplepois = np.random.choice(size, poisct)
 
     trnx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in sampletrn])
-    # trnx = np.asarray(trnx)
     trny = [y[row] for row in sampletrn]
 
-    # # Save array
-    # train_matrix = np.hstack((trnx, np.matrix(trny).T))
-    # train_array = np.asarray(train_matrix)
-    # np.save(
-    #     f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy",
-    #     train_array,
-    # )
+    # Save array
+    train_array = np.asarray(trnx)
+    np.save(
+        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy",
+        train_array,
+    )
 
     tstx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in sampletst])
-    # tstx = np.asarray(tstx)
     tsty = [y[row] for row in sampletst]
 
-    # # Save array
-    # test_matrix = np.hstack((tstx, np.matrix(tsty).T))
-    # test_array = np.asarray(test_matrix)
-    # np.save(
-    #     f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy",
-    #     test_array,
-    # )
+    # Save array
+    test_array = np.asarray(tstx)
+    np.save(
+        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy",
+        test_array,
+    )
 
     poisx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in samplepois])
-    # poisx = np.asarray(poisx)
     poisy = [y[row] for row in samplepois]
 
-    # # Save array
-    # poison_matrix = np.hstack((poisx, np.matrix(poisy).T))
-    # poison_array = np.asarray(poison_matrix)
-    # np.save(
-    #     f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy",
-    #     poison_array,
-    # )
+    # Save array
+    poison_array = np.asarray(poisx)
+    np.save(
+        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy",
+        poison_array,
+    )
 
 
     vldx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in samplevld])
@@ -510,7 +504,7 @@ def rmml(X_tr, Y_tr, count):
     covar = np.dot((X_tr - mean).T, (X_tr - mean)) / X_tr.shape[0] + 0.01 * np.eye(
         X_tr.shape[1]
     )
-    model = linear_model.Ridge(alpha=0.01)
+    model = linear_model.Ridge(alpha=0.1)
     model.fit(X_tr, Y_tr)
     allpoisx = np.random.multivariate_normal(mean, covar, size=count)
     allpoisx[allpoisx >= 0.5] = 1
@@ -728,7 +722,11 @@ def main(args):
     trainfile.close()
     testfile.close()
 
-    print("Hello")
+    print("Testing data:")
+    print(testx)
+    print(testy)
+    print(testx.shape)
+    print(testy.shape)
 
     print()
     print("Unpoisoned")
