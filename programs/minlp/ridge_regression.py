@@ -71,6 +71,8 @@ def run(config, instance_data, wide=False):
     y_pred = model.predict(X[: instance_data.no_train_samples])
     mse = mean_squared_error(y[: instance_data.no_train_samples], y_pred)
 
+    print(f"MSE: {mse}")
+
     return {
         "weights_num": _weights_num,
         "weights_cat": _weights_cat,
@@ -83,16 +85,13 @@ def run(config, instance_data, wide=False):
 
 def run_not_poisoned(config, instance_data, data_type="train", wide=False):
     """Run ridge regression without poisoning"""
-    if data_type == "train":
-        num_dataframe = instance_data.get_num_x_train_dataframe(wide=True)
-        cat_dataframe = instance_data.get_cat_x_train_dataframe(wide=True)
-    elif data_type == "test":
-        num_dataframe = instance_data.get_num_x_test_dataframe(wide=True)
-        cat_dataframe = instance_data.get_cat_x_test_dataframe(wide=True)
+    num_dataframe = instance_data.get_num_x_train_dataframe(wide=True)
+    cat_dataframe = instance_data.get_cat_x_train_dataframe(wide=True)
+    y_df = instance_data.get_y_train_dataframe()
     X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
     X = X_df.to_numpy()
-    y_df = instance_data.get_y_train_dataframe()
     y = y_df.to_numpy()
+
     model = Ridge(
         alpha=len(X) * config["regularization"],
         fit_intercept=True,
@@ -131,8 +130,19 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
             column = f"{k[0]}:{k[1]}"
             _weights_cat[column] = [v]
 
-    y_pred = model.predict(X[: instance_data.no_train_samples])
-    mse = mean_squared_error(y[: instance_data.no_train_samples], y_pred)
+    if data_type == "train":
+        y_pred = model.predict(X)
+        mse = mean_squared_error(y, y_pred)
+    elif data_type == "test":
+        num_dataframe = instance_data.get_num_x_test_dataframe(wide=True)
+        cat_dataframe = instance_data.get_cat_x_test_dataframe(wide=True)
+        y_df = instance_data.get_y_test_dataframe()
+        X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
+        X = X_df.to_numpy()
+        y = y_df.to_numpy()
+        y_pred = model.predict(X)
+        mse = mean_squared_error(y, y_pred)
+    
 
     _weights_num.to_csv(
         "programs/minlp/attacks/{}/initial_numerical_weights.csv".format(
@@ -145,9 +155,24 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         )
     )
 
+    print(f"MSE: {mse}")
+
     return {
         "weights_num": _weights_num,
         "weights_cat": _weights_cat,
         "bias": bias,
         "mse": mse,
     }
+
+if __name__ == "__main__":
+    from main import config
+    import instance_data_class
+
+    instance_data = instance_data_class.InstanceData(config)
+    numerical_model = None
+
+    regression_parameters = run_not_poisoned(
+        config, instance_data, data_type="test"
+    )
+
+
