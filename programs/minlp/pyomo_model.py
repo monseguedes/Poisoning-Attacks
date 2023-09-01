@@ -323,7 +323,9 @@ class PyomoModel(pmo.block):
         print("Building SOS contraints")
         self.sos_constraints = pmo.constraint_dict()
         for psample in range(instance_data.no_poison_samples):
+            print(f"Building SOS contraints for sample {psample}")
             for cat_feature in instance_data.categorical_feature_names:
+                print(f"Building SOS contraints for feature {cat_feature}")
                 constraint = pmo.constraint(
                     sum(
                         self.x_poison_cat[psample, cat_feature, category]
@@ -341,6 +343,7 @@ class PyomoModel(pmo.block):
             pmo.constraint_dict()
         )
         for numfeature in instance_data.numerical_feature_names:
+            print(f"Building num weights contraints for feature {numfeature}")
             constraint = pmo.constraint(
                 body=loss_function_derivative_num_weights(
                     instance_data, self, numfeature, self.function
@@ -358,6 +361,9 @@ class PyomoModel(pmo.block):
             for category in instance_data.categories_in_categorical_feature[
                 cat_feature
             ]:
+                print(
+                    f"Building cat weights contraints for feature {cat_feature} and category {category}"
+                )
                 constraint = pmo.constraint(
                     body=loss_function_derivative_cat_weights(
                         instance_data,
