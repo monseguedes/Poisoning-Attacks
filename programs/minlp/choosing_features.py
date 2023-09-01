@@ -59,7 +59,7 @@ class LASSOdataframe:
         """
         self.no_numerical = no_numerical
         self.no_categorical = no_categorical
-        alpha = 0.05
+        alpha = 0.5
         self.format_data()
         (
             self.chosen_numerical,
@@ -135,8 +135,12 @@ class LASSOdataframe:
             numerical_features = {}
             # Make sure LASSO selects enough features
             while no_numerical > len(numerical_features):
+                print(no_numerical)
+                print(len(numerical_features))
                 self.get_used_features(alpha)
-                alpha -= 0.001
+                # print(alpha)
+                if alpha > 0.001:
+                    alpha -= 0.001
                 numerical_features = {
                     int(key): abs(value)
                     for key, value in self.coeffs_used_features.items()
@@ -204,6 +208,7 @@ class LASSOdataframe:
                 ],
                 axis=1,
             )
+            print(categorical_dataframe.head())
             new_categorical_columns_dict = {
                 str(feature) + ":": str(i) + "_"
                 for i, feature in enumerate(self.chosen_categorical)
@@ -219,6 +224,8 @@ class LASSOdataframe:
                     )
             columns = [x.replace("_", ":") for x in columns]
 
+            print(columns)
+
             # Currently, the categories are 1-based. We are updating them to be 0-based.
             # For example, if columns are ["1:1", "1:2", "1:3", "2:1", "2:2"],
             # it ['1:0', '1:1', '1:2', '2:0', '2:1'].
@@ -226,6 +233,8 @@ class LASSOdataframe:
             g = lambda x: f"{x[0]}:{x[1]}"
             lm = lambda f, lst: list(map(f, lst))
             columns = lm(g, lm(f, (lm(int, x.split(":")) for x in columns)))
+
+            raise SystemExit
 
             categorical_dataframe.columns = columns
             whole_dataframe = pd.concat(
@@ -255,5 +264,6 @@ class LASSOdataframe:
 if __name__ == "__main__":
     dataframe = create_dataframe("house")
     model = LASSOdataframe(dataframe)
-    model.get_features_lists(20, 20)
+    model.get_features_lists(6, 6)
+    print("Done features")
     model.save_new_dataframe()
