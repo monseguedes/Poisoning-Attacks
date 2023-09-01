@@ -94,7 +94,7 @@ def read_dataset_file(f):
         new_cols = cols[1:]
         new_cols.append("target")
         # Add y as last column of x
-        new_x = x
+        new_x = [a[:] for a in x]
         for i in range(len(new_x)):
             new_x[i].append(y[i])
         # Convert to pandas dataframe
@@ -208,7 +208,8 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     trny = [y[row] for row in sampletrn]
 
     # Save array
-    train_array = np.asarray(trnx)
+    train_matrix = np.hstack((trnx, np.matrix(trny).T))
+    train_array = np.asarray(train_matrix)
     np.save(
         f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy",
         train_array,
@@ -218,7 +219,8 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     tsty = [y[row] for row in sampletst]
 
     # Save array
-    test_array = np.asarray(tstx)
+    test_matrix = np.hstack((tstx, np.matrix(tsty).T))
+    test_array = np.asarray(test_matrix)
     np.save(
         f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy",
         test_array,
@@ -228,7 +230,8 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     poisy = [y[row] for row in samplepois]
 
     # Save array
-    poison_array = np.asarray(poisx)
+    poison_matrix = np.hstack((poisx, np.matrix(poisy).T))
+    poison_array = np.asarray(poison_matrix)
     np.save(
         f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy",
         poison_array,
