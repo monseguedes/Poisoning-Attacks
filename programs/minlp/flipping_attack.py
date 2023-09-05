@@ -215,12 +215,12 @@ def run(config, instance_data, model=None):
 
     end = timeit.timeit()
 
-    # print("RESULTS")
-    # print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
-    # print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
-    # print(
-    #     f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
-    # )
+    print("RESULTS")
+    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
+    print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
+    print(
+        f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
+    )
 
     # TODO: should I add new items to best_sol or should I return new dictionary?
     best_sol["mse_per_iteration"] = mse_iteration_array
