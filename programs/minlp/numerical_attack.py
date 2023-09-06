@@ -130,8 +130,10 @@ def run(config, instance_data, model=None):
                 num_feature_flag[:, None],
                 model.POISON_DATA_FIXED,
             )
-
-            model.solve()
+            if config["solver_name"] == 'neos':
+                model.solve(neos=True)
+            else:
+                model.solve()
             solution = model.get_solution()
             if solution["mse"] > best_mse:
                 buff = instance_data.copy()
@@ -169,9 +171,19 @@ def run(config, instance_data, model=None):
 
 if __name__ == "__main__":
     import doctest
+    from main import config
+    import instance_data_class
 
     n_fails, _ = doctest.testmod()
     if n_fails > 0:
         raise SystemExit(1)
+    
+    instance_data = instance_data_class.InstanceData(config)
+    numerical_model = None
+
+    _, instance_data, regression_parameters = run(
+        config, instance_data, numerical_model
+    )
+
 
 # vimquickrun: python % && ./vimquickrun.sh
