@@ -10,6 +10,9 @@ import pyomo
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
 
+# import os
+# os.environ['NEOS_SERVER'] = 'neos-server.org:3333' 
+
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
 
@@ -47,6 +50,8 @@ class PyomoModel(pmo.block):
         self.upper_bound = 1000
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
+        elif self.solver_name == "neos":
+            self.opt = pyo.SolverManagerFactory("neos")
         elif self.binary:
             self.opt = pyo.SolverFactory("gurobi", solver_io="python")
             self.opt.options["NonConvex"] = 2
@@ -80,7 +85,7 @@ class PyomoModel(pmo.block):
 
     def prod(self, a, b):
         """Return the product of two expressions"""
-        if self.solver_name == "ipopt":
+        if self.solver_name in ["ipopt", "neos"]:
             return self._prod_ipopt(a, b)
         elif self.solver_name == "gurobi" and not self.binary:
             return self._prod_gurobi(a, b)
@@ -90,7 +95,7 @@ class PyomoModel(pmo.block):
             raise ValueError(f"unknown solver name {self.solver_name}")
 
     def triple_prod(self, a, b, c):
-        if self.solver_name == "ipopt":
+        if self.solver_name in ["ipopt", "neos"]:
             return self._triple_prod_ipopt(a, b, c)
         elif self.solver_name == "gurobi" and not self.binary:
             raise NotImplementedError
@@ -477,8 +482,11 @@ class PyomoModel(pmo.block):
             for value in self.x_poison_cat.values():
                 value.domain = pmo.Binary
 
-    def solve(self):
-        self.results = self.opt.solve(self, load_solutions=True, tee=self.tee)
+    def solve(self, neos=False):
+        if neos == True:
+            self.results = self.opt.solve(self, load_solutions=True, tee=self.tee, solver='knitro')
+        else:
+            self.results = self.opt.solve(self, load_solutions=True, tee=self.tee)
 
     def assert_optimal(self):
         results = self.results
