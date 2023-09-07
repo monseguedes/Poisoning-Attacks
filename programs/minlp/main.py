@@ -31,7 +31,7 @@ config = {
     "binary": False,
     # "regularization": 0.6612244897959183,
     "regularization": 0.1,
-    "solver_name": "ipopt",
+    "solver_name": "neos",
     # Solvers
     "solver_output": False,
     "feasibility": 0.00001,
