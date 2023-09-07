@@ -5,12 +5,15 @@
 #
 # $ ./setup_python_env.sh
 
+set -x
+set -e
+
 if [ -d "env" ]; then
     echo "virtual environment exists"
     exit 0
 fi
 
-python3 -m venv env
+~/download/Python-3.9.17/python -m venv env
 
 . ./env/bin/activate
 
