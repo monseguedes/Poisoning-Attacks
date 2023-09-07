@@ -9,9 +9,13 @@ import pandas as pd
 import pyomo
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
+import os
 
 # import os
 # os.environ['NEOS_SERVER'] = 'neos-server.org:3333' 
+
+os.environ['NEOS_EMAIL'] = 's1553571@ed.ac.uk' 
+
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
@@ -50,6 +54,10 @@ class PyomoModel(pmo.block):
         self.upper_bound = 1000
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
+        elif self.solver_name == 'knitro':
+            self.opt = pyo.SolverFactory("knitro")
+        elif self.solver_name == 'baron':
+            self.opt = pyo.SolverFactory("baron")
         elif self.solver_name == "neos":
             self.opt = pyo.SolverManagerFactory("neos")
         elif self.binary:
@@ -85,24 +93,28 @@ class PyomoModel(pmo.block):
 
     def prod(self, a, b):
         """Return the product of two expressions"""
-        if self.solver_name in ["ipopt", "neos"]:
-            return self._prod_ipopt(a, b)
-        elif self.solver_name == "gurobi" and not self.binary:
+        if self.solver_name == "gurobi" and not self.binary:
             return self._prod_gurobi(a, b)
         elif self.binary:
             return self._prod_linearise(a, b)
+        # if self.solver_name in ["ipopt", "neos"]:
+        #     return self._prod_ipopt(a, b)
         else:
-            raise ValueError(f"unknown solver name {self.solver_name}")
+            return self._prod_ipopt(a, b)
+        # else:
+        #     raise ValueError(f"unknown solver name {self.solver_name}")
 
     def triple_prod(self, a, b, c):
-        if self.solver_name in ["ipopt", "neos"]:
-            return self._triple_prod_ipopt(a, b, c)
-        elif self.solver_name == "gurobi" and not self.binary:
+        # if self.solver_name in ["ipopt", "neos"]:
+        #     return self._triple_prod_ipopt(a, b, c)
+        if self.solver_name == "gurobi" and not self.binary:
             raise NotImplementedError
         elif self.binary:
             return self._triple_prod_linearise(a, b, c)
         else:
-            raise ValueError(f"unknown solver name {self.solver_name}")
+            return self._triple_prod_ipopt(a, b, c)
+        # else:
+        #     raise ValueError(f"unknown solver name {self.solver_name}")
 
     def _prod_ipopt(self, a, b):
         return a * b
