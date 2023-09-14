@@ -31,9 +31,9 @@ config = {
     "binary": False,
     # "regularization": 0.6612244897959183,
     "regularization": 0.1,
-    "solver_name": "neos",
+    "solver_name": "knitro",
     # Solvers
-    "solver_output": False,
+    "solver_output": True,
     "feasibility": 0.00001,
     "time_limit": 300,
     # Numerical attack

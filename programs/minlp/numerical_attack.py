@@ -132,8 +132,18 @@ def run(config, instance_data, model=None):
             )
             if config["solver_name"] == 'neos':
                 model.solve(neos=True)
+                for k, v in model.weights_num.items():
+                    print(v.value)
+                print(model.bias)
+                print(model.bias.value)
+                raise SystemExit
             else:
                 model.solve()
+                for k, v in model.weights_num.items():
+                    print(v.value)
+                print(model.bias)
+                print(model.bias.value)
+                raise SystemExit
             solution = model.get_solution()
             if solution["mse"] > best_mse:
                 buff = instance_data.copy()
