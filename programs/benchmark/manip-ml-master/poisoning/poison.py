@@ -51,7 +51,7 @@ def robustopt(x, y, count, lam, poiser):
     return clf, w, b, lam, tau
 
 
-def open_dataset(f, visualize):
+def open_dataset(f, visualize, seed):
     if visualize:
         rng = np.random.RandomState(1)
         random_state = 1
@@ -64,13 +64,13 @@ def open_dataset(f, visualize):
         plt.plot(x, y, "k.")
         colmap = []
     else:
-        x, y = read_dataset_file(f)
+        x, y = read_dataset_file(f, seed)
 
     # return np.matrix(x), y
     return np.matrix(x), y
 
 
-def read_dataset_file(f):
+def read_dataset_file(f, seed):
     with open(f) as dataset:
         x = []
         y = []
@@ -101,13 +101,13 @@ def read_dataset_file(f):
         dataframe = pd.DataFrame(new_x, columns=new_cols)
 
         # Save dataframe
-        save_new_dataframe(dataframe)
+        save_new_dataframe(dataframe, seed)
 
         return np.matrix(x), y
         # return np.asarray(np.matrix(x)), y
 
 
-def save_new_dataframe(dataframe):
+def save_new_dataframe(dataframe, seed):
     """
     Filter dataframe and save it
     """
@@ -165,7 +165,7 @@ def save_new_dataframe(dataframe):
 
     whole_dataframe.index.name = "sample"
 
-    dataset_name = "123whole_dataframe.csv"
+    dataset_name = f"{seed}_whole_dataframe.csv"
     directory = "programs/benchmark/manip-ml-master/datasets/house"
 
     whole_dataframe.to_csv(os.path.join(directory, dataset_name))
@@ -546,7 +546,7 @@ def main(args):
     trainfile, testfile, validfile, resfile, newlogdir = open_logging_files(
         args.logdir, args.model, args.logind, args
     )
-    x, y = open_dataset(args.dataset, args.visualize)
+    x, y = open_dataset(args.dataset, args.visualize, args.seed)
     trainx, trainy, testx, testy, poisx, poisy, validx, validy = sample_dataset(
         x, y, args.trainct, args.poisct, args.testct, args.validct, args.seed
     )
@@ -730,6 +730,19 @@ def main(args):
     print(testy)
     print(testx.shape)
     print(len(testy))
+
+    results_dict = {
+        "unpoisoned_validation_mse": errgrd[0],
+        "unpoisoned_test_mse": errgrd[1],
+        "poisoned_validation_mse": errgrd[0],
+        "poisoned_test_mse": errgrd[1],
+    }
+
+    # Save results as dict using numpy
+    np.save(
+        f"programs/benchmark/manip-ml-master/poisoning/results/{args.seed}_results.npy",
+        results_dict,
+    )
 
     print()
     print("Unpoisoned")
