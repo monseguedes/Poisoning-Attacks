@@ -13,7 +13,6 @@ vimquickrun.sh
 *.png
 *.jpg
 *.csv
-*.npy
 
 *.yaml
 
