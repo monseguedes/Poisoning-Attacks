@@ -61,6 +61,12 @@ def run(config, instance_data, model=None):
     )
     it += 1
 
+    # Run ridge regression on the unpoisoned data.
+    # This is used as a benchmark.
+    regression_parameters = ridge_regression.run_not_poisoned(
+        config, instance_data, data_type="train"
+    )
+
     # Solve benchmark
     benchmark_start = timeit.timeit()
     config["iterative_attack_incremental"] = True
@@ -216,7 +222,7 @@ def run(config, instance_data, model=None):
     end = timeit.timeit()
 
     print("RESULTS")
-    print(f'Unpoisoned mse:')
+    print(f'Unpoisoned mse:      {regression_parameters["mse"]:7.6f}')
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
     print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
     print(
@@ -335,7 +341,10 @@ if __name__ == "__main__":
 
     # Print gradient results 
     # Load npy file
-    dictionary = np.load()
+    dictionary = np.load("programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy")
+    # Print dictionary
+    print("Gradient results")
+    print(dictionary.item())
 
     # # Run the utitlity to check the results with scikitlearn
     # scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
