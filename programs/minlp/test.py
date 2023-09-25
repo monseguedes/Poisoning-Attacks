@@ -34,10 +34,10 @@ model.o = pmo.objective(model.x)
 
 opt = pmo.SolverFactory("ipopt")
 
-solver_manager = pe.SolverManagerFactory('neos')
+# solver_manager = pe.SolverManagerFactory('neos')
 
-results = solver_manager.solve(model, solver = "ipopt")
+# results = solver_manager.solve(model, solver = "ipopt")
 
-# result = opt.solve(model)
+result = opt.solve(model)
 print(model.x.value)
 # assert str(result.solver.termination_condition) == "optimal"
