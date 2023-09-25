@@ -55,7 +55,8 @@ class PyomoModel(pmo.block):
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
         elif self.solver_name == 'knitro':
-            self.opt = pyo.SolverFactory("knitro", executable='/usr/local/knitro/12.3/knitroampl/knitroampl')
+            self.opt = pyo.SolverFactory("knitro")
+                                         #executable='/usr/local/knitro/12.3/knitroampl/knitroampl')
         elif self.solver_name == 'baron':
             self.opt = pyo.SolverFactory("baron")
         elif self.solver_name == "neos":
