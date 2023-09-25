@@ -54,10 +54,10 @@ def setup_argparse():
         help="number of points to test models on",
     )
     parser.add_argument(
-        "-v", "--validct", default=250, type=int, help="size of validation set"
+        "-v", "--validct", default=300, type=int, help="size of validation set"
     )
     parser.add_argument(
-        "-p", "--poisct", default=60, type=int, help="number of poisoning points"
+        "-p", "--poisct", default=48, type=int, help="number of poisoning points"
     )
     parser.add_argument(
         "-s",
@@ -172,7 +172,7 @@ def setup_argparse():
     )
 
     # seed for randmization
-    parser.add_argument("-seed", type=int, help="random seed", default=123)
+    parser.add_argument("-seed", type=int, help="random seed", default=1)
 
     # enable multi processing
     parser.add_argument(

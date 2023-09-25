@@ -740,7 +740,7 @@ def main(args):
 
     # Save results as dict using numpy
     np.save(
-        f"programs/benchmark/manip-ml-master/poisoning/results/{args.seed}_results.npy",
+        f"programs/benchmark/manip-ml-master/poisoning/results/{args.seed}_{args.poisct}_gradient_results.npy",
         results_dict,
     )
 
