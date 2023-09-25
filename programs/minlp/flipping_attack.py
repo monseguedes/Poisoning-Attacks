@@ -61,13 +61,13 @@ def run(config, instance_data, model=None):
     )
     it += 1
 
-    # # Solve benchmark
-    # benchmark_start = timeit.timeit()
-    # config["iterative_attack_incremental"] = True
-    # _, benchmark_data, benchmark_solution = numerical_attack.run(
-    #     config, instance_data
-    # )
-    # config["iterative_attack_incremental"] = False
+    # Solve benchmark
+    benchmark_start = timeit.timeit()
+    config["iterative_attack_incremental"] = True
+    _, benchmark_data, benchmark_solution = numerical_attack.run(
+        config, instance_data
+    )
+    config["iterative_attack_incremental"] = False
     numerical_model = model
     # benchmark_end = timeit.timeit()
 
@@ -216,6 +216,7 @@ def run(config, instance_data, model=None):
     end = timeit.timeit()
 
     print("RESULTS")
+    print(f'Unpoisoned mse:')
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
     print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
     print(
@@ -322,13 +323,19 @@ if __name__ == "__main__":
     n_fails, _ = doctest.testmod()
     if n_fails > 0:
         raise SystemExit(1)
+    
+    seed = 1
 
-    instance_data = instance_data_class.InstanceData(config)
+    instance_data = instance_data_class.InstanceData(config, benchmark_data=False, seed=1)
     numerical_model = None
 
     _, instance_data, regression_parameters = run(
         config, instance_data, numerical_model
     )
+
+    # Print gradient results 
+    # Load npy file
+    dictionary = np.load()
 
     # # Run the utitlity to check the results with scikitlearn
     # scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
