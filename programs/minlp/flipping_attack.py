@@ -341,7 +341,7 @@ if __name__ == "__main__":
 
     # Print gradient results 
     # Load npy file
-    dictionary = np.load("programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy")
+    dictionary = np.load(f"programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy", allow_pickle=True)
     # Print dictionary
     print("Gradient results")
     print(dictionary.item())
