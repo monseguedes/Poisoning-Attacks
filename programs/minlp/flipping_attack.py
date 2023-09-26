@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 import yaml
 
-import categorical_attack
 import numerical_attack
 import pyomo_model
 import ridge_regression
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 long_space = 80
 short_space = 60
@@ -45,46 +45,36 @@ def run(config, instance_data, model=None):
     print("FLIPPING ATTACK HEURISTIC")
     print("*" * long_space)
 
-    # TODO we use both solvers. but ipopts first.
     if not config.get("solver_name"):
-        config["solver_name"] = "ipopt"
-    # np.testing.assert_equal(config["solver_name"], "ipopt")
+        raise NameError("solver_name not set in config")
 
     n_epochs = config["flipping_attack_n_epochs"]
-
     no_poison_samples = instance_data.no_poison_samples
 
-    it = 0
-
-    instance_data.poison_dataframe.to_csv(
-        "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-            config["dataset_name"], it
-        )
-    )
-    it += 1
-
-    # Run ridge regression on the unpoisoned data.
-    # This is used as a benchmark.
+    # Run ridge regression on the unpoisoned data---------------------------
     regression_parameters = ridge_regression.run_not_poisoned(
         config, instance_data, data_type="train"
     )
+    regression_parameters_test = ridge_regression.run_not_poisoned(
+        config, instance_data, data_type="test"
+    )
+    regression_parameters_validation = ridge_regression.run_not_poisoned(
+        config, instance_data, data_type="validation"
+    )
 
-    # Solve benchmark
+    # Solve benchmark-------------------------------------------------------
     benchmark_start = timeit.timeit()
     config["iterative_attack_incremental"] = True
+    config["bounding"] = False
     _, benchmark_data, benchmark_solution = numerical_attack.run(
         config, instance_data
     )
     config["iterative_attack_incremental"] = False
-    numerical_model = model
-    # benchmark_end = timeit.timeit()
+    config["bounding"] = True
+    benchmark_end = timeit.timeit()
 
-    # benchmark_data.poison_dataframe.to_csv(
-    #     "programs/minlp/attacks/{}/benchmark_attack.csv".format(
-    #         config["dataset_name"]
-    #     )
-    # )
-
+    # Start flipping attack-------------------------------------------------
+    numerical_model = model  # Reset model to None
     start = timeit.timeit()
     for epoch in range(n_epochs):
         (
@@ -92,9 +82,6 @@ def run(config, instance_data, model=None):
             numerical_attack_instance_data,
             solution,
         ) = numerical_attack.run(config, instance_data, numerical_model)
-        # Save poisoning samples after numerical attack
-        # save_dataframes(numerical_attack_instance_data, solution, config, it)
-        it += 1
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
             best_sol = solution
@@ -191,10 +178,6 @@ def run(config, instance_data, model=None):
 
             mse_iteration_array.append(best_sol["mse"])
 
-            # Save poisoning samples
-            save_dataframes(best_instance_data, best_sol, config, it)
-            it += 1
-
         config["numerical_attack_mini_batch_size"] = 0.5
         (
             numerical_model,
@@ -209,12 +192,6 @@ def run(config, instance_data, model=None):
             instance_data = numerical_attack_instance_data
         else:
             instance_data = best_instance_data.copy()
-        best_instance_data.poison_dataframe.to_csv(
-            "programs/minlp/attacks/{}/poison_dataframe{}.csv".format(
-                config["dataset_name"], it
-            )
-        )
-        it += 1
 
         # # Project numerical features
         # round_except_last = lambda x: round(x, 0) if x.name != best_instance_data.poison_dataframe.columns[-1] else x
@@ -223,23 +200,132 @@ def run(config, instance_data, model=None):
 
     end = timeit.timeit()
 
+    # Get test and validation errors.
+    validation_benchmark_error = mean_squared_error(
+        instance_data.get_y_validation_dataframe().to_numpy(),
+        make_predictions(
+            "validation",
+            benchmark_data,
+            benchmark_solution["weights_num"],
+            benchmark_solution["weights_cat"],
+            benchmark_solution["bias"],
+        )
+    )
+    test_benchmark_error = mean_squared_error(
+        instance_data.get_y_test_dataframe().to_numpy(),
+        make_predictions(
+            "test",
+            benchmark_data,
+            benchmark_solution["weights_num"],
+            benchmark_solution["weights_cat"],
+            benchmark_solution["bias"],
+        )
+    )
+    validation_flipping_error = mean_squared_error(
+        instance_data.get_y_validation_dataframe().to_numpy(),
+        make_predictions(
+            "validation",
+            best_instance_data,
+            best_sol["weights_num"],
+            best_sol["weights_cat"],
+            best_sol["bias"],
+        )
+    )
+    test_flipping_error = mean_squared_error(
+        instance_data.get_y_test_dataframe().to_numpy(),
+        make_predictions(
+            "test",
+            best_instance_data,
+            best_sol["weights_num"],
+            best_sol["weights_cat"],
+            best_sol["bias"],
+        )
+    )
+
     print("RESULTS")
-    print(f'Unpoisoned mse:      {regression_parameters["mse"]:7.6f}')
+    print(
+        f'Unpoisoned mse validation:      {regression_parameters_validation["mse"]:7.6f}'
+    )
+    print(
+        f'Unpoisoned mse test:            {regression_parameters_test["mse"]:7.6f}'
+    )
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
+    print(f'Benchmark mse validation:        {validation_benchmark_error:7.6f}')
+    print(f'Benchmark mse test:              {test_benchmark_error:7.6f}')
     print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
+    print(f'Flipping method mse validation:  {validation_flipping_error:7.6f}')
+    print(f'Flipping method mse test:        {test_flipping_error:7.6f}')
     print(
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
+    print(
+        f'Improvement validation:          {(best_sol["mse"] - regression_parameters_validation["mse"]) / regression_parameters_validation["mse"] * 100:7.6f}'
+    )
+    print(
+        f'Improvement test:                {(best_sol["mse"] - regression_parameters_test["mse"]) / regression_parameters_test["mse"] * 100:7.6f}'
+    )
+
+    # Save results as dictionary
+    results_dict = {
+        "unpoisoned_validation_mse": regression_parameters_validation["mse"],
+        "unpoisoned_test_mse": regression_parameters_test["mse"],
+        "benchmark_mse": benchmark_solution["mse"],
+        "benchmark_validation_mse": validation_benchmark_error,
+        "benchmark_test_mse": test_benchmark_error,
+        "flippin_validation_mse": best_sol["mse"],
+        "flipping_test_mse": best_sol["mse"],
+        "benchmark_time": (benchmark_end - benchmark_start).total_seconds(),
+        "flipping_time": (end - start).total_seconds(),
+    }
+
+    # Save results as dict using numpy
+    np.save(
+        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_gradient_results.npy",
+        results_dict,
+    )
 
     # TODO: should I add new items to best_sol or should I return new dictionary?
-    best_sol["mse_per_iteration"] = mse_iteration_array
-    best_sol["mse_final"] = best_sol["mse"]
-    best_sol["computational_time_final"] = end - start
+    # best_sol["mse_per_iteration"] = mse_iteration_array
+    # best_sol["mse_final"] = best_sol["mse"]
+    # best_sol["computational_time_final"] = end - start
     # best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
     # best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
 
     return best_model, best_instance_data, best_sol
 
+def make_predictions(
+    data_type: str,
+    instance_data: instance_data_class.InstanceData,
+    numerical_weights: np.ndarray,
+    categorical_weights: np.ndarray,
+    bias: float,
+):
+    """
+    Take the regression coefficents given by solving the nonpoisoned model
+    and use them to make predictions on training dataset.
+    """
+
+    if data_type == "test":
+        X_cat = instance_data.get_cat_x_test_dataframe(wide=True).to_numpy()
+        X_num = instance_data.get_num_x_test_dataframe(wide=True).to_numpy()
+        X = np.concatenate((X_num, X_cat), axis=1)
+
+    if data_type == "train":
+        X_cat = instance_data.get_cat_x_train_dataframe(wide=True).to_numpy()
+        X_num = instance_data.get_num_x_train_dataframe(wide=True).to_numpy()
+        X = np.concatenate((X_num, X_cat), axis=1)
+
+    if data_type == "validation":
+        X_cat = instance_data.get_cat_x_validation_dataframe(wide=True).to_numpy()
+        X_num = instance_data.get_num_x_validation_dataframe(wide=True).to_numpy()
+        X = np.concatenate((X_num, X_cat), axis=1)
+
+    weights = np.concatenate((numerical_weights, categorical_weights))
+
+    # Make predictions
+    predictions = np.dot(X, weights) + bias
+
+    return predictions
 
 def save_dataframes(instance, solution, config, it):
     # Save poisoning samples after numerical attack
@@ -337,7 +423,7 @@ if __name__ == "__main__":
     seed = 1
 
     instance_data = instance_data_class.InstanceData(
-        config, benchmark_data=True, seed=1
+        config, benchmark_data=False, seed=1
     )
     numerical_model = None
 
