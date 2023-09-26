@@ -71,7 +71,7 @@ def run(config, instance_data, wide=False):
     y_pred = model.predict(X[: instance_data.no_train_samples])
     mse = mean_squared_error(y[: instance_data.no_train_samples], y_pred)
 
-    print(f"MSE: {mse}")
+    # print(f"MSE: {mse}")
 
     return {
         "weights_num": _weights_num,

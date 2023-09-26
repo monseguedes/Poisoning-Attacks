@@ -36,7 +36,7 @@ class InstanceData:
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
             whole_dataframe = pd.read_csv(
-                "programs/benchmark/manip-ml-master/datasets/house/{seed}_whole_dataframe.csv",
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_whole_dataframe.csv",
                 index_col=[0],
             )
 
@@ -52,7 +52,7 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            train_array = np.load("programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy")
+            train_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy")
             print(train_array.shape)
             print(len(whole_dataframe.columns))
             self.train_dataframe = pd.DataFrame(
@@ -67,7 +67,7 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            test_array = np.load("programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy")
+            test_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy")
             self.test_dataframe = pd.DataFrame(
                 test_array, columns=whole_dataframe.columns
             )
@@ -82,7 +82,7 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            poison_array = np.load("programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy")
+            poison_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy")
             self.poison_dataframe = pd.DataFrame(
                 poison_array, columns=whole_dataframe.columns
             )

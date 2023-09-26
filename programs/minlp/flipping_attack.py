@@ -91,7 +91,7 @@ def run(config, instance_data, model=None):
             solution,
         ) = numerical_attack.run(config, instance_data, numerical_model)
         # Save poisoning samples after numerical attack
-        save_dataframes(numerical_attack_instance_data, solution, config, it)
+        # save_dataframes(numerical_attack_instance_data, solution, config, it)
         it += 1
         if (epoch == 0) or (best_sol["mse"] <= solution["mse"]):
             # Store the best solution found so far.
@@ -332,7 +332,7 @@ if __name__ == "__main__":
     
     seed = 1
 
-    instance_data = instance_data_class.InstanceData(config, benchmark_data=False, seed=1)
+    instance_data = instance_data_class.InstanceData(config, benchmark_data=True, seed=1)
     numerical_model = None
 
     _, instance_data, regression_parameters = run(
