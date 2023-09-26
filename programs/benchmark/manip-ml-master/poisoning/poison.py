@@ -733,11 +733,11 @@ def main(args):
     trainfile.close()
     testfile.close()
 
-    print("Testing data:")
-    print(testx)
-    print(testy)
-    print(testx.shape)
-    print(len(testy))
+    # print("Testing data:")
+    # print(testx)
+    # print(testy)
+    # print(testx.shape)
+    # print(len(testy))
 
     results_dict = {
         "unpoisoned_validation_mse": errgrd[0],
