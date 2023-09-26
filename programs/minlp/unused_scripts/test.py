@@ -1,7 +1,7 @@
 from pyomo import environ as pe
 import os
 
-os.environ['NEOS_EMAIL'] = 's1553571@ed.ac.uk' 
+os.environ["NEOS_EMAIL"] = "s1553571@ed.ac.uk"
 
 # model = pe.ConcreteModel()
 

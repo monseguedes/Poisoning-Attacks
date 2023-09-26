@@ -108,7 +108,7 @@ def run(config, instance_data, warmstart_data=None, model=None):
 
 if __name__ == "__main__":
     import doctest
-    from main import config
+    from programs.minlp.unused_scripts.main import config
     import instance_data_class
 
     n_fails, _ = doctest.testmod()

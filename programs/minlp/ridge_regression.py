@@ -142,7 +142,6 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         y = y_df.to_numpy()
         y_pred = model.predict(X)
         mse = mean_squared_error(y, y_pred)
-    
 
     _weights_num.to_csv(
         "programs/minlp/attacks/{}/initial_numerical_weights.csv".format(
@@ -164,8 +163,9 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         "mse": mse,
     }
 
+
 if __name__ == "__main__":
-    from main import config
+    from programs.minlp.unused_scripts.main import config
     import instance_data_class
 
     instance_data = instance_data_class.InstanceData(config)
@@ -174,5 +174,3 @@ if __name__ == "__main__":
     regression_parameters = run_not_poisoned(
         config, instance_data, data_type="test"
     )
-
-

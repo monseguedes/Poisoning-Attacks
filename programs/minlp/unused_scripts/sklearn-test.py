@@ -33,13 +33,17 @@ ridge.fit(X, y)
 # # Plot data with fitted regression line
 # plt.scatter(X, y)
 # plt.plot(X, ridge.predict(X), color='red')
-# # Add mean of y 
+# # Add mean of y
 # plt.plot(X, np.mean(y)*np.ones(X.shape), color='green')
 # plt.show()
 
 
 # Try to reproduce sklearn with closed form.
-weights = np.linalg.inv(X.T.dot(X) + alpha * np.eye(X.shape[1])).dot(X.T).dot(y - np.mean(y)) 
+weights = (
+    np.linalg.inv(X.T.dot(X) + alpha * np.eye(X.shape[1]))
+    .dot(X.T)
+    .dot(y - np.mean(y))
+)
 # intercept= np.mean(y) - weights.dot(np.mean(X))
 intercept = np.mean(y)
 
@@ -52,13 +56,13 @@ intercept = np.mean(y)
 
 # Combine both plots in one figure with subplots
 fig, (ax1, ax2) = plt.subplots(1, 2)
-fig.suptitle('Ridge Regression')
+fig.suptitle("Ridge Regression")
 ax1.scatter(X, y)
-ax1.plot(X, ridge.predict(X), color='red')
-ax1.plot(X, np.mean(y)*np.ones(X.shape), color='green')
-ax1.set_title('sklearn')
+ax1.plot(X, ridge.predict(X), color="red")
+ax1.plot(X, np.mean(y) * np.ones(X.shape), color="green")
+ax1.set_title("sklearn")
 ax2.scatter(X, y)
-ax2.plot(X, weights*X + intercept, color='red')
-ax2.plot(X, np.mean(y)*np.ones(X.shape), color='green')
-ax2.set_title('closed form')
+ax2.plot(X, weights * X + intercept, color="red")
+ax2.plot(X, np.mean(y) * np.ones(X.shape), color="green")
+ax2.set_title("closed form")
 plt.show()
