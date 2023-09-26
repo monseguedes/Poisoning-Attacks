@@ -284,6 +284,7 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
 
 
 if __name__ == "__main__":
-    from main import config
+    with open("config.yml", "r") as config_file:
+        config = yaml.safe_load(config_file)
 
     plot_mse(config, "test")
