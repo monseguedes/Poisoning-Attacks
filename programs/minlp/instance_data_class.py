@@ -85,6 +85,16 @@ class InstanceData:
         ).reset_index(drop=True)
 
         if benchmark_data:
+            validation_array = np.load(
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_validation_array.npy"
+            )
+            self.validation_dataframe = pd.DataFrame(
+                validation_array, columns=whole_dataframe.columns
+            )
+            _cast_column_names_to_int(self.validation_dataframe, inplace=True)
+
+
+        if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
             poison_array = np.load(
                 f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy"
@@ -170,6 +180,15 @@ class InstanceData:
 
     def get_y_test_dataframe(self):
         return get_targets(df=self.test_dataframe)
+    
+    def get_num_x_validation_dataframe(self, wide=False):
+        return get_numerical_features(df=self.validation_dataframe, wide=wide)
+    
+    def get_cat_x_validation_dataframe(self, wide=False):
+        return get_categorical_features(df=self.validation_dataframe, wide=wide)
+    
+    def get_y_validation_dataframe(self):
+        return get_targets(df=self.validation_dataframe)
 
     @property
     def no_samples(self):
