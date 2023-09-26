@@ -17,7 +17,7 @@ import choosing_features
 
 
 class InstanceData:
-    def __init__(self, config, benchmark_data = False, seed = 123):
+    def __init__(self, config, benchmark_data=False, seed=123):
         """
         The initialization corresponds to the data for the first iteration.
         If there are no iterations (single attack strategy).
@@ -52,7 +52,9 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            train_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy")
+            train_array = np.load(
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_train_array.npy"
+            )
             print(train_array.shape)
             print(len(whole_dataframe.columns))
             self.train_dataframe = pd.DataFrame(
@@ -67,7 +69,9 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            test_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy")
+            test_array = np.load(
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_test_array.npy"
+            )
             self.test_dataframe = pd.DataFrame(
                 test_array, columns=whole_dataframe.columns
             )
@@ -82,13 +86,17 @@ class InstanceData:
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
-            poison_array = np.load(f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy")
+            poison_array = np.load(
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy"
+            )
             self.poison_dataframe = pd.DataFrame(
                 poison_array, columns=whole_dataframe.columns
             )
             _cast_column_names_to_int(self.poison_dataframe, inplace=True)
 
-        self.poison_dataframe["target"] = 1 - self.poison_dataframe["target"].round(0)
+        self.poison_dataframe["target"] = 1 - self.poison_dataframe[
+            "target"
+        ].round(0)
 
         self.no_numfeatures = len(
             get_numerical_feature_column_names(self.train_dataframe)
@@ -141,7 +149,7 @@ class InstanceData:
 
     def get_y_train_dataframe(self):
         return get_targets(df=self.train_dataframe)
-    
+
     def get_y_test_dataframe(self):
         return get_targets(df=self.test_dataframe)
 

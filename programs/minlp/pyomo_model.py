@@ -12,10 +12,9 @@ import pyomo.kernel as pmo
 import os
 
 # import os
-# os.environ['NEOS_SERVER'] = 'neos-server.org:3333' 
+# os.environ['NEOS_SERVER'] = 'neos-server.org:3333'
 
-os.environ['NEOS_EMAIL'] = 's1553571@ed.ac.uk' 
-
+os.environ["NEOS_EMAIL"] = "s1553571@ed.ac.uk"
 
 # TODO Refactor and simplify function calls around model building.
 # TODO Improve efficiency by avoid calling unnecesary instance_data.get_x.
@@ -54,10 +53,10 @@ class PyomoModel(pmo.block):
         self.upper_bound = 1000
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
-        elif self.solver_name == 'knitro':
+        elif self.solver_name == "knitro":
             self.opt = pyo.SolverFactory("knitro")
-                                         #executable='/usr/local/knitro/12.3/knitroampl/knitroampl')
-        elif self.solver_name == 'baron':
+            # executable='/usr/local/knitro/12.3/knitroampl/knitroampl')
+        elif self.solver_name == "baron":
             self.opt = pyo.SolverFactory("baron")
         elif self.solver_name == "neos":
             self.opt = pyo.SolverManagerFactory("neos")
@@ -497,9 +496,13 @@ class PyomoModel(pmo.block):
 
     def solve(self, neos=False):
         if neos == True:
-            self.results = self.opt.solve(self, load_solutions=True, tee=self.tee, solver='knitro')
+            self.results = self.opt.solve(
+                self, load_solutions=True, tee=self.tee, solver="knitro"
+            )
         else:
-            self.results = self.opt.solve(self, load_solutions=True, tee=self.tee)
+            self.results = self.opt.solve(
+                self, load_solutions=True, tee=self.tee
+            )
 
     def assert_optimal(self):
         results = self.results
