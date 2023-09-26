@@ -243,7 +243,9 @@ class GDPoisoner(object):
         else:
             for j in range(poisct):
                 self.trainfile.write(
-                    ",".join([str(val) for val in [poisy[j]] + poisx[j].tolist()[0]])
+                    ",".join(
+                        [str(val) for val in [poisy[j]] + poisx[j].tolist()[0]]
+                    )
                     + "\n"
                 )
 
@@ -258,7 +260,8 @@ class GDPoisoner(object):
 
             clf, lam = self.learn_model(x_cur, y_cur, None)
             pois_params = [
-                (poisx[i], poisy[i], eq7lhs, mu, clf, lam) for i in range(poisct)
+                (poisx[i], poisy[i], eq7lhs, mu, clf, lam)
+                for i in range(poisct)
             ]
             outofboundsct = 0
 
@@ -293,7 +296,9 @@ class GDPoisoner(object):
 
             print("Validation MSE: {}".format(it_res[2][0]))
             print("Test MSE: {}".format(it_res[2][1]))
-            print("Y pushed out of bounds: {}/{}".format(outofboundsct, poisct))
+            print(
+                "Y pushed out of bounds: {}/{}".format(outofboundsct, poisct)
+            )
 
             # if we don't make progress, decrease learning rate
             if it_res[0] < it_res[1]:
@@ -325,7 +330,11 @@ class GDPoisoner(object):
             for j in range(poisct):
                 self.trainfile.write(
                     ",".join(
-                        [str(val) for val in [new_poisy[j]] + new_poisx[j].tolist()[0]]
+                        [
+                            str(val)
+                            for val in [new_poisy[j]]
+                            + new_poisx[j].tolist()[0]
+                        ]
                     )
                     + "\n"
                 )
@@ -338,7 +347,13 @@ class GDPoisoner(object):
             # visualization done - plotting time
             if visualize and count >= 9:
                 self.plot_path(
-                    clf_init, lam_init, eq7lhs, mu, poisx_hist, poisy_hist, newlogdir
+                    clf_init,
+                    lam_init,
+                    eq7lhs,
+                    mu,
+                    poisx_hist,
+                    poisy_hist,
+                    newlogdir,
                 )
                 break
 
@@ -347,7 +362,9 @@ class GDPoisoner(object):
 
         return best_poisx, best_poisy
 
-    def plot_path(self, clf, lam, eq7lhs, mu, poisx_hist, poisy_hist, newlogdir):
+    def plot_path(
+        self, clf, lam, eq7lhs, mu, poisx_hist, poisy_hist, newlogdir
+    ):
         """
         plot_path makes a pretty picture of the gradient descent path
 
@@ -372,9 +389,13 @@ class GDPoisoner(object):
         # plot path of poisoning pt
         for i in range(poisx_hist.shape[1]):
             # plot start, path, and end
-            plt.plot(poisx_hist[0, i, :], poisy_hist[0, i], "g.", markersize=10)
+            plt.plot(
+                poisx_hist[0, i, :], poisy_hist[0, i], "g.", markersize=10
+            )
             plt.plot(poisx_hist[:, i, :], poisy_hist[:, i], "g-", linewidth=3)
-            plt.plot(poisx_hist[-1, i, :], poisy_hist[-1, i], "g*", markersize=10)
+            plt.plot(
+                poisx_hist[-1, i, :], poisy_hist[-1, i], "g*", markersize=10
+            )
 
         plt.xlabel("x")
         plt.ylabel("y")
@@ -402,7 +423,9 @@ class GDPoisoner(object):
         z = np.zeros(shape=(grid_x.shape[0],))
 
         for i in range(grid_x.shape[0]):
-            poisx = np.concatenate((self.trnx, grid_x[i][0].reshape((1, 1))), axis=0)
+            poisx = np.concatenate(
+                (self.trnx, grid_x[i][0].reshape((1, 1))), axis=0
+            )
             poisy = self.trny + [grid_x[i][1].item()]
             clf, lam = self.learn_model(poisx, poisy, None)
             z[i] = f(clf, lam, None)
@@ -413,7 +436,9 @@ class GDPoisoner(object):
         plt.xlim(xx1.min(), xx1.max())
         plt.ylim(xx2.min(), xx2.max())
 
-    def plot_grad(self, clf, lam, eq7lhs, mu, min_x=0, max_x=1, resolution=0.1):
+    def plot_grad(
+        self, clf, lam, eq7lhs, mu, min_x=0, max_x=1, resolution=0.1
+    ):
         """
         plot_grad plots vector field for gradients of the objective function
 
@@ -433,7 +458,9 @@ class GDPoisoner(object):
 
         for i in range(grid_x.shape[0]):
             clf, lam = self.learn_model(
-                np.concatenate((self.trnx, grid_x[i, 0].reshape((1, 1))), axis=0),
+                np.concatenate(
+                    (self.trnx, grid_x[i, 0].reshape((1, 1))), axis=0
+                ),
                 self.trny + [x[i, 1]],
                 None,
             )
@@ -499,7 +526,9 @@ class GDPoisoner(object):
         attack, attacky = self.attack_comp(clf, wxc, bxc, wyc, byc, otherargs)
 
         # keep track of how many points are pushed out of bounds
-        if (poisyelem >= 1 and attacky >= 0) or (poisyelem <= 0 and attacky <= 0):
+        if (poisyelem >= 1 and attacky >= 0) or (
+            poisyelem <= 0 and attacky <= 0
+        ):
             outofbounds = True
         else:
             outofbounds = False
@@ -519,7 +548,9 @@ class GDPoisoner(object):
         else:
             attack = allattack
 
-        poisxelem, poisyelem, _ = self.lineSearch(poisxelem, poisyelem, attack, attacky)
+        poisxelem, poisyelem, _ = self.lineSearch(
+            poisxelem, poisyelem, attack, attacky
+        )
         poisxelem = poisxelem.reshape((1, self.feanum))
 
         return poisxelem, poisyelem, outofbounds
@@ -656,7 +687,9 @@ class GDPoisoner(object):
         initw, initb = self.initclf.coef_, self.initclf.intercept_
         curw, curb = clf.coef_, clf.intercept_
 
-        attackx = np.dot(np.transpose(curw - initw), wxc) + (curb - initb) * bxc
+        attackx = (
+            np.dot(np.transpose(curw - initw), wxc) + (curb - initb) * bxc
+        )
         attacky = np.dot(curw - initw, wyc.T) + (curb - initb) * byc
 
         return attackx, attacky
@@ -906,7 +939,9 @@ class LassoGDPoisoner(LinRegGDPoisoner):
                 clf = linear_model.LassoCV(max_iter=10000)
                 clf.fit(x, y)
                 lam = clf.alpha_
-            clf = linear_model.Lasso(alpha=lam, max_iter=10000, warm_start=True)
+            clf = linear_model.Lasso(
+                alpha=lam, max_iter=10000, warm_start=True
+            )
         clf.fit(x, y)
         return clf, lam
 
@@ -1036,7 +1071,9 @@ class ENetGDPoisoner(LinRegGDPoisoner):
             opty,
         )
         self.initlam = -1
-        self.initclf, self.initlam = self.learn_model(self.x, self.y, None, None)
+        self.initclf, self.initlam = self.learn_model(
+            self.x, self.y, None, None
+        )
 
     def comp_obj_trn(self, clf, lam, otherargs):
         curweight = LinRegGDPoisoner.comp_W_0(self, clf, lam, otherargs)
@@ -1082,6 +1119,8 @@ class ENetGDPoisoner(LinRegGDPoisoner):
                 clf = linear_model.ElasticNetCV(max_iter=10000)
                 clf.fit(x, y)
                 lam = clf.alpha_
-            clf = linear_model.ElasticNet(alpha=lam, max_iter=10000, warm_start=True)
+            clf = linear_model.ElasticNet(
+                alpha=lam, max_iter=10000, warm_start=True
+            )
         clf.fit(x, y)
         return clf, lam

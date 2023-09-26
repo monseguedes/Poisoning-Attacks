@@ -142,7 +142,7 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         y = y_df.to_numpy()
         y_pred = model.predict(X)
         mse = mean_squared_error(y, y_pred)
-    elif data_type == 'validation':
+    elif data_type == "validation":
         num_dataframe = instance_data.get_num_x_validation_dataframe(wide=True)
         cat_dataframe = instance_data.get_cat_x_validation_dataframe(wide=True)
         y_df = instance_data.get_y_validation_dataframe()

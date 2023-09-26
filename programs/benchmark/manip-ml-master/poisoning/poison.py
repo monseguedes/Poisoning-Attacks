@@ -29,7 +29,9 @@ def robustopt(x, y, count, lam, poiser):
 
     clf, _ = poiser.learn_model(x, y, None)
 
-    while sorted(tau) != sorted(newtau) and it < 400 and lasterr - toterr > 1e-5:
+    while (
+        sorted(tau) != sorted(newtau) and it < 400 and lasterr - toterr > 1e-5
+    ):
         newtau = tau[:]
         lasterr = toterr
         subx = x[tau]
@@ -37,7 +39,9 @@ def robustopt(x, y, count, lam, poiser):
         clf.fit(subx, suby)
         w, b = clf.coef_, clf.intercept_
 
-        residvec = [(w * np.transpose(x[i]) + b - y[i]) ** 2 for i in range(length)]
+        residvec = [
+            (w * np.transpose(x[i]) + b - y[i]) ** 2 for i in range(length)
+        ]
 
         residtopns = sorted([(residvec[i], i) for i in range(length)])[:count]
         resid = [val[1] for val in residtopns]
@@ -56,7 +60,11 @@ def open_dataset(f, visualize, seed):
         rng = np.random.RandomState(1)
         random_state = 1
         x, y = make_regression(
-            n_samples=300, n_features=1, random_state=random_state, noise=15.0, bias=1.5
+            n_samples=300,
+            n_features=1,
+            random_state=random_state,
+            noise=15.0,
+            bias=1.5,
         )
         x = (x - x.min()) / (x.max() - x.min())
         y = (y - y.min()) / (y.max() - y.min())
@@ -112,7 +120,11 @@ def save_new_dataframe(dataframe, seed):
     Filter dataframe and save it
     """
     numerical_dataframe = dataframe[
-        [str(column) for column in dataframe.columns if ":" not in column and column != "target"]
+        [
+            str(column)
+            for column in dataframe.columns
+            if ":" not in column and column != "target"
+        ]
     ]
     new_numerical_cols = [
         str(i) for i in range(len(numerical_dataframe.columns))
@@ -204,7 +216,9 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     samplevld = fullperm[trnct + tstct : trnct + tstct + vldct]
     samplepois = np.random.choice(size, poisct)
 
-    trnx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in sampletrn])
+    trnx = np.matrix(
+        [np.array(x[row]).reshape((x.shape[1],)) for row in sampletrn]
+    )
     trny = [y[row] for row in sampletrn]
 
     # Save array
@@ -215,7 +229,9 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
         train_array,
     )
 
-    tstx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in sampletst])
+    tstx = np.matrix(
+        [np.array(x[row]).reshape((x.shape[1],)) for row in sampletst]
+    )
     tsty = [y[row] for row in sampletst]
 
     # Save array
@@ -226,7 +242,9 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
         test_array,
     )
 
-    poisx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in samplepois])
+    poisx = np.matrix(
+        [np.array(x[row]).reshape((x.shape[1],)) for row in samplepois]
+    )
     poisy = [y[row] for row in samplepois]
 
     # Save array
@@ -237,8 +255,9 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
         poison_array,
     )
 
-
-    vldx = np.matrix([np.array(x[row]).reshape((x.shape[1],)) for row in samplevld])
+    vldx = np.matrix(
+        [np.array(x[row]).reshape((x.shape[1],)) for row in samplevld]
+    )
     # vldx = np.asarray(vldx)
     vldy = [y[row] for row in samplevld]
 
@@ -322,7 +341,9 @@ def cookflip(x, y, count, poiser):
     invmat = np.linalg.pinv(corr)
     hmat = x * invmat * np.transpose(x)
 
-    allcooks = [hmat[i, i] * errs[i] / (1 - hmat[i, i]) ** 2 for i in range(x.shape[0])]
+    allcooks = [
+        hmat[i, i] * errs[i] / (1 - hmat[i, i]) ** 2 for i in range(x.shape[0])
+    ]
 
     totalprob = sum(allcooks)
 
@@ -373,7 +394,9 @@ def alfatilt(x, y, count, poiser):
     truepreds = trueclf.predict(x)
 
     goalmodel = np.random.uniform(
-        low=-1 / sqrt(x.shape[1]), high=1 / sqrt(x.shape[1]), shape=(x.shape[1] + 1)
+        low=-1 / sqrt(x.shape[1]),
+        high=1 / sqrt(x.shape[1]),
+        shape=(x.shape[1] + 1),
     )
     goalpreds = np.dot(x, goalmodel[:-1]) + goalmodel[-1].item()
 
@@ -512,9 +535,9 @@ def randflipnobd(X_tr, Y_tr, count):
 def rmml(X_tr, Y_tr, count):
     print(X_tr.shape, len(Y_tr), count)
     mean = np.ravel(X_tr.mean(axis=0))  # .reshape(1,-1)
-    covar = np.dot((X_tr - mean).T, (X_tr - mean)) / X_tr.shape[0] + 0.01 * np.eye(
-        X_tr.shape[1]
-    )
+    covar = np.dot((X_tr - mean).T, (X_tr - mean)) / X_tr.shape[
+        0
+    ] + 0.01 * np.eye(X_tr.shape[1])
     model = linear_model.Ridge(alpha=0.1)
     model.fit(X_tr, Y_tr)
     allpoisx = np.random.multivariate_normal(mean, covar, size=count)
@@ -555,25 +578,37 @@ def main(args):
         args.logdir, args.model, args.logind, args
     )
     x, y = open_dataset(args.dataset, args.visualize, args.seed)
-    trainx, trainy, testx, testy, poisx, poisy, validx, validy = sample_dataset(
+    (
+        trainx,
+        trainy,
+        testx,
+        testy,
+        poisx,
+        poisy,
+        validx,
+        validy,
+    ) = sample_dataset(
         x, y, args.trainct, args.poisct, args.testct, args.validct, args.seed
     )
 
     for i in range(len(testy)):
         testfile.write(
-            ",".join([str(val) for val in [testy[i]] + testx[i].tolist()[0]]) + "\n"
+            ",".join([str(val) for val in [testy[i]] + testx[i].tolist()[0]])
+            + "\n"
         )
     testfile.close()
 
     for i in range(len(validy)):
         validfile.write(
-            ",".join([str(val) for val in [validy[i]] + validx[i].tolist()[0]]) + "\n"
+            ",".join([str(val) for val in [validy[i]] + validx[i].tolist()[0]])
+            + "\n"
         )
     validfile.close()
 
     for i in range(len(trainy)):
         trainfile.write(
-            ",".join([str(val) for val in [trainy[i]] + trainx[i].tolist()[0]]) + "\n"
+            ",".join([str(val) for val in [trainy[i]] + trainx[i].tolist()[0]])
+            + "\n"
         )
 
     print(la.matrix_rank(trainx))
@@ -631,7 +666,9 @@ def main(args):
         )
         # clf, _ = genpoiser.learn_model(np.concatenate((trainx,poisx),axis=0),trainy+poisy,None)
         clf, _ = genpoiser.learn_model(
-            np.asarray(np.concatenate((trainx, poisx), axis=0)), trainy + poisy, None
+            np.asarray(np.concatenate((trainx, poisx), axis=0)),
+            trainy + poisy,
+            None,
         )
 
         err = genpoiser.computeError(clf)[0]
@@ -703,7 +740,12 @@ def main(args):
         trainfile.write("\n")
         for j in range(numsamples):
             trainfile.write(
-                ",".join([str(val) for val in [poisresy[j]] + poisres[j].tolist()[0]])
+                ",".join(
+                    [
+                        str(val)
+                        for val in [poisresy[j]] + poisres[j].tolist()[0]
+                    ]
+                )
                 + "\n"
             )
 
@@ -721,7 +763,12 @@ def main(args):
             trainfile.write("\nround\n")
             for j in range(numsamples):
                 trainfile.write(
-                    ",".join([str(val) for val in [roundy[j]] + roundx[j].tolist()[0]])
+                    ",".join(
+                        [
+                            str(val)
+                            for val in [roundy[j]] + roundx[j].tolist()[0]
+                        ]
+                    )
                     + "\n"
                 )
 

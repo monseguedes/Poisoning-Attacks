@@ -9,6 +9,7 @@ seed: 3
 function: "MSE"
 binary: False
 regularization: 0.1
+bounding: True
 
 # Solvers
 solver_name: "knitro"

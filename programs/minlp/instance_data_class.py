@@ -93,7 +93,6 @@ class InstanceData:
             )
             _cast_column_names_to_int(self.validation_dataframe, inplace=True)
 
-
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
             poison_array = np.load(
@@ -180,13 +179,15 @@ class InstanceData:
 
     def get_y_test_dataframe(self):
         return get_targets(df=self.test_dataframe)
-    
+
     def get_num_x_validation_dataframe(self, wide=False):
         return get_numerical_features(df=self.validation_dataframe, wide=wide)
-    
+
     def get_cat_x_validation_dataframe(self, wide=False):
-        return get_categorical_features(df=self.validation_dataframe, wide=wide)
-    
+        return get_categorical_features(
+            df=self.validation_dataframe, wide=wide
+        )
+
     def get_y_validation_dataframe(self):
         return get_targets(df=self.validation_dataframe)
 

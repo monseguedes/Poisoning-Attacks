@@ -57,7 +57,11 @@ def setup_argparse(poisct, seed):
         "-v", "--validct", default=300, type=int, help="size of validation set"
     )
     parser.add_argument(
-        "-p", "--poisct", default=poisct, type=int, help="number of poisoning points"
+        "-p",
+        "--poisct",
+        default=poisct,
+        type=int,
+        help="number of poisoning points",
     )
     parser.add_argument(
         "-s",
@@ -69,7 +73,10 @@ def setup_argparse(poisct, seed):
 
     # logging results
     parser.add_argument(
-        "-ld", "--logdir", default="../results", help="directory to store output"
+        "-ld",
+        "--logdir",
+        default="../results",
+        help="directory to store output",
     )
     parser.add_argument(
         "-li",
@@ -168,7 +175,10 @@ def setup_argparse(poisct, seed):
 
     # round
     parser.add_argument(
-        "-rnd", "--rounding", action="store_true", help="to round or not to round"
+        "-rnd",
+        "--rounding",
+        action="store_true",
+        help="to round or not to round",
     )
 
     # seed for randmization

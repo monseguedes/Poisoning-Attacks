@@ -58,8 +58,8 @@ class PyomoModel(pmo.block):
                 instance_data.train_dataframe.iloc[:, :-1],
                 instance_data.train_dataframe.iloc[:, -1],
                 instance_data.no_poison_samples,
-                config
-            )   
+                config,
+            )
 
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
@@ -315,7 +315,7 @@ class PyomoModel(pmo.block):
 
         upper_bound = self.upper_bound
         lower_bound = -upper_bound
-        
+
         print(f"Upper bound is: {upper_bound:.2f}")
         print(f"Lower bound is: {lower_bound:.2f}")
 
