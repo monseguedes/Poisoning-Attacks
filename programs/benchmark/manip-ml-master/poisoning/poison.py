@@ -242,6 +242,14 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     # vldx = np.asarray(vldx)
     vldy = [y[row] for row in samplevld]
 
+    # Save array
+    validation_matrix = np.hstack((vldx, np.matrix(vldy).T))
+    validation_array = np.asarray(validation_matrix)
+    np.save(
+        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_validation_array.npy",
+        validation_array,
+    )
+
     return trnx, trny, tstx, tsty, poisx, poisy, vldx, vldy
 
 
@@ -734,8 +742,9 @@ def main(args):
     results_dict = {
         "unpoisoned_validation_mse": errgrd[0],
         "unpoisoned_test_mse": errgrd[1],
-        "poisoned_validation_mse": errgrd[0],
-        "poisoned_test_mse": errgrd[1],
+        "poisoned_validation_mse": err[0],
+        "poisoned_test_mse": err[1],
+        "compute_time": (timeend - timestart).total_seconds(),
     }
 
     # Save results as dict using numpy
@@ -745,11 +754,11 @@ def main(args):
     )
 
     print()
-    print("Unpoisoned")
+    print("Unpoisoned-----------------")
     print("Validation MSE:", errgrd[0])
     print("Test MSE:", errgrd[1])
     print("Size of unpoisoned training set:", trainx.shape[0])
-    print("Poisoned:")
+    print("Poisoned-------------------")
     print("Validation MSE:", err[0])
     print("Test MSE:", err[1])
     print("Size of poisoned training set:", poisedx.shape[0])

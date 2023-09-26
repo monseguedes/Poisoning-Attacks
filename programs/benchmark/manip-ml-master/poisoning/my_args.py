@@ -26,7 +26,7 @@ python MYTEST -m ridge -init randflip -obj 2 -a 0.5 -b 0.1 -i 1 -s 4 -seed 123
 import argparse
 
 
-def setup_argparse():
+def setup_argparse(poisct, seed):
     parser = argparse.ArgumentParser(description="handle poisoning inputs")
 
     # dataset file
@@ -57,7 +57,7 @@ def setup_argparse():
         "-v", "--validct", default=300, type=int, help="size of validation set"
     )
     parser.add_argument(
-        "-p", "--poisct", default=48, type=int, help="number of poisoning points"
+        "-p", "--poisct", default=poisct, type=int, help="number of poisoning points"
     )
     parser.add_argument(
         "-s",
@@ -172,7 +172,7 @@ def setup_argparse():
     )
 
     # seed for randmization
-    parser.add_argument("-seed", type=int, help="random seed", default=1)
+    parser.add_argument("-seed", type=int, help="random seed", default=seed)
 
     # enable multi processing
     parser.add_argument(
