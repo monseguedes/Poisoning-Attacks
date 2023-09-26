@@ -8,6 +8,7 @@ import pyomo.environ as pyo
 import seaborn as sns
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import yaml
 
 import flipping_attack
 import instance_data_class
