@@ -210,7 +210,7 @@ def run(config, instance_data, model=None):
             benchmark_solution["weights_num"],
             benchmark_solution["weights_cat"],
             benchmark_solution["bias"],
-        )
+        ),
     )
     test_benchmark_error = mean_squared_error(
         instance_data.get_y_test_dataframe().to_numpy(),
@@ -220,7 +220,7 @@ def run(config, instance_data, model=None):
             benchmark_solution["weights_num"],
             benchmark_solution["weights_cat"],
             benchmark_solution["bias"],
-        )
+        ),
     )
     validation_flipping_error = mean_squared_error(
         instance_data.get_y_validation_dataframe().to_numpy(),
@@ -230,7 +230,7 @@ def run(config, instance_data, model=None):
             best_sol["weights_num"],
             best_sol["weights_cat"],
             best_sol["bias"],
-        )
+        ),
     )
     test_flipping_error = mean_squared_error(
         instance_data.get_y_test_dataframe().to_numpy(),
@@ -240,34 +240,36 @@ def run(config, instance_data, model=None):
             best_sol["weights_num"],
             best_sol["weights_cat"],
             best_sol["bias"],
-        )
+        ),
     )
 
     print("RESULTS")
-    print('*' * short_space)
+    print("*" * short_space)
     print(
         f'Unpoisoned mse validation:      {regression_parameters_validation["mse"]:7.6f}'
     )
     print(
         f'Unpoisoned mse test:            {regression_parameters_test["mse"]:7.6f}'
     )
-    print('*' * short_space)
-    print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
-    print(f'Benchmark mse validation:        {validation_benchmark_error:7.6f}')
-    print(f'Benchmark mse test:              {test_benchmark_error:7.6f}')
-    print('*' * short_space)
-    print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
-    print(f'Flipping method mse validation:  {validation_flipping_error:7.6f}')
-    print(f'Flipping method mse test:        {test_flipping_error:7.6f}')
-    print('*' * short_space)
+    print("*" * short_space)
+    print(f'Benchmark mse:                   {benchmark_solution["mse"]:7.6f}')
     print(
-        f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
+        f"Benchmark mse validation:        {validation_benchmark_error:7.6f}"
+    )
+    print(f"Benchmark mse test:              {test_benchmark_error:7.6f}")
+    print("*" * short_space)
+    print(f'Flipping method mse:             {best_sol["mse"]:7.6f}')
+    print(f"Flipping method mse validation:  {validation_flipping_error:7.6f}")
+    print(f"Flipping method mse test:        {test_flipping_error:7.6f}")
+    print("*" * short_space)
+    print(
+        f'Improvement:                     {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
     print(
-        f'Improvement validation:          {(validation_flipping_error - regression_parameters_validation["mse"]) / regression_parameters_validation["mse"] * 100:7.6f}'
+        f"Improvement validation:          {(validation_flipping_error - validation_benchmark_error) / validation_benchmark_error * 100:7.6f}"
     )
     print(
-        f'Improvement test:                {(test_flipping_error - regression_parameters_test["mse"]) / regression_parameters_test["mse"] * 100:7.6f}'
+        f"Improvement test:                {(test_flipping_error - test_benchmark_error) / test_benchmark_error * 100:7.6f}"
     )
 
     # Save results as dictionary
@@ -280,7 +282,7 @@ def run(config, instance_data, model=None):
         "flippin_validation_mse": best_sol["mse"],
         "flipping_test_mse": best_sol["mse"],
         "benchmark_time": (benchmark_end - benchmark_start),
-        "flipping_time": (end - start)
+        "flipping_time": (end - start),
     }
 
     # Save results as dict using numpy
@@ -297,6 +299,7 @@ def run(config, instance_data, model=None):
     # best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
 
     return best_model, best_instance_data, best_sol
+
 
 def make_predictions(
     data_type: str,
@@ -321,8 +324,12 @@ def make_predictions(
         X = np.concatenate((X_num, X_cat), axis=1)
 
     if data_type == "validation":
-        X_cat = instance_data.get_cat_x_validation_dataframe(wide=True).to_numpy()
-        X_num = instance_data.get_num_x_validation_dataframe(wide=True).to_numpy()
+        X_cat = instance_data.get_cat_x_validation_dataframe(
+            wide=True
+        ).to_numpy()
+        X_num = instance_data.get_num_x_validation_dataframe(
+            wide=True
+        ).to_numpy()
         X = np.concatenate((X_num, X_cat), axis=1)
 
     weights = np.concatenate((numerical_weights, categorical_weights))
@@ -331,6 +338,7 @@ def make_predictions(
     predictions = np.dot(X, weights) + bias
 
     return predictions
+
 
 def save_dataframes(instance, solution, config, it):
     # Save poisoning samples after numerical attack
@@ -428,7 +436,7 @@ if __name__ == "__main__":
     seed = 1
 
     instance_data = instance_data_class.InstanceData(
-        config, benchmark_data=False, seed=1
+        config, benchmark_data=True, seed=1
     )
     numerical_model = None
 
