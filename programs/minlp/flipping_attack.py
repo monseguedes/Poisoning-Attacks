@@ -244,26 +244,30 @@ def run(config, instance_data, model=None):
     )
 
     print("RESULTS")
+    print('*' * short_space)
     print(
         f'Unpoisoned mse validation:      {regression_parameters_validation["mse"]:7.6f}'
     )
     print(
         f'Unpoisoned mse test:            {regression_parameters_test["mse"]:7.6f}'
     )
+    print('*' * short_space)
     print(f'Benchmark mse:       {benchmark_solution["mse"]:7.6f}')
     print(f'Benchmark mse validation:        {validation_benchmark_error:7.6f}')
     print(f'Benchmark mse test:              {test_benchmark_error:7.6f}')
+    print('*' * short_space)
     print(f'Flipping method mse: {best_sol["mse"]:7.6f}')
     print(f'Flipping method mse validation:  {validation_flipping_error:7.6f}')
     print(f'Flipping method mse test:        {test_flipping_error:7.6f}')
+    print('*' * short_space)
     print(
         f'Improvement:         {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
     )
     print(
-        f'Improvement validation:          {(best_sol["mse"] - regression_parameters_validation["mse"]) / regression_parameters_validation["mse"] * 100:7.6f}'
+        f'Improvement validation:          {(validation_flipping_error - regression_parameters_validation["mse"]) / regression_parameters_validation["mse"] * 100:7.6f}'
     )
     print(
-        f'Improvement test:                {(best_sol["mse"] - regression_parameters_test["mse"]) / regression_parameters_test["mse"] * 100:7.6f}'
+        f'Improvement test:                {(test_flipping_error - regression_parameters_test["mse"]) / regression_parameters_test["mse"] * 100:7.6f}'
     )
 
     # Save results as dictionary
