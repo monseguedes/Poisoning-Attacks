@@ -13,6 +13,7 @@ import numerical_attack
 import pyomo_model
 import ridge_regression
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import instance_data_class
 
 long_space = 80
 short_space = 60
@@ -274,13 +275,13 @@ def run(config, instance_data, model=None):
         "benchmark_test_mse": test_benchmark_error,
         "flippin_validation_mse": best_sol["mse"],
         "flipping_test_mse": best_sol["mse"],
-        "benchmark_time": (benchmark_end - benchmark_start).total_seconds(),
-        "flipping_time": (end - start).total_seconds(),
+        "benchmark_time": (benchmark_end - benchmark_start),
+        "flipping_time": (end - start)
     }
 
     # Save results as dict using numpy
     np.save(
-        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_gradient_results.npy",
+        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_bilevel_results.npy",
         results_dict,
     )
 
@@ -413,7 +414,7 @@ if __name__ == "__main__":
     import doctest
     import instance_data_class
 
-    with open("config.yml", "r") as config_file:
+    with open("programs/minlp/config.yml", "r") as config_file:
         config = yaml.safe_load(config_file)
 
     n_fails, _ = doctest.testmod()
