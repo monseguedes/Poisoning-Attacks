@@ -13,7 +13,7 @@ from os import path
 import numpy as np
 import pandas as pd
 
-import choosing_features
+# import choosing_features
 
 
 class InstanceData:
@@ -66,6 +66,8 @@ class InstanceData:
         # validating sets
         self.test_dataframe = whole_dataframe.drop(self.train_dataframe.index)
         self.test_dataframe = self.test_dataframe.reset_index(drop=True)
+
+        self.validation_dataframe = self.test_dataframe
 
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
@@ -900,70 +902,70 @@ def make_vertical_categorical_dataframe(df):
     return df
 
 
-def get_chosen_numerical_feature_names(df, no_chosen_numerical_features):
-    """Extract the column names of chosen numerical features
+# def get_chosen_numerical_feature_names(df, no_chosen_numerical_features):
+#     """Extract the column names of chosen numerical features
 
-    Examples #TODO how do I add more input
-    --------
-    >>> df = pd.DataFrame({
-    ...     "1":      [ 0,  1,  2],
-    ...     "2":      [ 3,  4,  5],
-    ...     "1:1":    [ 1,  0,  0],
-    ...     "1:2":    [ 0,  1,  0],
-    ...     "2:1":    [ 0,  0,  1],
-    ...     "2:2":    [ 0,  1,  0],
-    ...     "2:3":    [ 0,  0,  1],
-    ...     "target": [ 6,  7,  8],
-    ... })
-    >>> get_numerical_feature_column_names(df)
-    [1, 2]
+#     Examples #TODO how do I add more input
+#     --------
+#     >>> df = pd.DataFrame({
+#     ...     "1":      [ 0,  1,  2],
+#     ...     "2":      [ 3,  4,  5],
+#     ...     "1:1":    [ 1,  0,  0],
+#     ...     "1:2":    [ 0,  1,  0],
+#     ...     "2:1":    [ 0,  0,  1],
+#     ...     "2:2":    [ 0,  1,  0],
+#     ...     "2:3":    [ 0,  0,  1],
+#     ...     "target": [ 6,  7,  8],
+#     ... })
+#     >>> get_numerical_feature_column_names(df)
+#     [1, 2]
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
+#     Parameters
+#     ----------
+#     df : pandas.DataFrame
 
-    Returns
-    -------
-    names : list[int]
-    """
-    chosen_numerical = choosing_features.LASSOdataframe(df).get_features_lists(
-        no_chosen_numerical_features, 0
-    )[0]
+#     Returns
+#     -------
+#     names : list[int]
+#     """
+#     chosen_numerical = choosing_features.LASSOdataframe(df).get_features_lists(
+#         no_chosen_numerical_features, 0
+#     )[0]
 
-    return chosen_numerical
+#     return chosen_numerical
 
 
-def get_chosen_categorical_feature_names(df, no_chosen_categorical_features):
-    """Extract the column names of chosen numerical features
+# def get_chosen_categorical_feature_names(df, no_chosen_categorical_features):
+#     """Extract the column names of chosen numerical features
 
-    Examples #TODO how do I add more input
-    --------
-    >>> df = pd.DataFrame({
-    ...     "1":      [ 0,  1,  2],
-    ...     "2":      [ 3,  4,  5],
-    ...     "1:1":    [ 1,  0,  0],
-    ...     "1:2":    [ 0,  1,  0],
-    ...     "2:1":    [ 0,  0,  1],
-    ...     "2:2":    [ 0,  1,  0],
-    ...     "2:3":    [ 0,  0,  1],
-    ...     "target": [ 6,  7,  8],
-    ... })
-    >>> get_numerical_feature_column_names(df)
-    [1, 2]
+#     Examples #TODO how do I add more input
+#     --------
+#     >>> df = pd.DataFrame({
+#     ...     "1":      [ 0,  1,  2],
+#     ...     "2":      [ 3,  4,  5],
+#     ...     "1:1":    [ 1,  0,  0],
+#     ...     "1:2":    [ 0,  1,  0],
+#     ...     "2:1":    [ 0,  0,  1],
+#     ...     "2:2":    [ 0,  1,  0],
+#     ...     "2:3":    [ 0,  0,  1],
+#     ...     "target": [ 6,  7,  8],
+#     ... })
+#     >>> get_numerical_feature_column_names(df)
+#     [1, 2]
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
+#     Parameters
+#     ----------
+#     df : pandas.DataFrame
 
-    Returns
-    -------
-    names : list[int]
-    """
-    chosen_categorical = choosing_features.LASSOdataframe(
-        df
-    ).get_features_lists(0, no_chosen_categorical_features)[1]
+#     Returns
+#     -------
+#     names : list[int]
+#     """
+#     chosen_categorical = choosing_features.LASSOdataframe(
+#         df
+#     ).get_features_lists(0, no_chosen_categorical_features)[1]
 
-    return chosen_categorical
+#     return chosen_categorical
 
 
 def _cast_column_names_to_int(df, inplace=False):
