@@ -142,19 +142,28 @@ def run_not_poisoned(config, instance_data, data_type="train", wide=False):
         y = y_df.to_numpy()
         y_pred = model.predict(X)
         mse = mean_squared_error(y, y_pred)
+    elif data_type == 'validation':
+        num_dataframe = instance_data.get_num_x_validation_dataframe(wide=True)
+        cat_dataframe = instance_data.get_cat_x_validation_dataframe(wide=True)
+        y_df = instance_data.get_y_validation_dataframe()
+        X_df = pd.concat([num_dataframe, cat_dataframe], axis=1)
+        X = X_df.to_numpy()
+        y = y_df.to_numpy()
+        y_pred = model.predict(X)
+        mse = mean_squared_error(y, y_pred)
 
-    _weights_num.to_csv(
-        "programs/minlp/attacks/{}/initial_numerical_weights.csv".format(
-            config["dataset_name"]
-        )
-    )
-    _weights_cat.to_csv(
-        "programs/minlp/attacks/{}/initial_categorical_weights.csv".format(
-            config["dataset_name"]
-        )
-    )
+    # _weights_num.to_csv(
+    #     "programs/minlp/attacks/{}/initial_numerical_weights.csv".format(
+    #         config["dataset_name"]
+    #     )
+    # )
+    # _weights_cat.to_csv(
+    #     "programs/minlp/attacks/{}/initial_categorical_weights.csv".format(
+    #         config["dataset_name"]
+    #     )
+    # )
 
-    print(f"MSE: {mse}")
+    # print(f"MSE: {mse}")
 
     return {
         "weights_num": _weights_num,
