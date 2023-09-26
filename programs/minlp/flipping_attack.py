@@ -272,7 +272,9 @@ def run(config, instance_data, model=None):
         f"Improvement test:                {(test_flipping_error - test_benchmark_error) / test_benchmark_error * 100:7.6f}"
     )
     print("*" * short_space)
-    print(f"Benchmark omputation time:                {benchmark_end - benchmark_start:7.6f}")
+    print(
+        f"Benchmark omputation time:                {benchmark_end - benchmark_start:7.6f}"
+    )
     print(f"Flipping method computation time:         {end - start:7.6f}")
 
     # Save results as dictionary
@@ -282,7 +284,7 @@ def run(config, instance_data, model=None):
         "benchmark_mse": benchmark_solution["mse"],
         "benchmark_validation_mse": validation_benchmark_error,
         "benchmark_test_mse": test_benchmark_error,
-        "flippin_validation_mse": best_sol["mse"],
+        "flipping_validation_mse": best_sol["mse"],
         "flipping_test_mse": best_sol["mse"],
         "benchmark_time": (benchmark_end - benchmark_start),
         "flipping_time": (end - start),
@@ -466,10 +468,13 @@ if __name__ == "__main__":
     print(
         f"Gradient mse validation:         {dictionary.item()['poisoned_validation_mse']:7.6f}"
     )
-    print(f"Gradient mse test:             {dictionary.item()['poisoned_test_mse']:7.6f}")
+    print(
+        f"Gradient mse test:             {dictionary.item()['poisoned_test_mse']:7.6f}"
+    )
     print("*" * middle_space)
-    print(f"Computation time:              {dictionary.item()['compute_time']:7.6f}")  
-
+    print(
+        f"Computation time:              {dictionary.item()['compute_time']:7.6f}"
+    )
 
     # # Run the utitlity to check the results with scikitlearn
     # scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)
