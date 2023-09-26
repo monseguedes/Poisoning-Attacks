@@ -10,6 +10,7 @@ import pyomo
 import pyomo.environ as pyo
 import pyomo.kernel as pmo
 import os
+import bounding_procedure
 
 # import os
 # os.environ['NEOS_SERVER'] = 'neos-server.org:3333'
@@ -50,7 +51,16 @@ class PyomoModel(pmo.block):
         self.solver_name = config["solver_name"]
         self.tee = config["solver_output"]
         self.binary = config["binary"]
-        self.upper_bound = 1000
+        if config["bounding"] == False:
+            self.upper_bound = 10000
+        elif config["bounding"] == True:
+            self.upper_bound = bounding_procedure.find_bounds(
+                instance_data.train_dataframe.iloc[:, :-1],
+                instance_data.train_dataframe.iloc[:, -1],
+                instance_data.no_poison_samples,
+                config
+            )   
+
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
         elif self.solver_name == "knitro":
@@ -303,10 +313,9 @@ class PyomoModel(pmo.block):
                     domain=pmo.Binary
                 )
 
-        # TODO Fix bounds.
-        # upper_bound = bnd.find_bounds(instance_data, self)
-        upper_bound = 10000
+        upper_bound = self.upper_bound
         lower_bound = -upper_bound
+        
         print(f"Upper bound is: {upper_bound:.2f}")
         print(f"Lower bound is: {lower_bound:.2f}")
 
