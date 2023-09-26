@@ -53,13 +53,18 @@ class PyomoModel(pmo.block):
         self.binary = config["binary"]
         if config["bounding"] == False:
             self.upper_bound = 10000
+            self.lb_intercept = -10000
+            self.up_intercept = 10000
         elif config["bounding"] == True:
-            self.upper_bound = bounding_procedure.find_bounds(
+            bounds = bounding_procedure.find_bounds(
                 instance_data.train_dataframe.iloc[:, :-1],
                 instance_data.train_dataframe.iloc[:, -1],
                 instance_data.no_poison_samples,
                 config,
             )
+            self.upper_bound = bounds[0]
+            self.lb_intercept = bounds[2]
+            self.up_intercept = bounds[1]
 
         if self.solver_name == "ipopt":
             self.opt = pyo.SolverFactory("ipopt")
@@ -316,8 +321,10 @@ class PyomoModel(pmo.block):
         upper_bound = self.upper_bound
         lower_bound = -upper_bound
 
-        print(f"Upper bound is: {upper_bound:.2f}")
-        print(f"Lower bound is: {lower_bound:.2f}")
+        print(f"Weights upper bound is: {upper_bound:.2f}")
+        print(f"Weights lower bound is: {lower_bound:.2f}")
+        print(f"Intercept upper bound is: {upper_bound:.2f}")
+        print(f"Weights lower bound is: {lower_bound:.2f}"))
 
         self.weights_num = pmo.variable_dict()
         for numfeature in instance_data.numerical_feature_names:
