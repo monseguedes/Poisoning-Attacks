@@ -1,0 +1,28 @@
+
+# Dataset
+dataset_name: "5num5cat"
+training_samples: 300
+poison_rate: 20
+seed: 3
+
+# Problem
+function: "MSE"
+binary: False
+regularization: 0.1
+
+# Solvers
+solver_name: "knitro"
+solver_output: True
+feasibility: 0.00001
+time_limit: 300
+
+# Numerical attack
+numerical_attack_n_epochs: 1
+numerical_attack_mini_batch_size: 0.5
+numerical_attack_incremental: False
+
+# Iterative attack
+iterative_attack_n_epochs: 1
+
+# Flipping attack
+flipping_attack_n_epochs: 1

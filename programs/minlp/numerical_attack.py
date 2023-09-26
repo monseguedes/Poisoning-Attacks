@@ -5,10 +5,12 @@ import timeit
 
 import numpy as np
 import pandas as pd
+import yaml
 
 import pyomo_model
 import ridge_regression
 import testing
+
 
 long_space = 80
 short_space = 60
@@ -130,7 +132,7 @@ def run(config, instance_data, model=None):
                 num_feature_flag[:, None],
                 model.POISON_DATA_FIXED,
             )
-            if config["solver_name"] == 'neos':
+            if config["solver_name"] == "neos":
                 model.solve(neos=True)
             else:
                 model.solve()
@@ -171,14 +173,18 @@ def run(config, instance_data, model=None):
 
 if __name__ == "__main__":
     import doctest
-    from main import config
     import instance_data_class
+
+    with open("config.yml", "r") as config_file:
+        config = yaml.safe_load(config_file)
 
     n_fails, _ = doctest.testmod()
     if n_fails > 0:
         raise SystemExit(1)
-    
-    instance_data = instance_data_class.InstanceData(config, benchmark_data = False)
+
+    instance_data = instance_data_class.InstanceData(
+        config, benchmark_data=False
+    )
     numerical_model = None
 
     _, instance_data, regression_parameters = run(

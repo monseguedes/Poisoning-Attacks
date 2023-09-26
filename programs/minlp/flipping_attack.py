@@ -6,6 +6,8 @@ import copy
 import timeit
 
 import numpy as np
+import pandas as pd
+import yaml
 
 import categorical_attack
 import numerical_attack
@@ -323,25 +325,32 @@ def flip_row():
 
 if __name__ == "__main__":
     import doctest
-    from main import config
     import instance_data_class
+
+    with open("config.yml", "r") as config_file:
+        config = yaml.safe_load(config_file)
 
     n_fails, _ = doctest.testmod()
     if n_fails > 0:
         raise SystemExit(1)
-    
+
     seed = 1
 
-    instance_data = instance_data_class.InstanceData(config, benchmark_data=True, seed=1)
+    instance_data = instance_data_class.InstanceData(
+        config, benchmark_data=True, seed=1
+    )
     numerical_model = None
 
     _, instance_data, regression_parameters = run(
         config, instance_data, numerical_model
     )
 
-    # Print gradient results 
+    # Print gradient results
     # Load npy file
-    dictionary = np.load(f"programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy", allow_pickle=True)
+    dictionary = np.load(
+        f"programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy",
+        allow_pickle=True,
+    )
     # Print dictionary
     print("Gradient results")
     print(dictionary.item())
