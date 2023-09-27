@@ -89,24 +89,24 @@ def run(config, instance_data, model=None):
     best_solution = regression_parameters
     best_instance_data = instance_data
 
-    # Project numerical features
-    if config["binary"]:
-        round_except_last = (
-            lambda x: round(x, 0)
-            if x.name != best_instance_data.poison_dataframe.columns[-1]
-            else x
-        )
-        best_instance_data.poison_dataframe = (
-            best_instance_data.poison_dataframe.apply(round_except_last)
-        )
-        round_except_last = (
-            lambda x: round(x, 0)
-            if x.name != instance_data.poison_dataframe.columns[-1]
-            else x
-        )
-        instance_data.poison_dataframe = instance_data.poison_dataframe.apply(
-            round_except_last
-        )
+    # # Project numerical features
+    # if config["binary"]:
+    #     round_except_last = (
+    #         lambda x: round(x, 0)
+    #         if x.name != best_instance_data.poison_dataframe.columns[-1]
+    #         else x
+    #     )
+    #     best_instance_data.poison_dataframe = (
+    #         best_instance_data.poison_dataframe.apply(round_except_last)
+    #     )
+    #     round_except_last = (
+    #         lambda x: round(x, 0)
+    #         if x.name != instance_data.poison_dataframe.columns[-1]
+    #         else x
+    #     )
+    #     instance_data.poison_dataframe = instance_data.poison_dataframe.apply(
+    #         round_except_last
+    #     )
 
     start = timeit.timeit()
     for epoch in range(n_epochs):
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     import doctest
     import instance_data_class
 
-    with open("config.yml", "r") as config_file:
+    with open("programs/minlp/config.yml", "r") as config_file:
         config = yaml.safe_load(config_file)
 
     n_fails, _ = doctest.testmod()
