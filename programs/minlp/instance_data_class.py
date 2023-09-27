@@ -17,7 +17,7 @@ import pandas as pd
 
 
 class InstanceData:
-    def __init__(self, config, benchmark_data=False, seed=123):
+    def __init__(self, config, benchmark_data=False, seed=123, poisoning_rate=0.2):
         """
         The initialization corresponds to the data for the first iteration.
         If there are no iterations (single attack strategy).
@@ -98,7 +98,7 @@ class InstanceData:
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
             poison_array = np.load(
-                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy"
+                f"programs/benchmark/manip-ml-master/datasets/house/{seed}_{int(poisoning_rate * 100)}_poison_array.npy"
             )
             self.poison_dataframe = pd.DataFrame(
                 poison_array, columns=whole_dataframe.columns
