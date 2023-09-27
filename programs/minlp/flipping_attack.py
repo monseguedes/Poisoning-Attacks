@@ -284,8 +284,9 @@ def run(config, instance_data, model=None):
         "benchmark_mse": benchmark_solution["mse"],
         "benchmark_validation_mse": validation_benchmark_error,
         "benchmark_test_mse": test_benchmark_error,
-        "flipping_validation_mse": best_sol["mse"],
-        "flipping_test_mse": best_sol["mse"],
+        "flipping_mse": best_sol["mse"],
+        "flipping_validation_mse": validation_flipping_error,
+        "flipping_test_mse": test_flipping_error,
         "benchmark_time": (benchmark_end - benchmark_start),
         "flipping_time": (end - start),
     }
