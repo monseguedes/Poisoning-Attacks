@@ -204,7 +204,7 @@ def open_logging_files(logdir, modeltype, logind, args):
 
 
 # -------------------------------------------------------------------------------
-def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
+def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed, no_poisoning_samples):
     size = x.shape[0]
     print(size)
 
@@ -251,7 +251,7 @@ def sample_dataset(x, y, trnct, poisct, tstct, vldct, seed):
     poison_matrix = np.hstack((poisx, np.matrix(poisy).T))
     poison_array = np.asarray(poison_matrix)
     np.save(
-        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_poison_array.npy",
+        f"programs/benchmark/manip-ml-master/datasets/house/{seed}_{no_poisoning_samples}_poison_array.npy",
         poison_array,
     )
 
@@ -588,7 +588,7 @@ def main(args):
         validx,
         validy,
     ) = sample_dataset(
-        x, y, args.trainct, args.poisct, args.testct, args.validct, args.seed
+        x, y, args.trainct, args.poisct, args.testct, args.validct, args.seed, args.poisct
     )
 
     for i in range(len(testy)):
