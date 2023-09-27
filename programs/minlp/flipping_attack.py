@@ -3,7 +3,7 @@
 """Flipping heuristic attack which poisons both numerical and categorical data"""
 
 import copy
-import timeit
+import time
 
 import numpy as np
 import pandas as pd
@@ -71,12 +71,12 @@ def run(config, instance_data, model=None):
         config, instance_data
     )
     config["iterative_attack_incremental"] = False
-    config["bounding"] = True
-    benchmark_end = timeit.timeit()
+    config["bounding"] = False
+    benchmark_end = time.time()
 
     # Start flipping attack-------------------------------------------------
     numerical_model = model  # Reset model to None
-    start = timeit.timeit()
+    start = time.time()
     for epoch in range(n_epochs):
         (
             numerical_model,
@@ -179,7 +179,7 @@ def run(config, instance_data, model=None):
 
             mse_iteration_array.append(best_sol["mse"])
 
-        config["numerical_attack_mini_batch_size"] = 0.5
+        # config["numerical_attack_mini_batch_size"] = 0.5
         (
             numerical_model,
             numerical_attack_instance_data,
@@ -199,7 +199,7 @@ def run(config, instance_data, model=None):
         # best_instance_data.poison_dataframe = best_instance_data.poison_dataframe.apply(round_except_last)
         # best_sol = ridge_regression.run(config, instance_data)
 
-    end = timeit.timeit()
+    end = time.time()
 
     # Get test and validation errors.
     validation_benchmark_error = mean_squared_error(
@@ -273,9 +273,9 @@ def run(config, instance_data, model=None):
     )
     print("*" * short_space)
     print(
-        f"Benchmark omputation time:                {benchmark_end - benchmark_start:7.6f}"
+        f"Benchmark computation time:      {benchmark_end - benchmark_start:7.6f}"
     )
-    print(f"Flipping method computation time:         {end - start:7.6f}")
+    print(f"Flipping computation time:     {end - start:7.6f}")
 
     # Save results as dictionary
     results_dict = {
@@ -284,16 +284,18 @@ def run(config, instance_data, model=None):
         "benchmark_mse": benchmark_solution["mse"],
         "benchmark_validation_mse": validation_benchmark_error,
         "benchmark_test_mse": test_benchmark_error,
+        "benchmark_parameters": benchmark_solution,
         "flipping_mse": best_sol["mse"],
         "flipping_validation_mse": validation_flipping_error,
         "flipping_test_mse": test_flipping_error,
+        "flipping_parameters": best_sol,
         "benchmark_time": (benchmark_end - benchmark_start),
         "flipping_time": (end - start),
     }
 
     # Save results as dict using numpy
     np.save(
-        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_bilevel_results.npy",
+        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_{config['numerical_attack_mini_batch_size']}_bilevel_results.npy",
         results_dict,
     )
 
@@ -439,10 +441,10 @@ if __name__ == "__main__":
     if n_fails > 0:
         raise SystemExit(1)
 
-    seed = 1
+    seed = 2
 
     instance_data = instance_data_class.InstanceData(
-        config, benchmark_data=True, seed=1
+        config, benchmark_data=True, seed=seed
     )
     numerical_model = None
 
@@ -470,11 +472,11 @@ if __name__ == "__main__":
         f"Gradient mse validation:         {dictionary.item()['poisoned_validation_mse']:7.6f}"
     )
     print(
-        f"Gradient mse test:             {dictionary.item()['poisoned_test_mse']:7.6f}"
+        f"Gradient mse test:               {dictionary.item()['poisoned_test_mse']:7.6f}"
     )
     print("*" * middle_space)
     print(
-        f"Computation time:              {dictionary.item()['compute_time']:7.6f}"
+        f"Computation time:                {dictionary.item()['compute_time']:7.6f}"
     )
 
     # # Run the utitlity to check the results with scikitlearn

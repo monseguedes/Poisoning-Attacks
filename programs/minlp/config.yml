@@ -9,7 +9,7 @@ seed: 3
 function: "MSE"
 binary: False
 regularization: 0.1
-bounding: True
+bounding: False
 
 # Solvers
 solver_name: "knitro"
@@ -19,7 +19,7 @@ time_limit: 300
 
 # Numerical attack
 numerical_attack_n_epochs: 1
-numerical_attack_mini_batch_size: 0.5
+numerical_attack_mini_batch_size: 20
 numerical_attack_incremental: False
 
 # Categorical attack
