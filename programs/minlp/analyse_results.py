@@ -33,14 +33,18 @@ bilevel_dict = np.load(
 
 # Print formatted table with all columns aligned, including headings
 print(
-    f"{'Score':<25}  {'Gradient':<25}  {'Benchmark':<25}  {'Our Method':<25} \\"
+    f"{'Score':<25}  {'Gradient':<25}  {'Benchmark':<25}  {'Our Method':<25} \n"
 )
 print("-" * 100)
 print(
-    f"{'Poisoned mse validation':<25}  {gradient_dict.item()['poisoned_validation_mse']:<25}  {bilevel_dict.item()['benchmark_validation_mse']:<25}  {bilevel_dict.item()['flippin_validation_mse']:<25} \\"
+    f"{'Unpoisoned mse validation':<25}  {gradient_dict.item()['unpoisoned_validation_mse']:<25}  {bilevel_dict.item()['unpoisoned_validation_mse']:<25}  {'-':<25} \n"
 )
 print(
-    f"{'Poisoned mse test':<25}  {gradient_dict.item()['poisoned_test_mse']:<25}  {bilevel_dict.item()['benchmark_test_mse']:<25}  {bilevel_dict.item()['flipping_test_mse']:<25} \\"
+    f"{'Unpoisoned mse test':<25}  {gradient_dict.item()['unpoisoned_test_mse']:<25}  {bilevel_dict.item()['unpoisoned_test_mse']:<25}  {'-':<25} \n"
 )
-
-
+print(
+    f"{'Poisoned mse validation':<25}  {gradient_dict.item()['poisoned_validation_mse']:<25}  {bilevel_dict.item()['benchmark_validation_mse']:<25}  {bilevel_dict.item()['flippin_validation_mse']:<25} \n"
+)
+print(
+    f"{'Poisoned mse test':<25}  {gradient_dict.item()['poisoned_test_mse']:<25}  {bilevel_dict.item()['benchmark_test_mse']:<25}  {bilevel_dict.item()['flipping_test_mse']:<25} \n"
+)
