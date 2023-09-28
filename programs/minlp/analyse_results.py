@@ -4,8 +4,9 @@ File to check results make sense
 
 import numpy as np
 
-seed = 3
+seed = 1
 poisoning_rate = 0.2
+subset_size = 6
 
 # Import gradient results
 gradient_dict = np.load(
@@ -17,7 +18,7 @@ print(gradient_dict)
 
 # Import bilevel results
 bilevel_dict = np.load(
-    f"programs/minlp/results/{seed}_{int(poisoning_rate * 100)}_bilevel_results.npy",
+    f"programs/minlp/results/{seed}_{int(poisoning_rate * 100)}_{subset_size}_bilevel_results.npy",
     allow_pickle=True,
 )
 
@@ -43,7 +44,7 @@ print(
     f"{'Unpoisoned mse test':<25}  {gradient_dict.item()['unpoisoned_test_mse']:<25}  {bilevel_dict.item()['unpoisoned_test_mse']:<25}  {'-':<25} \n"
 )
 print(
-    f"{'Poisoned mse validation':<25}  {gradient_dict.item()['poisoned_validation_mse']:<25}  {bilevel_dict.item()['benchmark_validation_mse']:<25}  {bilevel_dict.item()['flippin_validation_mse']:<25} \n"
+    f"{'Poisoned mse validation':<25}  {gradient_dict.item()['poisoned_validation_mse']:<25}  {bilevel_dict.item()['benchmark_validation_mse']:<25}  {bilevel_dict.item()['flipping_validation_mse']:<25} \n"
 )
 print(
     f"{'Poisoned mse test':<25}  {gradient_dict.item()['poisoned_test_mse']:<25}  {bilevel_dict.item()['benchmark_test_mse']:<25}  {bilevel_dict.item()['flipping_test_mse']:<25} \n"
