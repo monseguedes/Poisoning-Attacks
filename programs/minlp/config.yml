@@ -4,22 +4,23 @@ dataset_name: "5num5cat"
 training_samples: 300
 poison_rate: 20
 seed: 3
+runs: 40
 
 # Problem
 function: "MSE"
 binary: False
-regularization: 0.1
+regularization: 0.001
 bounding: False
 
 # Solvers
-solver_name: "knitro"
+solver_name: "neos"
 solver_output: True
 feasibility: 0.00001
 time_limit: 300
 
 # Numerical attack
 numerical_attack_n_epochs: 1
-numerical_attack_mini_batch_size: 20
+numerical_attack_mini_batch_size: 6
 numerical_attack_incremental: False
 
 # Categorical attack
