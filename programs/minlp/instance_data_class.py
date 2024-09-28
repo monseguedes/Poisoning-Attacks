@@ -17,7 +17,7 @@ import pandas as pd
 
 
 class InstanceData:
-    def __init__(self, config, benchmark_data=False, seed=123):
+    def __init__(self, config, benchmark_data=False, seed=123, thesis=False):
         """
         The initialization corresponds to the data for the first iteration.
         If there are no iterations (single attack strategy).
@@ -33,12 +33,19 @@ class InstanceData:
             path.join(dataset_directory, "data-binary.csv"), index_col=[0]
         )
 
+        if thesis:
+            dataset_directory = path.join("data", "thesis_" + config["dataset"], config["dataset_name"])
+            whole_dataframe = pd.read_csv(
+                path.join(dataset_directory, "data-binary.csv"), index_col=[0]
+            )
+
         if benchmark_data:
             # ALTERNATIVE FROM BENCHMARK-----------------
             whole_dataframe = pd.read_csv(
                 f"programs/benchmark/manip-ml-master/datasets/house/{seed}_whole_dataframe.csv",
                 index_col=[0],
             )
+
 
         _cast_column_names_to_int(whole_dataframe, inplace=True)
 
