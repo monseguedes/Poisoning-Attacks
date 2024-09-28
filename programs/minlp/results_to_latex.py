@@ -5,6 +5,8 @@ Results to latex table
 import numpy as np
 import instance_data_class
 import plots
+import os
+import numerical_attack
 
 def main_comparison_table(config):
     """
@@ -129,7 +131,108 @@ def main_comparison_table(config):
     """
     print(footer)
 
+def SAS_vs_IAS_table(config):
+    """
+    \begin{table}[!htbp]
+    \centering
+    \captionof{table}{Comparison of the iterative attack strategy (IAS) and the shifting attack strategy (SAS). \todo{update}}\label{tab: SAS vs IAS}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    Dataset & $r$(\%) & MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)}\\
+    \midrule
+    \textit{House Price} & 4 & 0.00676 & 0.00679 & 0.4308 \\
+    & 8  & 0.00623 & 0.00653 & 4.7404 \\
+    & 12  & 0.00618 & 0.00626 & 1.3952 \\
+    & 16  & 0.00623 & 0.00653 & 4.7404 \\
+    & 20  & 0.00623 & 0.00653 & 4.7404 \\
+    \midrule
+    \textit{Healthcare} & 4 & 0.00676 & 0.00679 & 0.4308 \\
+    & 8  & 0.00623 & 0.00653 & 4.7404 \\
+    & 12  & 0.00618 & 0.00626 & 1.3952 \\
+    & 16  & 0.00623 & 0.00653 & 4.7404 \\
+    & 20  & 0.00623 & 0.00653 & 4.7404 \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+    """
 
+    header = r"""
+    \begin{table}[!htbp]
+    \centering
+    \captionof{table}{Comparison of the iterative attack strategy (IAS) and the shifting attack strategy (SAS). \todo{update}}\label{tab: SAS vs IAS}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    Dataset & $r$(\%) & MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)}\\
+    \midrule
+    """
+
+    print(header)
+
+    for dataset_name in ["house", "pharm"]:
+        if dataset_name == "pharm":
+            print(r"\midrule")
+        for i, poisoning_rate in enumerate([4, 8, 12, 16, 20]):
+            config["poison_rate"] = poisoning_rate
+            # Folder name of this experiment and rate
+            folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}"
+            # Iterative attack strategy results (IAS)------------------------------
+            ias_directory = f"results/IAS/{dataset_name}/{config['dataset_name']}"
+            # Check if results exist
+            if not os.path.exists(f"{ias_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running IAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = True
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, ias_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{ias_directory}/{folder_name}/results.npz", **ias_results)
+
+            else:
+                ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+                
+
+            # Shift attack strategy results (SAS)----------------------------------
+            sas_directory = f"results/SAS/{dataset_name}/{config['dataset_name']}"
+            # Check if results exist
+            if not os.path.exists(f"{sas_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running SAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = False
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, sas_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{sas_directory}/{folder_name}/results.npz", **sas_results)
+            else:
+                sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+
+            if poisoning_rate == 4:
+                print(
+                    f"\\textit{{{dataset_name}}}"
+                    + f" & {poisoning_rate}"
+                    + f" & {ias_results['mse']}"
+                    + f" & {sas_results['mse']}"
+                    + f" & {(sas_results['mse'] - ias_results['mse']) / ias_results['mse']} \\\\"
+                )
+            
+            else:
+                print(
+                    f"& {poisoning_rate}"
+                    + f" & {ias_results['mse']}"
+                    + f" & {sas_results['mse']}"
+                    + f" & {(sas_results['mse'] - ias_results['mse']) / ias_results['mse']} \\\\"
+                )
+
+    footer = r"""
+    \bottomrule
+    \end{tabular}
+    \end{table}
+    """
+    print(footer)
+     
 
 
 if __name__ == "__main__":
@@ -141,4 +244,17 @@ if __name__ == "__main__":
         "dataset_name": "5num5cat",
         "seed": 123,
     }
-    main_comparison_table(config)
+    # main_comparison_table(config)
+
+    # load config yaml
+    import yaml
+    with open("programs/minlp/config.yml", "r") as config_file:
+        config = yaml.safe_load(config_file)
+
+    config["numerical_attack_mini_batch_size"] = 6
+    config["dataset_name"] = "5num5cat"
+    config["dataset"] = "house"
+    config["seed"] = 123   
+    config["regularization"] = 0.001 
+
+    SAS_vs_IAS_table(config)
