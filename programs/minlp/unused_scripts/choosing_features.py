@@ -43,14 +43,15 @@ def create_dataframe(name: str):
         df_columns = [catfeature + ":" + category for category in categories]
         has_one = df[df_columns].eq(1).any(axis=1).all()
         check.append(has_one)
-    print(np.all(check))
+    # print(np.all(check))
 
     return dataframe
 
 
 class LASSOdataframe:
-    def __init__(self, dataframe: pd.DataFrame):
+    def __init__(self, dataframe: pd.DataFrame, name_dataset: str):
         self.dataframe = dataframe
+        self.name_dataset = name_dataset
 
     def get_features_lists(self, no_numerical: int, no_categorical: int):
         """
@@ -135,8 +136,8 @@ class LASSOdataframe:
             numerical_features = {}
             # Make sure LASSO selects enough features
             while no_numerical > len(numerical_features):
-                print(no_numerical)
-                print(len(numerical_features))
+                # print(no_numerical)
+                # print(len(numerical_features))
                 self.get_used_features(alpha)
                 # print(alpha)
                 if alpha > 0.001:
@@ -146,6 +147,7 @@ class LASSOdataframe:
                     for key, value in self.coeffs_used_features.items()
                     if ":" not in key
                 }
+            print("test")
             chosen_numerical = sorted(
                 numerical_features, key=numerical_features.get, reverse=True
             )[:no_numerical]
@@ -167,6 +169,7 @@ class LASSOdataframe:
         else:
             max_dict = {}
             while no_categorical > len(max_dict):
+                # print(no_categorical)
                 self.get_used_features(alpha)
                 categorical_features = {
                     key: abs(value)
@@ -208,7 +211,7 @@ class LASSOdataframe:
                 ],
                 axis=1,
             )
-            print(categorical_dataframe.head())
+            # print(categorical_dataframe.head())
             new_categorical_columns_dict = {
                 str(feature) + ":": str(i) + "_"
                 for i, feature in enumerate(self.chosen_categorical)
@@ -224,7 +227,7 @@ class LASSOdataframe:
                     )
             columns = [x.replace("_", ":") for x in columns]
 
-            print(columns)
+            # print(columns)
 
             # Currently, the categories are 1-based. We are updating them to be 0-based.
             # For example, if columns are ["1:1", "1:2", "1:3", "2:1", "2:2"],
@@ -233,8 +236,6 @@ class LASSOdataframe:
             g = lambda x: f"{x[0]}:{x[1]}"
             lm = lambda f, lst: list(map(f, lst))
             columns = lm(g, lm(f, (lm(int, x.split(":")) for x in columns)))
-
-            raise SystemExit
 
             categorical_dataframe.columns = columns
             whole_dataframe = pd.concat(
@@ -253,7 +254,7 @@ class LASSOdataframe:
         dataset_name = (
             str(self.no_numerical) + "num" + str(self.no_categorical) + "cat"
         )
-        directory = os.path.join("data", dataset_name)
+        directory = os.path.join("data", "thesis_" + self.name_dataset, dataset_name)
 
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -262,8 +263,9 @@ class LASSOdataframe:
 
 
 if __name__ == "__main__":
-    dataframe = create_dataframe("house")
-    model = LASSOdataframe(dataframe)
-    model.get_features_lists(6, 6)
+    name = "house"
+    dataframe = create_dataframe(name)
+    model = LASSOdataframe(dataframe, name)
+    model.get_features_lists("all", 5)
     print("Done features")
     model.save_new_dataframe()
