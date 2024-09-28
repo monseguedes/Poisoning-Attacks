@@ -8,6 +8,8 @@ import time
 import numpy as np
 import pandas as pd
 import yaml
+# import timeit
+import time
 
 import numerical_attack
 import pyomo_model
@@ -64,7 +66,7 @@ def run(config, instance_data, model=None):
     )
 
     # Solve benchmark-------------------------------------------------------
-    benchmark_start = timeit.timeit()
+    benchmark_start = time.time()
     config["iterative_attack_incremental"] = True
     config["bounding"] = False
     _, benchmark_data, benchmark_solution = numerical_attack.run(

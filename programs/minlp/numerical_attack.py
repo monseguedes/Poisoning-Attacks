@@ -1,7 +1,8 @@
 """Run iterative attack which which poison training data row by row"""
 
 import copy
-import timeit
+# import timeit
+import time
 
 import numpy as np
 import pandas as pd
@@ -108,7 +109,7 @@ def run(config, instance_data, model=None):
     #         round_except_last
     #     )
 
-    start = timeit.timeit()
+    start = time.time()
     for epoch in range(n_epochs):
         for mini_batch_index in range(n_mini_batches):
             # Modify num_feature_flag to specify which features are to be
@@ -155,7 +156,7 @@ def run(config, instance_data, model=None):
                 f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
             )
 
-    end = timeit.timeit()
+    end = time.time()
 
     best_solution["computational_time"] = end - start
 
