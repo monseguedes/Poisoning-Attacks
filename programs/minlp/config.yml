@@ -3,17 +3,18 @@
 dataset_name: "5num5cat"
 training_samples: 300
 poison_rate: 20
+poison_rates: [4, 8, 12, 16, 20]
 seed: 3
 runs: 40
 
 # Problem
 function: "MSE"
 binary: False
-regularization: 0.001
+regularization: 0.0001
 bounding: False
 
 # Solvers
-solver_name: "neos"
+solver_name: "knitro"
 solver_output: True
 feasibility: 0.00001
 time_limit: 300

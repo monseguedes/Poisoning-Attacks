@@ -137,11 +137,11 @@ class LASSOdataframe:
             # Make sure LASSO selects enough features
             while no_numerical > len(numerical_features):
                 # print(no_numerical)
-                # print(len(numerical_features))
+                print(len(numerical_features))
                 self.get_used_features(alpha)
-                # print(alpha)
-                if alpha > 0.001:
-                    alpha -= 0.001
+                print(alpha)
+                if alpha > 0.0001:
+                    alpha -= 0.0001
                 numerical_features = {
                     int(key): abs(value)
                     for key, value in self.coeffs_used_features.items()
@@ -162,10 +162,13 @@ class LASSOdataframe:
                     [
                         column.split(":")[0]
                         for column in self.features_dataframe.columns
-                        if ":" in column
+                        if ":" in column and "18:" not in column
                     ]
                 )
             )
+
+            print([column for column in self.features_dataframe.columns])
+
         else:
             max_dict = {}
             while no_categorical > len(max_dict):
@@ -181,6 +184,8 @@ class LASSOdataframe:
                     if key_type not in max_dict or value > max_dict[key_type]:
                         max_dict[key_type] = value
                 alpha -= 0.001
+                print(alpha)
+                print(len(max_dict))
 
             chosen_categorical = sorted(
                 max_dict, key=max_dict.get, reverse=True
@@ -211,11 +216,11 @@ class LASSOdataframe:
                 ],
                 axis=1,
             )
-            # print(categorical_dataframe.head())
             new_categorical_columns_dict = {
                 str(feature) + ":": str(i) + "_"
                 for i, feature in enumerate(self.chosen_categorical)
             }
+      
             columns = list(categorical_dataframe.columns)
             for i in range(len(columns)):
                 for (
@@ -227,7 +232,6 @@ class LASSOdataframe:
                     )
             columns = [x.replace("_", ":") for x in columns]
 
-            # print(columns)
 
             # Currently, the categories are 1-based. We are updating them to be 0-based.
             # For example, if columns are ["1:1", "1:2", "1:3", "2:1", "2:2"],
@@ -266,6 +270,6 @@ if __name__ == "__main__":
     name = "house"
     dataframe = create_dataframe(name)
     model = LASSOdataframe(dataframe, name)
-    model.get_features_lists("all", 5)
+    model.get_features_lists(5, 10)
     print("Done features")
     model.save_new_dataframe()

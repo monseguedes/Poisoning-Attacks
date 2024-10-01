@@ -296,10 +296,10 @@ def run(config, instance_data, model=None):
     }
 
     # Save results as dict using numpy
-    np.save(
-        f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_{config['numerical_attack_mini_batch_size']}_bilevel_results.npy",
-        results_dict,
-    )
+    # np.save(
+    #     f"programs/minlp/results/{config['seed']}_{config['poison_rate']}_{config['numerical_attack_mini_batch_size']}_bilevel_results.npy",
+    #     results_dict,
+    # )
 
     # TODO: should I add new items to best_sol or should I return new dictionary?
     # best_sol["mse_per_iteration"] = mse_iteration_array
@@ -308,7 +308,7 @@ def run(config, instance_data, model=None):
     # best_sol["benchmark_mse_final"] = benchmark_solution["mse"]
     # best_sol["benchmark_computational_time"] = benchmark_end - benchmark_start
 
-    return best_model, best_instance_data, best_sol
+    return best_model, best_instance_data, best_sol, results_dict
 
 
 def make_predictions(

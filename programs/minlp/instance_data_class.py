@@ -28,13 +28,13 @@ class InstanceData:
 
         # Whole dataframe with features as columns and target column,
         # as in file (1,2,3..,1:1,1:2,...,target).
-        dataset_directory = path.join("data", config["dataset_name"])
-        whole_dataframe = pd.read_csv(
-            path.join(dataset_directory, "data-binary.csv"), index_col=[0]
-        )
-
         if thesis:
             dataset_directory = path.join("data", "thesis_" + config["dataset"], config["dataset_name"])
+            whole_dataframe = pd.read_csv(
+                path.join(dataset_directory, "data-binary.csv"), index_col=[0]
+            )
+        else:
+            dataset_directory = path.join("data", config["dataset_name"])
             whole_dataframe = pd.read_csv(
                 path.join(dataset_directory, "data-binary.csv"), index_col=[0]
             )
@@ -52,7 +52,7 @@ class InstanceData:
         # Pick fixed number of trainig samples.
         # The indexes are not reset, but randomly shuffled
         training_samples = config["training_samples"]
-        seed = config["seed"]
+        # seed = config["seed"]
         self.train_dataframe = whole_dataframe.sample(
             frac=None, n=training_samples, random_state=seed
         )
