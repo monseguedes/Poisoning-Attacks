@@ -9,8 +9,8 @@ __pycache__
 vimquickrun.sh
 
 # ignore binaries
-*.pdf
-*.png
+# *.pdf
+# *.png
 *.jpg
 
 *.yaml

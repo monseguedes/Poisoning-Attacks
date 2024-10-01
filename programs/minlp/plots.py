@@ -324,16 +324,16 @@ def new_plot_mse(config, data_type="train", just_average=True):
                     config, instance_data, data_type="train"
                 )
                 unposioned_results.append(unpoisoned_results["mse"])
-                plt.title("Average MSE Comparison (Training data)")
+                plt.title("Average MSE Comparison (Training data)", y=1.03)
             elif data_type == "test":
                 benchmark_results.append(results_dict["benchmark_test_mse"])
                 flipping_results.append(results_dict["flipping_test_mse"])
-                instance_data = instance_data_class.InstanceData(config)
+                instance_data = instance_data_class.InstanceData(config, seed=run, thesis=True)
                 unpoisoned_results = ridge_regression.run_not_poisoned(
                     config, instance_data, data_type="test"
                 )
                 unposioned_results.append(unpoisoned_results["mse"])
-                plt.title("Average MSE Comparison (Testing data)")
+                plt.title("Average MSE Comparison (Testing data)", y=1.03)
 
             improvements = [
                 (flipping_results[i] - benchmark_results[i]) / benchmark_results[i]
@@ -383,46 +383,43 @@ def new_plot_mse(config, data_type="train", just_average=True):
         ax.text(
             poisoning_rate + 0.2,
             min_value + (max_value - min_value) / 2,
-            f"{geometric_mean:.0f}%",
-            fontsize=8,
+            str(int(geometric_mean * 100)) + "%",
+            fontsize=12,
         )
 
-        # if not just_average:
-        #     ax.scatter(
-        #         [poisoning_rate] * len(flipping_results["mse_final"]),
-        #         flipping_results["mse_final"],
-        #         marker="o",
-        #         color="lightcoral",
-        #         alpha=0.3,
-        #         s=5,
-        #     )
-        #     ax.scatter(
-        #         [poisoning_rate] * len(benchmark_results["mse_final"]),
-        #         benchmark_results["mse_final"],
-        #         marker="o",
-        #         color="lightskyblue",
-        #         alpha=0.3,
-        #         s=5,
-        #     )
+        #f"{geometric_mean:.0f}%"
 
-        #     # Add legend
-        #     ax.legend(
-        #         [
-        #             "Average Flipping",
-        #             "Average Benchmark",
-        #             "All Flipping",
-        #             "All Benchmark",
-        #         ]
-        #     )
-        #     file_name = "mse_all.pdf"
-        # else:
-        
-        ax.legend(["IFCF", "Şuvak et al.", "Unpoisoned"])
+        if not just_average:
+            ax.scatter(
+                [poisoning_rate] * len(flipping_results),
+                flipping_results,
+                marker="o",
+                color="lightcoral",
+                alpha=0.4,
+                s=5,
+            )
+            ax.scatter(
+                [poisoning_rate] * len(benchmark_results),
+                benchmark_results,
+                marker="o",
+                color="lightskyblue",
+                alpha=0.4,
+                s=5,
+            )
+
+            # Add legend
+            ax.legend(
+                ["IFCF", "Şuvak et al.", "Unpoisoned"]
+            )
+            file_name = "mse_all.pdf"
+        else:
+            ax.legend(["IFCF", "Şuvak et al.", "Unpoisoned"])
     
-    file_name = f"{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+    file_name = f"{data_type}_{config['runs']}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
 
     plt.ylim(0, max(averages) * 1.1)
-    # plt.xlim(0, max(config["poison_rates"]) * 1.1)
+    plt.xlim(2,22)
+    plt.xticks([int(r) for r in config["poison_rates"]])
 
     # Save plot
     fig.savefig(
@@ -435,7 +432,7 @@ def new_plot_mse(config, data_type="train", just_average=True):
         f"results/plots/{config['dataset']}/{config['dataset_name']}/{file_name}.png",
         bbox_inches="tight",
         dpi=300,
-        transparent=True,
+        transparent=False
     )
     plt.show()
 
@@ -448,7 +445,7 @@ if __name__ == "__main__":
 
     config["dataset"] = "house"
     config["regularization"] = 0.1 
-    config["runs"] = 1
+    config["runs"] = 20
     config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.5
-    new_plot_mse(config)
+    new_plot_mse(config, just_average=False, data_type="test")
