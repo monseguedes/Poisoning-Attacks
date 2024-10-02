@@ -443,7 +443,7 @@ if __name__ == "__main__":
 
     # plot_mse(config, "test")
 
-    config["dataset"] = "house"
+    config["dataset"] = "pharm"
     config["regularization"] = 0.1 
     config["runs"] = 20
     config["dataset_name"] = "allnum5cat"

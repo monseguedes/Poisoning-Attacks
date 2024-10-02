@@ -566,7 +566,7 @@ if __name__ == "__main__":
     # SAS_vs_IAS_table(config)
     # all_SAS_vs_IAS_table(config)
 
-    config["runs"] = 1
-    config["dataset_name"] = "allnumallcat"
+    config["runs"] = 10
+    config["dataset_name"] = "allnum10cat"
     config["numerical_attack_mini_batch_size"] = 0.5
     IFCF_comparison_table(config)
