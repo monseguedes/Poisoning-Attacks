@@ -443,9 +443,9 @@ if __name__ == "__main__":
 
     # plot_mse(config, "test")
 
-    config["dataset"] = "pharm"
+    config["dataset"] = "house"
     config["regularization"] = 0.1 
-    config["runs"] = 20
-    config["dataset_name"] = "allnum5cat"
+    config["runs"] = 1
+    config["dataset_name"] = "allnumallcat"
     config["numerical_attack_mini_batch_size"] = 0.5
-    new_plot_mse(config, just_average=False, data_type="test")
+    new_plot_mse(config, just_average=False, data_type="train")
