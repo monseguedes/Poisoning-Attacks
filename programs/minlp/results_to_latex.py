@@ -9,6 +9,7 @@ import os
 import numerical_attack
 import flipping_attack
 import yaml # type: ignore
+import regularization_parameter
 
 def main_comparison_table(config):
     """
@@ -367,7 +368,7 @@ def all_SAS_vs_IAS_table(config):
 
     print(footer)
 
-def IFCF_comparison_table(config):
+def IFCF_comparison_table(config, cross_validation=False):
     """
     \begin{table}[!htbp]
     \centering
@@ -438,6 +439,15 @@ def IFCF_comparison_table(config):
                 ifcf_mse = []
                 ifcf_time = []
                 for run in range(config["runs"]):
+                    if cross_validation:
+                        config["seed"] = run
+                        instance_data = instance_data_class.InstanceData(
+                            config=config, benchmark_data=False, seed=run, thesis=True
+                        )
+                        config["regularization"] = regularization_parameter.cross_validation_lambda(
+                            instance_data, np.linspace(0.001, 10, 20)
+                        )["alpha"]
+
                     # Folder name of this experiment and rate
                     folder_name = f"R{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
 

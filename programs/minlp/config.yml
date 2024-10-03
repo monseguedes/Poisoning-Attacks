@@ -1,5 +1,6 @@
 
 # Dataset
+dataset: "house"
 dataset_name: "5num5cat"
 training_samples: 300
 poison_rate: 20
