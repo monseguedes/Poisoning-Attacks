@@ -16,7 +16,7 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, cross_val_score
 
 
-def cross_validation_lambda(instance_data, values):
+def cross_validation_lambda(instance_data, values, print_results=False):
     """
     Function that performs cross validation for the regularization parameter
     """
@@ -37,23 +37,24 @@ def cross_validation_lambda(instance_data, values):
     )
     grid_search.fit(feature_matrix, target)
 
-    # Print results
-    print(" Results from Grid Search ")
-    print("-" * 50)
-    print("All scores: ", grid_search.cv_results_)
-    print(
-        "\n The best estimator across ALL searched params:\n",
-        grid_search.best_estimator_,
-    )
-    print(
-        "\n The best score across ALL searched params:\n", grid_search.best_score_
-    )
-    print(
-        "\n The best parameters across ALL searched params:\n",
-        grid_search.best_params_,
-    )
+    if print_results:
+        # Print results
+        print(" Results from Grid Search ")
+        print("-" * 50)
+        print("All scores: ", grid_search.cv_results_)
+        print(
+            "\n The best estimator across ALL searched params:\n",
+            grid_search.best_estimator_,
+        )
+        print(
+            "\n The best score across ALL searched params:\n", grid_search.best_score_
+        )
+        print(
+            "\n The best parameters across ALL searched params:\n",
+            grid_search.best_params_,
+        )
 
-    print("Weights of the best estimator: ", grid_search.best_estimator_.coef_)
+        print("Weights of the best estimator: ", grid_search.best_estimator_.coef_)
 
     return grid_search.best_params_
 

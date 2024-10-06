@@ -22,7 +22,7 @@ short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model=None):
+def run(config, instance_data, model=None, print_output=False):
     """Run flipping attack which poisons both numerica and categorical data
 
     This is a hueristic to poison features using a combination of
@@ -44,9 +44,10 @@ def run(config, instance_data, model=None):
     config = copy.deepcopy(config)
     instance_data = instance_data.copy()
 
-    print("\n" + "*" * long_space)
-    print("FLIPPING ATTACK HEURISTIC")
-    print("*" * long_space)
+    if print_output:
+        print("\n" + "*" * long_space)
+        print("FLIPPING ATTACK HEURISTIC")
+        print("*" * long_space)
 
     if not config.get("solver_name"):
         raise NameError("solver_name not set in config")
@@ -164,10 +165,12 @@ def run(config, instance_data, model=None):
             sol = ridge_regression.run(config, instance_data)
 
             if poison_sample_index % 20 == 0:
-                print(f"{'it':>3s}  {'mse':>9s}  {'best':>9s}")
-            print(
-                f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}"
-            )
+                if print_output:
+                    print(f"{'it':>3s}  {'mse':>9s}  {'best':>9s}")
+            if print_output:
+                print(
+                    f"{poison_sample_index:3d}  {sol['mse']:9.6f}  {best_sol['mse']:9.6f}"
+                )
 
             # Check if the updated data was better than the current best.
             if best_sol["mse"] > sol["mse"]:
@@ -245,39 +248,40 @@ def run(config, instance_data, model=None):
         ),
     )
 
-    print("RESULTS")
-    print("*" * short_space)
-    print(
-        f'Unpoisoned mse validation:      {regression_parameters_validation["mse"]:7.6f}'
-    )
-    print(
-        f'Unpoisoned mse test:            {regression_parameters_test["mse"]:7.6f}'
-    )
-    print("*" * short_space)
-    print(f'Benchmark mse:                   {benchmark_solution["mse"]:7.6f}')
-    print(
-        f"Benchmark mse validation:        {validation_benchmark_error:7.6f}"
-    )
-    print(f"Benchmark mse test:              {test_benchmark_error:7.6f}")
-    print("*" * short_space)
-    print(f'Flipping method mse:             {best_sol["mse"]:7.6f}')
-    print(f"Flipping method mse validation:  {validation_flipping_error:7.6f}")
-    print(f"Flipping method mse test:        {test_flipping_error:7.6f}")
-    print("*" * short_space)
-    print(
-        f'Improvement:                     {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
-    )
-    print(
-        f"Improvement validation:          {(validation_flipping_error - validation_benchmark_error) / validation_benchmark_error * 100:7.6f}"
-    )
-    print(
-        f"Improvement test:                {(test_flipping_error - test_benchmark_error) / test_benchmark_error * 100:7.6f}"
-    )
-    print("*" * short_space)
-    print(
-        f"Benchmark computation time:      {benchmark_end - benchmark_start:7.6f}"
-    )
-    print(f"Flipping computation time:     {end - start:7.6f}")
+    if print_output:
+        print("RESULTS")
+        print("*" * short_space)
+        print(
+            f'Unpoisoned mse validation:      {regression_parameters_validation["mse"]:7.6f}'
+        )
+        print(
+            f'Unpoisoned mse test:            {regression_parameters_test["mse"]:7.6f}'
+        )
+        print("*" * short_space)
+        print(f'Benchmark mse:                   {benchmark_solution["mse"]:7.6f}')
+        print(
+            f"Benchmark mse validation:        {validation_benchmark_error:7.6f}"
+        )
+        print(f"Benchmark mse test:              {test_benchmark_error:7.6f}")
+        print("*" * short_space)
+        print(f'Flipping method mse:             {best_sol["mse"]:7.6f}')
+        print(f"Flipping method mse validation:  {validation_flipping_error:7.6f}")
+        print(f"Flipping method mse test:        {test_flipping_error:7.6f}")
+        print("*" * short_space)
+        print(
+            f'Improvement:                     {(best_sol["mse"] - benchmark_solution["mse"]) / benchmark_solution["mse"] * 100:7.6f}'
+        )
+        print(
+            f"Improvement validation:          {(validation_flipping_error - validation_benchmark_error) / validation_benchmark_error * 100:7.6f}"
+        )
+        print(
+            f"Improvement test:                {(test_flipping_error - test_benchmark_error) / test_benchmark_error * 100:7.6f}"
+        )
+        print("*" * short_space)
+        print(
+            f"Benchmark computation time:      {benchmark_end - benchmark_start:7.6f}"
+        )
+        print(f"Flipping computation time:     {end - start:7.6f}")
 
     # Save results as dictionary
     results_dict = {

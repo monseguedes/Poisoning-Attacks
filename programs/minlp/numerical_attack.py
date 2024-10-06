@@ -18,7 +18,7 @@ short_space = 60
 middle_space = long_space
 
 
-def run(config, instance_data, model=None):
+def run(config, instance_data, model=None, print_output=False):
     """Run iterative attack which which poison training data row by row
 
     This is a hueristic to optimize numerical features row by row using IPOPT.
@@ -40,10 +40,11 @@ def run(config, instance_data, model=None):
 
     # Solve benchmark
 
-    print("" * 2)
-    print("*" * long_space)
-    print("NUMERICAL ATTACK STRATEGY")
-    print("*" * long_space)
+    if print_output:
+        print("" * 2)
+        print("*" * long_space)
+        print("NUMERICAL ATTACK STRATEGY")
+        print("*" * long_space)
 
     if not config.get("solver_name"):
         config["solver_name"] = "ipopt"
@@ -149,12 +150,14 @@ def run(config, instance_data, model=None):
 
             solution_list.append(solution)
             if (epoch * n_mini_batches + mini_batch_index) % 20 == 0:
+                if print_output:
+                    print(
+                        f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}"
+                    )
+            if print_output:
                 print(
-                    f"{'epoch':>5s}  {'batch':>5s}  {'mse':>9s}  {'best_mse':>9s}"
+                    f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
                 )
-            print(
-                f"{epoch:5d}  {mini_batch_index:5d}  {solution['mse']:9.6f}  {best_mse:9.6f}"
-            )
 
     end = time.time()
 

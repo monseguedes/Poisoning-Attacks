@@ -14,6 +14,7 @@ import flipping_attack
 import instance_data_class
 import numerical_attack
 import ridge_regression
+import regularization_parameter
 
 sns.set_style("whitegrid")
 
@@ -288,6 +289,7 @@ def plot_actual_vs_predicted(config, plot_config, data_type: str):
     )
     plt.show()
 
+
 def new_plot_mse(config, data_type="train", just_average=True):
     """Plot MSE for each computational experiment and average.
     We want poisoning rates as horizontal axis, and MSE as vertical axis.
@@ -437,6 +439,185 @@ def new_plot_mse(config, data_type="train", just_average=True):
     plt.show()
 
 
+def batch_size_IAS_vs_SAS(config, cross_validation=False):
+    """
+    Plot with batch size on x-axis and MSE on y-axis.
+    We compare all poisoning rates, each rate as a different color.
+    IAS and SAS are diffent line styles.
+    """
+    colors = sns.color_palette("husl", len(config["poison_rates"]))
+    batch_sizes = [0.1, 0.2, 0.3, 0.4, 0.5]
+    # Plot results
+    fig, ax = plt.subplots(figsize=(10, 8))
+    for i, poisoning_rate in enumerate(config["poison_rates"]):
+        config["poison_rate"] = poisoning_rate
+        MSE_IAS = []
+        MSE_SAS = []
+        if cross_validation:
+                    instance_data = instance_data_class.InstanceData(
+                        config=config, benchmark_data=False, thesis=True
+                    )
+                    config["regularization"] = regularization_parameter.cross_validation_lambda(
+                        instance_data, np.linspace(0.001, 10, 20)
+                    )["alpha"]
+
+        for j, batch_size in enumerate(batch_sizes):
+            config["numerical_attack_mini_batch_size"] = batch_size
+            folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+            
+            # Iterative attack strategy results (IAS)------------------------------
+            ias_directory = f"results/IAS/{config['dataset']}/{config['dataset_name']}"
+            if not os.path.exists(os.path.join(ias_directory, folder_name)):
+                os.makedirs(os.path.join(ias_directory, folder_name))
+            # Check if results exist
+            if not os.path.exists(f"{ias_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running IAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = True
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, ias_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{ias_directory}/{folder_name}/results.npz", **ias_results)
+            else:
+                ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+            MSE_IAS.append(ias_results["mse"])
+
+            # Shift attack strategy results (SAS)----------------------------------
+            sas_directory = f"results/SAS/{config['dataset']}/{config['dataset_name']}"
+            if not os.path.exists(os.path.join(sas_directory, folder_name)):
+                os.makedirs(os.path.join(sas_directory, folder_name))
+            # Check if results exist
+            if not os.path.exists(f"{sas_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running SAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = False
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, sas_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{sas_directory}/{folder_name}/results.npz", **sas_results)
+            else:
+                sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+            MSE_SAS.append(sas_results["mse"])
+            print("SAS results poisioning rate ", poisoning_rate, " MSE ", sas_results["mse"])
+
+        ax.plot(batch_sizes, MSE_IAS, label="IAS", color=colors[i], linestyle="--")
+        ax.plot(batch_sizes, MSE_SAS, label="SAS", color=colors[i])
+        ax.set_xlabel("Batch size")
+        ax.set_ylabel("MSE")
+        
+    legend_lines = [matplotlib.lines.Line2D([0], [0], color="black", linestyle="--", lw=2),
+                    matplotlib.lines.Line2D([0], [0], color="black", lw=2)] 
+    legend_colors = [matplotlib.lines.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(config["poison_rates"]))]
+    ax.add_artist(ax.legend(legend_lines, ["IAS", "SAS"], title="Attack strategy", loc="lower right"))
+    ax.add_artist(ax.legend(legend_colors, [f"r={pr}" for pr in config["poison_rates"]], title="Poisoning rate", loc="upper right"))
+
+
+    # Save plot
+    fig.savefig(
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/CV_{cross_validation}_batch_IAS_vs_SAS.pdf",
+        bbox_inches="tight",
+        dpi=300,
+        transparent=True,
+    )
+
+    fig.savefig(
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/CV_{cross_validation}_batch_IAS_vs_SAS.png",
+        bbox_inches="tight",
+        dpi=300,
+        transparent=False
+    )
+
+
+def hyperparameter_IAS_vs_SAS(config):
+    """
+    Plot with hyperparameter on x-axis and MSE on y-axis.
+    We compare all poisoning rates, each rate as a different color.
+    IAS and SAS are diffent line styles.
+    """
+    colors = sns.color_palette("husl", len(config["poison_rates"]))
+    # Plot results
+    fig, ax = plt.subplots(figsize=(10, 8))
+    for i, poisoning_rate in enumerate(config["poison_rates"]):
+        config["poison_rate"] = poisoning_rate
+        MSE_IAS = []
+        MSE_SAS = []
+        for hyperparameter in [0.001, 0.01, 0.1, 1, 10]:
+            config["regularization"] = hyperparameter
+            folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+            
+            # Iterative attack strategy results (IAS)------------------------------
+            ias_directory = f"results/IAS/{config['dataset']}/{config['dataset_name']}"
+            if not os.path.exists(os.path.join(ias_directory, folder_name)):
+                os.makedirs(os.path.join(ias_directory, folder_name))
+            # Check if results exist
+            if not os.path.exists(f"{ias_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running IAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = True
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, ias_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{ias_directory}/{folder_name}/results.npz", **ias_results)
+            else:
+                ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+            MSE_IAS.append(ias_results["mse"])
+            # print("IAS results poisioning rate ", config["poison_rate"], " MSE ", ias_results["mse"])
+
+            # Shift attack strategy results (SAS)----------------------------------
+            sas_directory = f"results/SAS/{config['dataset']}/{config['dataset_name']}"
+            if not os.path.exists(os.path.join(sas_directory, folder_name)):
+                os.makedirs(os.path.join(sas_directory, folder_name))
+            # Check if results exist
+            if not os.path.exists(f"{sas_directory}/{folder_name}/results.npz"):
+                # Run experiments and store
+                print("Running SAS experiments for poisoning rate ", poisoning_rate)
+                config["numerical_attack_incremental"] = False
+                instance_data = instance_data_class.InstanceData(
+                    config, benchmark_data=False, seed=config["seed"], thesis=True
+                )
+                _, _, sas_results = numerical_attack.run(config, instance_data)
+                # Save results as npz
+                np.savez(f"{sas_directory}/{folder_name}/results.npz", **sas_results)
+            else:
+                sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+            MSE_SAS.append(sas_results["mse"])
+            # print("SAS results poisioning rate ", poisoning_rate, " MSE ", sas_results["mse"])
+
+        ax.plot([0.001, 0.01, 0.1, 1, 10], MSE_IAS, label="IAS", color=colors[i], linestyle="--")
+        ax.plot([0.001, 0.01, 0.1, 1, 10], MSE_SAS, label="SAS", color=colors[i])
+        ax.set_xscale("log")
+        ax.set_xlabel("Regularization hyperparameter")
+        ax.set_ylabel("MSE")
+        
+    legend_lines = [matplotlib.lines.Line2D([0], [0], color="black", linestyle="--", lw=2),
+                    matplotlib.lines.Line2D([0], [0], color="black", lw=2)] 
+    legend_colors = [matplotlib.lines.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(config["poison_rates"]))]
+    ax.add_artist(ax.legend(legend_lines, ["IAS", "SAS"], title="Attack strategy", loc="lower right"))
+    ax.add_artist(ax.legend(legend_colors, [f"{pr}%" for pr in config["poison_rates"]], title="Poisoning rate", loc="upper right"))
+
+
+    # Save plot
+    fig.savefig(
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/hyperparameter_IAS_vs_SAS.pdf",
+        bbox_inches="tight",
+        dpi=300,
+        transparent=True,
+    )
+
+    fig.savefig(
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/hyperparameter_IAS_vs_SAS.png",
+        bbox_inches="tight",
+        dpi=300,
+        transparent=False
+    )
+
+
 if __name__ == "__main__":
     with open("programs/minlp/config.yml", "r") as config_file:
         config = yaml.safe_load(config_file)
@@ -446,6 +627,9 @@ if __name__ == "__main__":
     config["dataset"] = "house"
     config["regularization"] = 0.1 
     config["runs"] = 1
-    config["dataset_name"] = "allnumallcat"
-    config["numerical_attack_mini_batch_size"] = 0.5
-    new_plot_mse(config, just_average=False, data_type="train")
+    config["dataset_name"] = "allnum5cat"
+    config["numerical_attack_mini_batch_size"] = 0.1
+    # new_plot_mse(config, just_average=False, data_type="train")
+    # hyperparameter_IAS_vs_SAS(config)
+    batch_size_IAS_vs_SAS(config, cross_validation=False)
+    batch_size_IAS_vs_SAS(config, cross_validation=True)

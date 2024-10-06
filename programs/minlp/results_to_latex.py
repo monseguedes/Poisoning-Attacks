@@ -11,6 +11,10 @@ import flipping_attack
 import yaml # type: ignore
 import regularization_parameter
 
+def geo_mean(iterable):
+            a = np.array(iterable)
+            return a.prod()**(1.0/len(a))
+
 def main_comparison_table(config):
     """
     Table to compare suvak and our method for both datasets
@@ -86,9 +90,8 @@ def main_comparison_table(config):
                 # Print results
                 if poisoning_rate == 4 and data_type == "Train":
                     print(
-                        "\\textit{"
-                        + dataset_name
-                        + "} & "
+                        dataset_name
+                        + " & "
                         + data_type
                         + " & 4 & {:6.6f} & {:6.2f} && {:6.6f} & {:6.2f} & {:6.2f} \\\\".format(
                             benchmark_average,
@@ -145,7 +148,7 @@ def main_comparison_table(config):
     """
     print(footer)
 
-def SAS_vs_IAS_table(config):
+def SAS_vs_IAS_table(config, cross_validation=False):
     """
     \begin{table}[!htbp]
     \centering
@@ -154,13 +157,13 @@ def SAS_vs_IAS_table(config):
     \toprule
     Dataset & $r$(\%) & MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)}\\
     \midrule
-    \textit{House Price} & 4 & 0.00676 & 0.00679 & 0.4308 \\
+    House Price & 4 & 0.00676 & 0.00679 & 0.4308 \\
     & 8  & 0.00623 & 0.00653 & 4.7404 \\
     & 12  & 0.00618 & 0.00626 & 1.3952 \\
     & 16  & 0.00623 & 0.00653 & 4.7404 \\
     & 20  & 0.00623 & 0.00653 & 4.7404 \\
     \midrule
-    \textit{Healthcare} & 4 & 0.00676 & 0.00679 & 0.4308 \\
+    Healthcare & 4 & 0.00676 & 0.00679 & 0.4308 \\
     & 8  & 0.00623 & 0.00653 & 4.7404 \\
     & 12  & 0.00618 & 0.00626 & 1.3952 \\
     & 16  & 0.00623 & 0.00653 & 4.7404 \\
@@ -188,54 +191,73 @@ def SAS_vs_IAS_table(config):
             config["dataset"] = "pharm"
         for i, poisoning_rate in enumerate([4, 8, 12, 16, 20]):
             config["poison_rate"] = poisoning_rate
-            # Folder name of this experiment and rate
-            folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}"
+            if cross_validation:
+                        instance_data = instance_data_class.InstanceData(
+                            config=config, benchmark_data=False, thesis=True
+                        )
+                        config["regularization"] = regularization_parameter.cross_validation_lambda(
+                            instance_data, np.linspace(0.001, 10, 20)
+                        )["alpha"]
             
-            # Iterative attack strategy results (IAS)------------------------------
-            ias_directory = f"results/IAS/{dataset_name}/{config['dataset_name']}"
-            if not os.path.exists(os.path.join(ias_directory, folder_name)):
-                os.makedirs(os.path.join(ias_directory, folder_name))
-            # Check if results exist
-            if not os.path.exists(f"{ias_directory}/{folder_name}/results.npz"):
-                # Run experiments and store
-                print("Running IAS experiments for poisoning rate ", poisoning_rate)
-                config["numerical_attack_incremental"] = True
-                instance_data = instance_data_class.InstanceData(
-                    config, benchmark_data=False, seed=config["seed"], thesis=True
-                )
-                _, _, ias_results = numerical_attack.run(config, instance_data)
-                # Save results as npz
-                np.savez(f"{ias_directory}/{folder_name}/results.npz", **ias_results)
-            else:
-                ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+            IAS_mse = []
+            SAS_mse = []
+            increments = []
+            for run in range(config["runs"]):
+                config["seed"] = run
+                # Folder name of this experiment and rate
+                folder_name = f"{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+                
+                # Iterative attack strategy results (IAS)------------------------------
+                ias_directory = f"results/IAS/{dataset_name}/{config['dataset_name']}"
+                if not os.path.exists(os.path.join(ias_directory, folder_name)):
+                    os.makedirs(os.path.join(ias_directory, folder_name))
+                # Check if results exist
+                if not os.path.exists(f"{ias_directory}/{folder_name}/results.npz"):
+                    # Run experiments and store
+                    print("Running IAS experiments for poisoning rate ", poisoning_rate)
+                    config["numerical_attack_incremental"] = True
+                    instance_data = instance_data_class.InstanceData(
+                        config, benchmark_data=False, seed=run, thesis=True
+                    )
+                    _, _, ias_results = numerical_attack.run(config, instance_data)
+                    # Save results as npz
+                    np.savez(f"{ias_directory}/{folder_name}/results.npz", **ias_results)
+                else:
+                    ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+                IAS_mse.append(ias_results["mse"])
 
-            # Shift attack strategy results (SAS)----------------------------------
-            sas_directory = f"results/SAS/{dataset_name}/{config['dataset_name']}"
-            if not os.path.exists(os.path.join(sas_directory, folder_name)):
-                os.makedirs(os.path.join(sas_directory, folder_name))
-            # Check if results exist
-            if not os.path.exists(f"{sas_directory}/{folder_name}/results.npz"):
-                # Run experiments and store
-                print("Running SAS experiments for poisoning rate ", poisoning_rate)
-                config["numerical_attack_incremental"] = False
-                instance_data = instance_data_class.InstanceData(
-                    config, benchmark_data=False, seed=config["seed"], thesis=True
-                )
-                _, _, sas_results = numerical_attack.run(config, instance_data)
-                # Save results as npz
-                np.savez(f"{sas_directory}/{folder_name}/results.npz", **sas_results)
-            else:
-                sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+                # Shift attack strategy results (SAS)----------------------------------
+                sas_directory = f"results/SAS/{dataset_name}/{config['dataset_name']}"
+                if not os.path.exists(os.path.join(sas_directory, folder_name)):
+                    os.makedirs(os.path.join(sas_directory, folder_name))
+                # Check if results exist
+                if not os.path.exists(f"{sas_directory}/{folder_name}/results.npz"):
+                    # Run experiments and store
+                    print("Running SAS experiments for poisoning rate ", poisoning_rate)
+                    config["numerical_attack_incremental"] = False
+                    instance_data = instance_data_class.InstanceData(
+                        config, benchmark_data=False, seed=run, thesis=True
+                    )
+                    _, _, sas_results = numerical_attack.run(config, instance_data)
+                    # Save results as npz
+                    np.savez(f"{sas_directory}/{folder_name}/results.npz", **sas_results)
+                else:
+                    sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+                SAS_mse.append(sas_results["mse"])
+                increments.append((sas_results["mse"] - ias_results["mse"]) / ias_results["mse"] * 100)
+
+            # Calculate averages
+            ias_average = np.mean(IAS_mse)
+            sas_average = np.mean(SAS_mse)
+            geo_increments = geo_mean(increments)
 
             if poisoning_rate == 4:
-                print("\\textit{" 
-                    + dataset_name 
-                    + "}" 
+                print(dataset_name 
                     + " & {} & {:.4f} & {:.4f} & {:.2f} \\\\".format(
                         poisoning_rate,
-                        ias_results["mse"],
-                        sas_results["mse"],
-                        (sas_results["mse"] - ias_results["mse"]) / ias_results["mse"],
+                        ias_average,
+                        sas_average,
+                        geo_increments,
                     )
                 )
             
@@ -243,10 +265,10 @@ def SAS_vs_IAS_table(config):
                 print(
                     "& {} & {:.4f} & {:.4f} & {:.2f} \\\\".format(
                         poisoning_rate,
-                        ias_results["mse"],
-                        sas_results["mse"],
-                        (sas_results["mse"] - ias_results["mse"]) / ias_results["mse"],
-                    )
+                        ias_average,
+                        sas_average,
+                        geo_increments,
+                        )
                 )
 
     footer = r"""
@@ -256,7 +278,7 @@ def SAS_vs_IAS_table(config):
     """
     print(footer)
 
-def all_SAS_vs_IAS_table(config):
+def all_SAS_vs_IAS_table(config, cross_validation=False):
     """
     \begin{table}[!htbp]
     \centering
@@ -269,13 +291,13 @@ def all_SAS_vs_IAS_table(config):
     \rule{0pt}{10pt} % Adding space of 10pt between lines and text below
     Dataset & $r$(\%) & MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)} && MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)} && MSE$_{\textup{IAS}}$ & MSE$_{\textup{SAS}}$ &  $\Delta$\textbf{(\%)}\\
     \midrule
-    \textit{House Price} & 4 & 0.0078 & 0.0123 & 0.59 \\
+    House Price & 4 & 0.0078 & 0.0123 & 0.59 \\
     & 8 & 0.0153 & 0.0203 & 0.33 \\
     & 12 & 0.0164 & 0.0264 & 0.61 \\
     & 16 & 0.0221 & 0.0326 & 0.48 \\
     & 20 & 0.0269 & 0.0388 & 0.44 \\
     \midrule
-    \textit{Healthcare} & 4 & 0.0057 & 0.0096 & 0.69 \\
+    Healthcare & 4 & 0.0057 & 0.0096 & 0.69 \\
     & 8 & 0.0102 & 0.0175 & 0.71 \\
     & 12 & 0.0150 & 0.0237 & 0.58 \\
     & 16 & 0.0207 & 0.0356 & 0.72 \\
@@ -309,27 +331,40 @@ def all_SAS_vs_IAS_table(config):
             config["poison_rate"] = poisoning_rate
             results = {}
             for dataset in ["allnum5cat", "allnum10cat", "allnumallcat"]:
-                # Folder name of this experiment and rate
-                folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}"
-                
-                # Iterative attack strategy results (IAS)------------------------------
-                ias_directory = f"results/IAS/{dataset_name}/{dataset}"
-                ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+                if cross_validation:
+                        instance_data = instance_data_class.InstanceData(
+                            config=config, benchmark_data=False, thesis=True
+                        )
+                        config["regularization"] = regularization_parameter.cross_validation_lambda(
+                            instance_data, np.linspace(0.001, 10, 20)
+                        )["alpha"]
+                SAS_mse = []
+                IAS_mse = []
+                increments = []
+                for run in range(config["runs"]):
+                    # Folder name of this experiment and rate
+                    folder_name = f"{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+                    
+                    # Iterative attack strategy results (IAS)------------------------------
+                    ias_directory = f"results/IAS/{dataset_name}/{dataset}"
+                    ias_results = np.load(f"{ias_directory}/{folder_name}/results.npz")
+                    IAS_mse.append(ias_results["mse"])
 
-                results[dataset] = [ias_results["mse"]]
+                    # Shift attack strategy results (SAS)----------------------------------
+                    sas_directory = f"results/SAS/{dataset_name}/{dataset}"
+                    sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+                    SAS_mse.append(sas_results["mse"])
+                    increments.append((sas_results["mse"] - ias_results["mse"]) / ias_results["mse"] * 100)
 
-                # Shift attack strategy results (SAS)----------------------------------
-                sas_directory = f"results/SAS/{dataset_name}/{dataset}"
-                sas_results = np.load(f"{sas_directory}/{folder_name}/results.npz")
+                # Calculate averages
+                ias_average = np.mean(IAS_mse)
+                sas_average = np.mean(SAS_mse)
+                geo_increments = geo_mean(increments)
 
-                results[dataset].append(sas_results["mse"])
-                results[dataset].append((sas_results["mse"] - ias_results["mse"]) / ias_results["mse"] * 100)
+                results[dataset] = [ias_average, sas_average, geo_increments]
 
             if poisoning_rate == 4:
-                print("\\textit{" 
-                    + dataset_name 
-                    + "}" 
-                    + " & {} & {:.4f} & {:.4f} & {:.2f} && {:.4f} & {:.4f} & {:.2f} && {:.4f} & {:.4f} & {:.2f} \\\\".format(
+                print(dataset_name + " & {} & {:.4f} & {:.4f} & {:.2f} && {:.4f} & {:.4f} & {:.2f} && {:.4f} & {:.4f} & {:.2f} \\\\".format(
                         poisoning_rate,
                         results["allnum5cat"][0],
                         results["allnum5cat"][1],
@@ -368,7 +403,7 @@ def all_SAS_vs_IAS_table(config):
 
     print(footer)
 
-def IFCF_comparison_table(config, cross_validation=False):
+def IFCF_comparison_table(config, cross_validation=False, IAS=False):
     """
     \begin{table}[!htbp]
     \centering
@@ -381,7 +416,7 @@ def IFCF_comparison_table(config, cross_validation=False):
     \rule{0pt}{10pt} % Adding space of 10pt between lines and text below
     Dataset & Type & $r$ (\%) & MSE & Time (s) && MSE & Time (s) & $\Delta$ (\%)   \\
         \midrule
-    \textit{House Price}\todo{add time} & Train & 4 & 0.004004 &   0.00 && 0.004800 &   0.00 &  20.67 \\
+    House Price\todo{add time} & Train & 4 & 0.004004 &   0.00 && 0.004800 &   0.00 &  20.67 \\
     & &  8 & 0.004736 &   0.00 && 0.006127 &   0.00 &  30.39 \\
     & & 12 & 0.005172 &   0.00 && 0.007070 &   0.00 &  37.76 \\
     & & 16 & 0.005509 &   0.00 && 0.007858 &   0.00 &  43.87 \\
@@ -393,7 +428,7 @@ def IFCF_comparison_table(config, cross_validation=False):
     & & 16 & 0.007536 &   0.00 && 0.009041 &   0.00 &  20.27 \\
     & & 20 & 0.007850 &   0.00 && 0.009767 &   0.00 &  24.71 \\
     \midrule
-    \textit{Healthcare}\todo{run} & Train & 4 & 0.004004 &   0.00 && 0.004800 &   0.00 &  20.67 \\
+    Healthcare\todo{run} & Train & 4 & 0.004004 &   0.00 && 0.004800 &   0.00 &  20.67 \\
     & &  8 & 0.004736 &   0.00 && 0.006127 &   0.00 &  30.39 \\
     & & 12 & 0.005172 &   0.00 && 0.007070 &   0.00 &  37.76 \\
     & & 16 & 0.005509 &   0.00 && 0.007858 &   0.00 &  43.87 \\
@@ -448,8 +483,12 @@ def IFCF_comparison_table(config, cross_validation=False):
                             instance_data, np.linspace(0.001, 10, 20)
                         )["alpha"]
 
-                    # Folder name of this experiment and rate
-                    folder_name = f"R{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+                    if IAS:
+                        config["numerical_attack_incremental"] = True
+                        folder_name = f"SAS_{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+                    else:
+                        # Folder name of this experiment and rate
+                        folder_name = f"R{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
 
                     # Results----------------------------------
                     directory = f"results/ifcf/{dataset}/{config['dataset_name']}"
@@ -494,9 +533,8 @@ def IFCF_comparison_table(config, cross_validation=False):
                 # Print results
                 if poisoning_rate == 4 and type_data == "Train":
                     print(
-                        "\\textit{"
-                        + dataset
-                        + "} & "
+                        dataset
+                        + "& "
                         + type_data
                         + " & 4 & {:6.6f} & {:6.2f} && {:6.6f} & {:6.2f} & {:6.2f} \\\\".format(
                             benchmark_mse_average,
@@ -576,7 +614,9 @@ if __name__ == "__main__":
     # SAS_vs_IAS_table(config)
     # all_SAS_vs_IAS_table(config)
 
-    config["runs"] = 10
-    config["dataset_name"] = "allnum10cat"
-    config["numerical_attack_mini_batch_size"] = 0.5
-    IFCF_comparison_table(config)
+    config["runs"] = 1
+    config["dataset_name"] = "allnum5cat"
+    config["numerical_attack_mini_batch_size"] = 0.1
+    # SAS_vs_IAS_table(config, cross_validation=True)
+    # all_SAS_vs_IAS_table(config, cross_validation=True)
+    IFCF_comparison_table(config, cross_validation=True, IAS=True)

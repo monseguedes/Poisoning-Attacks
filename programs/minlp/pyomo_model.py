@@ -286,14 +286,14 @@ class PyomoModel(pmo.block):
             self.y_poison.setdefault(k, pmo.parameter())
             self.y_poison[k] = v
 
-    def build_variables(self, instance_data):
+    def build_variables(self, instance_data, print_output=False):
         """
         PYOMO
         Decision variables of single level model: features of poisoned samples,
         weights of regression model, and bias of regression model.
         """
-
-        print("Creating variables")
+        if print_output:
+            print("Creating variables")
 
         # Numerical feature vector of poisoned samples
         if self.binary:
@@ -323,10 +323,11 @@ class PyomoModel(pmo.block):
         ub_intercept = self.ub_intercept
         lb_intercept = self.lb_intercept
 
-        print(f"Weights upper bound is: {upper_bound:.2f}")
-        print(f"Weights lower bound is: {lower_bound:.2f}")
-        print(f"Intercept upper bound is: {ub_intercept:.2f}")
-        print(f"Intercept lower bound is: {lb_intercept:.2f}")
+        if print_output:
+            print(f"Weights upper bound is: {upper_bound:.2f}")
+            print(f"Weights lower bound is: {lower_bound:.2f}")
+            print(f"Intercept upper bound is: {ub_intercept:.2f}")
+            print(f"Intercept lower bound is: {lb_intercept:.2f}")
 
         self.weights_num = pmo.variable_dict()
         for numfeature in instance_data.numerical_feature_names:
@@ -348,19 +349,22 @@ class PyomoModel(pmo.block):
             domain=pmo.Reals, lb=lb_intercept, ub=ub_intercept
         )
 
-    def build_constraints(self, instance_data):
+    def build_constraints(self, instance_data, print_output=False):
         """
         PYOMO
         Constraints of the single-level reformulation: first order optimality
         conditions for lower-level variables: weights and bias of regression
         model
         """
-        print("Building SOS contraints")
+        if print_output:
+            print("Building SOS contraints")
         self.sos_constraints = pmo.constraint_dict()
         for psample in range(instance_data.no_poison_samples):
-            print(f"Building SOS contraints for sample {psample}")
+            if print_output:
+                print(f"Building SOS contraints for sample {psample}")
             for cat_feature in instance_data.categorical_feature_names:
-                print(f"Building SOS contraints for feature {cat_feature}")
+                if print_output:
+                    print(f"Building SOS contraints for feature {cat_feature}")
                 constraint = pmo.constraint(
                     sum(
                         self.x_poison_cat[psample, cat_feature, category]
@@ -372,13 +376,15 @@ class PyomoModel(pmo.block):
                 )
                 self.sos_constraints[psample, cat_feature] = constraint
 
-        print("Building num weights contraints")
+        if print_output:
+            print("Building num weights contraints")
         # There is one constraint per feature
         self.cons_first_order_optimality_conditions_num_weights = (
             pmo.constraint_dict()
         )
         for numfeature in instance_data.numerical_feature_names:
-            print(f"Building num weights contraints for feature {numfeature}")
+            if print_output:
+                print(f"Building num weights contraints for feature {numfeature}")
             constraint = pmo.constraint(
                 body=loss_function_derivative_num_weights(
                     instance_data, self, numfeature, self.function
@@ -388,7 +394,8 @@ class PyomoModel(pmo.block):
             self.cons_first_order_optimality_conditions_num_weights[
                 numfeature
             ] = constraint
-        print("Building cat weights contraints")
+        if print_output:
+            print("Building cat weights contraints")
         self.cons_first_order_optimality_conditions_cat_weights = (
             pmo.constraint_dict()
         )
@@ -396,9 +403,10 @@ class PyomoModel(pmo.block):
             for category in instance_data.categories_in_categorical_feature[
                 cat_feature
             ]:
-                print(
-                    f"Building cat weights contraints for feature {cat_feature} and category {category}"
-                )
+                if print_output:
+                    print(
+                        f"Building cat weights contraints for feature {cat_feature} and category {category}"
+                    )
                 constraint = pmo.constraint(
                     body=loss_function_derivative_cat_weights(
                         instance_data,
@@ -413,7 +421,8 @@ class PyomoModel(pmo.block):
                     cat_feature, category
                 ] = constraint
 
-        print("Building bias constraints")
+        if print_output:
+            print("Building bias constraints")
         self.cons_first_order_optimality_conditions_bias = pmo.constraint(
             body=loss_function_derivative_bias(
                 instance_data, self, self.function
