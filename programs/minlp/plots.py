@@ -630,6 +630,6 @@ if __name__ == "__main__":
     config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.1
     # new_plot_mse(config, just_average=False, data_type="train")
-    # hyperparameter_IAS_vs_SAS(config)
-    batch_size_IAS_vs_SAS(config, cross_validation=False)
-    batch_size_IAS_vs_SAS(config, cross_validation=True)
+    hyperparameter_IAS_vs_SAS(config)
+    # batch_size_IAS_vs_SAS(config, cross_validation=False)
+    # batch_size_IAS_vs_SAS(config, cross_validation=True)
