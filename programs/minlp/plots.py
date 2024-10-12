@@ -448,7 +448,7 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
     colors = sns.color_palette("husl", len(config["poison_rates"]))
     batch_sizes = [0.1, 0.2, 0.3, 0.4, 0.5]
     # Plot results
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(8, 6))
     for i, poisoning_rate in enumerate(config["poison_rates"]):
         config["poison_rate"] = poisoning_rate
         MSE_IAS = []
@@ -508,7 +508,8 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
         ax.plot(batch_sizes, MSE_SAS, label="SAS", color=colors[i])
         ax.set_xlabel("Batch size")
         ax.set_ylabel("MSE")
-        
+
+    plt.title("Batch size IAS vs SAS  λ = {:.4f}".format(config["regularization"]), fontsize=28)
     legend_lines = [matplotlib.lines.Line2D([0], [0], color="black", linestyle="--", lw=2),
                     matplotlib.lines.Line2D([0], [0], color="black", lw=2)] 
     legend_colors = [matplotlib.lines.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(config["poison_rates"]))]
@@ -592,15 +593,19 @@ def hyperparameter_IAS_vs_SAS(config):
         ax.plot([0.001, 0.01, 0.1, 1, 10], MSE_IAS, label="IAS", color=colors[i], linestyle="--")
         ax.plot([0.001, 0.01, 0.1, 1, 10], MSE_SAS, label="SAS", color=colors[i])
         ax.set_xscale("log")
-        ax.set_xlabel("Regularization hyperparameter")
-        ax.set_ylabel("MSE")
+        ax.set_xlabel("Regularization hyperparameter", fontsize=20)
+        ax.set_ylabel("MSE", fontsize=20)
+        plt.title("Hyperparameter IAS vs SAS", fontsize=28)
         
     legend_lines = [matplotlib.lines.Line2D([0], [0], color="black", linestyle="--", lw=2),
                     matplotlib.lines.Line2D([0], [0], color="black", lw=2)] 
     legend_colors = [matplotlib.lines.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(config["poison_rates"]))]
-    ax.add_artist(ax.legend(legend_lines, ["IAS", "SAS"], title="Attack strategy", loc="lower right"))
-    ax.add_artist(ax.legend(legend_colors, [f"{pr}%" for pr in config["poison_rates"]], title="Poisoning rate", loc="upper right"))
+    ax.add_artist(ax.legend(legend_lines, ["IAS", "SAS"], title="Attack strategy", loc="lower right", fontsize=18))
+    ax.add_artist(ax.legend(legend_colors, [f"{pr}%" for pr in config["poison_rates"]], title="Poisoning rate", loc="upper right", fontsize=18))
 
+    # Fontsize and ticks
+    plt.setp(ax.get_xticklabels(), fontsize=18)
+    plt.setp(ax.get_yticklabels(), fontsize=18)
 
     # Save plot
     fig.savefig(
@@ -630,6 +635,6 @@ if __name__ == "__main__":
     config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.1
     # new_plot_mse(config, just_average=False, data_type="train")
-    hyperparameter_IAS_vs_SAS(config)
-    # batch_size_IAS_vs_SAS(config, cross_validation=False)
-    # batch_size_IAS_vs_SAS(config, cross_validation=True)
+    # hyperparameter_IAS_vs_SAS(config)
+    batch_size_IAS_vs_SAS(config, cross_validation=False)
+    batch_size_IAS_vs_SAS(config, cross_validation=True)

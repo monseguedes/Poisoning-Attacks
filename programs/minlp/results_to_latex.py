@@ -10,10 +10,11 @@ import numerical_attack
 import flipping_attack
 import yaml # type: ignore
 import regularization_parameter
+from statistics import geometric_mean
 
 def geo_mean(iterable):
-            a = np.array(iterable)
-            return a.prod()**(1.0/len(a))
+    a = np.array(iterable)
+    return a.prod()**(1.0/len(a))
 
 def main_comparison_table(config):
     """
@@ -249,7 +250,7 @@ def SAS_vs_IAS_table(config, cross_validation=False):
             # Calculate averages
             ias_average = np.mean(IAS_mse)
             sas_average = np.mean(SAS_mse)
-            geo_increments = geo_mean(increments)
+            geo_increments = np.mean(increments)
 
             if poisoning_rate == 4:
                 print(dataset_name 
@@ -332,6 +333,8 @@ def all_SAS_vs_IAS_table(config, cross_validation=False):
             results = {}
             for dataset in ["allnum5cat", "allnum10cat", "allnumallcat"]:
                 if cross_validation:
+                        config["dataset_name"] = dataset
+                        config["dataset"] = dataset_name
                         instance_data = instance_data_class.InstanceData(
                             config=config, benchmark_data=False, thesis=True
                         )
@@ -342,6 +345,7 @@ def all_SAS_vs_IAS_table(config, cross_validation=False):
                 IAS_mse = []
                 increments = []
                 for run in range(config["runs"]):
+                    config["seed"] = run
                     # Folder name of this experiment and rate
                     folder_name = f"{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
                     
@@ -359,7 +363,7 @@ def all_SAS_vs_IAS_table(config, cross_validation=False):
                 # Calculate averages
                 ias_average = np.mean(IAS_mse)
                 sas_average = np.mean(SAS_mse)
-                geo_increments = geo_mean(increments)
+                geo_increments = np.mean(increments)
 
                 results[dataset] = [ias_average, sas_average, geo_increments]
 
@@ -485,7 +489,7 @@ def IFCF_comparison_table(config, cross_validation=False, IAS=False):
 
                     if IAS:
                         config["numerical_attack_incremental"] = True
-                        folder_name = f"SAS_{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+                        folder_name = f"IAS_{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
                     else:
                         # Folder name of this experiment and rate
                         folder_name = f"R{run}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
@@ -614,9 +618,9 @@ if __name__ == "__main__":
     # SAS_vs_IAS_table(config)
     # all_SAS_vs_IAS_table(config)
 
-    config["runs"] = 10
-    config["dataset_name"] = "allnumallcat"
+    config["runs"] = 5
+    config["dataset_name"] = "allnum10cat"
     config["numerical_attack_mini_batch_size"] = 0.1
     # SAS_vs_IAS_table(config, cross_validation=True)
-    # all_SAS_vs_IAS_table(config, cross_validation=True)
-    IFCF_comparison_table(config, cross_validation=True, IAS=False)
+    all_SAS_vs_IAS_table(config, cross_validation=True)
+    # IFCF_comparison_table(config, cross_validation=True, IAS=False)
