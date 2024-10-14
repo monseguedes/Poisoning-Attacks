@@ -455,7 +455,7 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
         MSE_SAS = []
         if cross_validation:
                     instance_data = instance_data_class.InstanceData(
-                        config=config, benchmark_data=False, thesis=True
+                        config=config, benchmark_data=False, thesis=True, seed=config["run"]
                     )
                     config["regularization"] = regularization_parameter.cross_validation_lambda(
                         instance_data, np.linspace(0.001, 10, 20)
@@ -463,7 +463,7 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
 
         for j, batch_size in enumerate(batch_sizes):
             config["numerical_attack_mini_batch_size"] = batch_size
-            folder_name = f"PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
+            folder_name = f"{config['run']}_PR{poisoning_rate}_BS{config['numerical_attack_mini_batch_size']}_TS{config['training_samples']}_{config['regularization']}"
             
             # Iterative attack strategy results (IAS)------------------------------
             ias_directory = f"results/IAS/{config['dataset']}/{config['dataset_name']}"
@@ -509,7 +509,8 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
         ax.set_xlabel("Batch size")
         ax.set_ylabel("MSE")
 
-    plt.title("Batch size IAS vs SAS  λ = {:.4f}".format(config["regularization"]), fontsize=28)
+    # plt.title("Batch size IAS vs SAS  λ = {:.4f}".format(config["regularization"]), fontsize=28)
+    plt.title("Batch size IAS vs SAS", fontsize=28)
     legend_lines = [matplotlib.lines.Line2D([0], [0], color="black", linestyle="--", lw=2),
                     matplotlib.lines.Line2D([0], [0], color="black", lw=2)] 
     legend_colors = [matplotlib.lines.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(config["poison_rates"]))]
@@ -519,7 +520,7 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
 
     # Save plot
     fig.savefig(
-        f"results/plots/{config['dataset']}/{config['dataset_name']}/CV_{cross_validation}_batch_IAS_vs_SAS.pdf",
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/{config['run']}_CV_{cross_validation}_batch_IAS_vs_SAS.pdf",
         bbox_inches="tight",
         dpi=300,
         transparent=True,
@@ -631,10 +632,11 @@ if __name__ == "__main__":
 
     config["dataset"] = "house"
     config["regularization"] = 0.1 
-    config["runs"] = 1
+    config["runs"] = 10
     config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.1
-    # new_plot_mse(config, just_average=False, data_type="train")
+    new_plot_mse(config, just_average=False, data_type="train")
     # hyperparameter_IAS_vs_SAS(config)
-    batch_size_IAS_vs_SAS(config, cross_validation=False)
-    batch_size_IAS_vs_SAS(config, cross_validation=True)
+    config["run"] = 2
+    # batch_size_IAS_vs_SAS(config, cross_validation=False)
+    # batch_size_IAS_vs_SAS(config, cross_validation=True)
