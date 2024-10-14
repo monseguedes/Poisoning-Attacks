@@ -527,7 +527,7 @@ def batch_size_IAS_vs_SAS(config, cross_validation=False):
     )
 
     fig.savefig(
-        f"results/plots/{config['dataset']}/{config['dataset_name']}/CV_{cross_validation}_batch_IAS_vs_SAS.png",
+        f"results/plots/{config['dataset']}/{config['dataset_name']}/{config['run']}_CV_{cross_validation}_batch_IAS_vs_SAS.png",
         bbox_inches="tight",
         dpi=300,
         transparent=False
@@ -635,8 +635,8 @@ if __name__ == "__main__":
     config["runs"] = 10
     config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.1
-    new_plot_mse(config, just_average=False, data_type="train")
+    # new_plot_mse(config, just_average=False, data_type="train")
     # hyperparameter_IAS_vs_SAS(config)
     config["run"] = 2
-    # batch_size_IAS_vs_SAS(config, cross_validation=False)
+    batch_size_IAS_vs_SAS(config, cross_validation=False)
     # batch_size_IAS_vs_SAS(config, cross_validation=True)
