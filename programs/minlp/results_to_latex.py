@@ -618,9 +618,9 @@ if __name__ == "__main__":
     # SAS_vs_IAS_table(config)
     # all_SAS_vs_IAS_table(config)
 
-    config["runs"] = 5
+    config["runs"] = 20
     config["dataset_name"] = "allnum10cat"
     config["numerical_attack_mini_batch_size"] = 0.1
     # SAS_vs_IAS_table(config, cross_validation=True)
-    all_SAS_vs_IAS_table(config, cross_validation=True)
-    # IFCF_comparison_table(config, cross_validation=True, IAS=False)
+    # all_SAS_vs_IAS_table(config, cross_validation=True)
+    IFCF_comparison_table(config, cross_validation=False, IAS=False)

@@ -326,7 +326,7 @@ def new_plot_mse(config, data_type="train", just_average=True):
                     config, instance_data, data_type="train"
                 )
                 unposioned_results.append(unpoisoned_results["mse"])
-                plt.title("Average MSE Comparison (Training data)", y=1.03)
+                plt.title("Average MSE Comparison", y=1.03)
             elif data_type == "test":
                 benchmark_results.append(results_dict["benchmark_test_mse"])
                 flipping_results.append(results_dict["flipping_test_mse"])
@@ -335,7 +335,7 @@ def new_plot_mse(config, data_type="train", just_average=True):
                     config, instance_data, data_type="test"
                 )
                 unposioned_results.append(unpoisoned_results["mse"])
-                plt.title("Average MSE Comparison (Testing data)", y=1.03)
+                plt.title("Average MSE Comparison", y=1.03)
 
             improvements = [
                 (flipping_results[i] - benchmark_results[i]) / benchmark_results[i]
@@ -632,11 +632,11 @@ if __name__ == "__main__":
 
     config["dataset"] = "house"
     config["regularization"] = 0.1 
-    config["runs"] = 10
-    config["dataset_name"] = "allnum5cat"
+    config["runs"] = 20
+    config["dataset_name"] = "allnum10cat"
     config["numerical_attack_mini_batch_size"] = 0.1
-    # new_plot_mse(config, just_average=False, data_type="train")
+    new_plot_mse(config, just_average=False, data_type="train")
     # hyperparameter_IAS_vs_SAS(config)
     config["run"] = 2
-    batch_size_IAS_vs_SAS(config, cross_validation=False)
+    # batch_size_IAS_vs_SAS(config, cross_validation=False)
     # batch_size_IAS_vs_SAS(config, cross_validation=True)
