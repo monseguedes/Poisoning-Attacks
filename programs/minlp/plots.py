@@ -635,7 +635,7 @@ if __name__ == "__main__":
     config["runs"] = 20
     config["dataset_name"] = "allnum10cat"
     config["numerical_attack_mini_batch_size"] = 0.1
-    new_plot_mse(config, just_average=False, data_type="train")
+    new_plot_mse(config, just_average=False, data_type="test")
     # hyperparameter_IAS_vs_SAS(config)
     config["run"] = 2
     # batch_size_IAS_vs_SAS(config, cross_validation=False)
