@@ -618,8 +618,8 @@ if __name__ == "__main__":
     # SAS_vs_IAS_table(config)
     # all_SAS_vs_IAS_table(config)
 
-    config["runs"] = 20
-    config["dataset_name"] = "allnum10cat"
+    config["runs"] = 21
+    config["dataset_name"] = "allnum5cat"
     config["numerical_attack_mini_batch_size"] = 0.1
     # SAS_vs_IAS_table(config, cross_validation=True)
     # all_SAS_vs_IAS_table(config, cross_validation=True)

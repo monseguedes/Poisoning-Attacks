@@ -452,6 +452,7 @@ if __name__ == "__main__":
     instance_data = instance_data_class.InstanceData(
         config, benchmark_data=True, seed=seed
     )
+    print("Done instance")
     numerical_model = None
 
     _, instance_data, regression_parameters = run(
@@ -460,30 +461,30 @@ if __name__ == "__main__":
 
     # Print gradient results
     # Load npy file
-    dictionary = np.load(
-        f"programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy",
-        allow_pickle=True,
-    )
-    # Print table with gradient results
-    print("Gradient results")
-    print("*" * middle_space)
-    print(
-        f'Unpoisoned mse validation:       {dictionary.item()["unpoisoned_validation_mse"]:7.6f}'
-    )
-    print(
-        f'Unpoisoned mse test:             {dictionary.item()["unpoisoned_test_mse"]:7.6f}'
-    )
-    print("*" * middle_space)
-    print(
-        f"Gradient mse validation:         {dictionary.item()['poisoned_validation_mse']:7.6f}"
-    )
-    print(
-        f"Gradient mse test:               {dictionary.item()['poisoned_test_mse']:7.6f}"
-    )
-    print("*" * middle_space)
-    print(
-        f"Computation time:                {dictionary.item()['compute_time']:7.6f}"
-    )
+    # dictionary = np.load(
+    #     f"programs/benchmark/manip-ml-master/poisoning/results/{seed}_60_gradient_results.npy",
+    #     allow_pickle=True,
+    # )
+    # # Print table with gradient results
+    # print("Gradient results")
+    # print("*" * middle_space)
+    # print(
+    #     f'Unpoisoned mse validation:       {dictionary.item()["unpoisoned_validation_mse"]:7.6f}'
+    # )
+    # print(
+    #     f'Unpoisoned mse test:             {dictionary.item()["unpoisoned_test_mse"]:7.6f}'
+    # )
+    # print("*" * middle_space)
+    # print(
+    #     f"Gradient mse validation:         {dictionary.item()['poisoned_validation_mse']:7.6f}"
+    # )
+    # print(
+    #     f"Gradient mse test:               {dictionary.item()['poisoned_test_mse']:7.6f}"
+    # )
+    # print("*" * middle_space)
+    # print(
+    #     f"Computation time:                {dictionary.item()['compute_time']:7.6f}"
+    # )
 
     # # Run the utitlity to check the results with scikitlearn
     # scikit_learn_regression_parameters = ridge_regression.run(config, instance_data)

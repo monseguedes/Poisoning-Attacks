@@ -89,18 +89,18 @@ class PyomoModel(pmo.block):
             self.bilinear_term_variable_list = pmo.variable_list()
             self.bilinear_term_constraint_list = pmo.constraint_list()
             self.opt.options["timelimit"] = config["time_limit"]
-        print("" * 2)
-        print("-" * long_space)
-        print("Building model...")
-        print("-" * long_space)
+        # print("" * 2)
+        # print("-" * long_space)
+        # print("Building model...")
+        # print("-" * long_space)
         self.update_parameters(instance_data, build=True)
-        print("*" * short_space)
+        # print("*" * short_space)
         self.build_variables(instance_data)
-        print("*" * short_space)
+        # print("*" * short_space)
         self.build_constraints(instance_data)
-        print("*" * short_space)
+        # print("*" * short_space)
         self.build_objective(instance_data)
-        print("*" * short_space)
+        # print("*" * short_space)
 
     def copy(self):
         """Return a deepcopy of self"""
@@ -442,7 +442,7 @@ class PyomoModel(pmo.block):
             sense=pyo.maximize,
         )
 
-        print("Objective has been built")
+        # print("Objective has been built")
 
     def set_poison_data_status(
         self, instance_data, num_feature_flag, cat_feature_flag
